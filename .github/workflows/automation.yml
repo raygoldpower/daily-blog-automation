@@ -1,0 +1,30 @@
+name: Daily Blog Automation
+
+on:
+  schedule:
+    # 한국 시간 기준 매일 오전 8시 (UTC 23:00)
+    - cron: '0 23 * * *'
+  workflow_dispatch: # 수동으로 즉시 실행할 수 있는 버튼을 만듭니다.
+
+jobs:
+  run-blog-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run Script
+        env: # 우리가 금고(Secrets)에 넣었던 열쇠들을 꺼내와 연결합니다.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PW: ${{ secrets.WP_APP_PW }}
+          WP_URL: ${{ secrets.WP_URL }}
+        run: python main.py
