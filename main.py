@@ -103,7 +103,10 @@ def generate_post():
     topic = random.choice(TOPICS)
     print("[글 생성] 주제: " + topic["title"])
     length_guide = {"medium": "2500자에서 3500자", "long": "4000자에서 6000자"}
+    strict_rule = "경고: 한자, 일본어, 중국어, 베트남어, 태국어 등 한국어가 아닌 모든 문자는 절대 사용하지 마세요. 위반 시 글 전체가 무효입니다. 모든 단어는 반드시 한글 또는 영어 알파벳으로만 작성하세요.\n\n"
+
     prompt = (
+        strict_rule +
         WRITING_STYLE + "\n\n"
         "주제: " + topic["title"] + "\n"
         "목표 분량: " + length_guide[topic["length"]] + "\n\n"
@@ -116,7 +119,6 @@ def generate_post():
         "제목: (호기심을 자극하는 제목)\n"
         "---\n"
         "(본문 내용)\n"
-    )
 
     try:
         full_text = generate_with_gemini(prompt)
