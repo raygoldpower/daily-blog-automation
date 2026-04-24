@@ -230,10 +230,11 @@ def post_to_blogger(post_data, images):
 
     print(f"[제목] {post_data['title']}")
     response = requests.post(
-        url,
+       url_with_param = f"{url}?isDraft=false"
+    response = requests.post(
+        url_with_param,
         headers=headers,
         json=payload,
-        params={"isDraft": "false"},
         timeout=30
     )
     print(f"[응답] 상태코드: {response.status_code}")
