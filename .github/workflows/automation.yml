@@ -2,19 +2,18 @@ name: Daily Blog Automation
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 매일 UTC 00:00 = 한국시간 09:00
-  workflow_dispatch:       # 수동 실행 가능
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   post-blog:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 코드 체크아웃 (최신 main 브랜치)
+      - name: 코드 체크아웃
         uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 0
 
       - name: Python 설치
         uses: actions/setup-python@v5
@@ -24,14 +23,13 @@ jobs:
       - name: 패키지 설치
         run: pip install requests
 
-      - name: 현재 코드 버전 확인 (디버깅)
+      - name: 현재 코드 확인
         run: |
-          echo "=== 현재 커밋 ==="
           git log --oneline -3
-          echo "=== main.py 내용 확인 ==="
-          head -30 main.py
+          head -10 main.py
 
-      - name: 블로그 자동 발행 실행
+      - name: 블로그 자동 발행
         env:
-  GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-  BLOGGER_API_KEY: ${{ secrets.BLOGGER_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          BLOGGER_API_KEY: ${{ secrets.BLOGGER_API_KEY }}
+        run: python main.py
