@@ -29,7 +29,7 @@ def generate_post():
     topic = random.choice(TOPICS)
     print(f"[글 생성] 주제: {topic}")
 
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
 
     prompt = f"""You are a warm and informative blogger. Write a blog post about "{topic}".
 
