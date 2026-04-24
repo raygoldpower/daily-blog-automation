@@ -3,21 +3,20 @@ import json
 import requests
 import random
 from datetime import datetime
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
 
 # ========================================
 # 설정
 # ========================================
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-SERVICE_ACCOUNT_JSON = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+GOOGLE_REFRESH_TOKEN = os.environ.get("GOOGLE_REFRESH_TOKEN", "")
 BLOG_ID = "4393162034375416055"
 
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "llama-3.3-70b-versatile"
-GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent"
 
 TOPICS = [
     {"title": "달리기 실력을 2배 높이는 보조 운동", "keyword": "running workout", "length": "long"},
@@ -55,6 +54,26 @@ WRITING_STYLE = """
 """
 
 # ========================================
+# Google Access Token 발급
+# ========================================
+def get_access_token():
+    print("[인증] Google Access Token 발급 중...")
+    url = "https://oauth2.googleapis.com/token"
+    payload = {
+        "client_id": GOOGLE_CLIENT_ID,
+        "client_secret": GOOGLE_CLIENT_SECRET,
+        "refresh_token": GOOGLE_REFRESH_TOKEN,
+        "grant_type": "refresh_token"
+    }
+    response = requests.post(url, data=payload, timeout=10)
+    if response.status_code != 200:
+        raise Exception(f"토큰 발급 실패: {response.text}")
+    token = response.json()["access_token"]
+    print("[인증] Access Token 발급 완료!")
+    return token
+
+
+# ========================================
 # Groq으로 글 생성
 # ========================================
 def generate_with_groq(prompt):
@@ -71,7 +90,7 @@ def generate_with_groq(prompt):
     }
     response = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=30)
     if response.status_code != 200:
-        raise Exception(f"Groq 오류: {response.status_code} {response.text[:200]}")
+        raise Exception(f"Groq 오류: {response.status_code}")
     return response.json()["choices"][0]["message"]["content"]
 
 
@@ -80,13 +99,10 @@ def generate_with_groq(prompt):
 # ========================================
 def generate_with_gemini(prompt):
     print("[AI] Gemini 사용 중...")
-    url = f"{GEMINI_API_URL}?key={GEMINI_API_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key={GEMINI_API_KEY}"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "temperature": 0.8,
-            "maxOutputTokens": 3000,
-        }
+        "generationConfig": {"temperature": 0.8, "maxOutputTokens": 3000}
     }
     response = requests.post(url, json=payload, timeout=30)
     if response.status_code != 200:
@@ -95,16 +111,13 @@ def generate_with_gemini(prompt):
 
 
 # ========================================
-# AI 선택 및 글 생성
+# 글 생성
 # ========================================
 def generate_post():
     topic = random.choice(TOPICS)
     print(f"[글 생성] 주제: {topic['title']}")
 
-    length_guide = {
-        "medium": "1000~1500자",
-        "long": "1500~2500자"
-    }
+    length_guide = {"medium": "1000~1500자", "long": "1500~2500자"}
     target_length = length_guide[topic["length"]]
 
     prompt = f"""{WRITING_STYLE}
@@ -122,7 +135,6 @@ HTML 태그 없이 순수 텍스트로만 작성하세요.
 (본문 내용)
 """
 
-    # 날짜 기준으로 AI 선택 (짝수=Groq, 홀수=Gemini)
     today = datetime.now().day
     full_text = ""
 
@@ -139,7 +151,6 @@ HTML 태그 없이 순수 텍스트로만 작성하세요.
             print(f"[Gemini 실패] {e} → Groq으로 전환")
             full_text = generate_with_groq(prompt)
 
-    # 제목/본문 분리
     lines = full_text.strip().split("\n")
     title = ""
     body_lines = []
@@ -165,7 +176,7 @@ HTML 태그 없이 순수 텍스트로만 작성하세요.
 
 
 # ========================================
-# Unsplash 이미지 가져오기
+# Unsplash 이미지
 # ========================================
 def get_images(keyword, count=2):
     if not UNSPLASH_ACCESS_KEY:
@@ -196,7 +207,7 @@ def get_images(keyword, count=2):
 
 
 # ========================================
-# 본문 HTML 변환 (이미지 포함)
+# HTML 변환
 # ========================================
 def body_to_html(body, images):
     paragraphs = body.split("\n")
@@ -205,7 +216,6 @@ def body_to_html(body, images):
     mid = total // 2
     img_index = 0
 
-    # 상단 메인 이미지
     if images:
         img = images[0]
         html += f'''<div style="text-align:center;margin-bottom:20px;">
@@ -224,7 +234,6 @@ def body_to_html(body, images):
         else:
             html += f"<p>{para}</p>\n"
 
-        # 중간 이미지 삽입
         if i == mid and img_index < len(images):
             img = images[img_index]
             html += f'''<div style="text-align:center;margin:20px 0;">
@@ -237,44 +246,41 @@ def body_to_html(body, images):
 
 
 # ========================================
-# Blogger에 포스팅
+# Blogger 포스팅
 # ========================================
 def post_to_blogger(post_data, images):
     print(f"\n[Blogger] 포스팅 시작...")
 
-    service_account_info = json.loads(SERVICE_ACCOUNT_JSON)
-    credentials = service_account.Credentials.from_service_account_info(
-        service_account_info,
-        scopes=["https://www.googleapis.com/auth/blogger"]
-    )
-    service = build("blogger", "v3", credentials=credentials)
-
+    access_token = get_access_token()
     body_html = body_to_html(post_data["body"], images)
 
-    post_body = {
+    url = f"https://www.googleapis.com/blogger/v3/blogs/{BLOG_ID}/posts"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json"
+    }
+    payload = {
         "kind": "blogger#post",
         "title": post_data["title"],
         "content": body_html,
     }
 
     print(f"[제목] {post_data['title']}")
+    response = requests.post(url, headers=headers, json=payload, timeout=30)
+    print(f"[응답] 상태코드: {response.status_code}")
 
-    result = service.posts().insert(
-        blogId=BLOG_ID,
-        body=post_body,
-        isDraft=False
-    ).execute()
-
-    post_url = result.get("url", "")
-    post_id = result.get("id", "")
-    print(f"\n✅ [성공] 발행 완료!")
-    print(f"   ID: {post_id}")
-    print(f"   링크: {post_url}")
-    return True
+    if response.status_code == 200:
+        result = response.json()
+        print(f"\n✅ 발행 완료!")
+        print(f"   링크: {result.get('url', '')}")
+        return True
+    else:
+        print(f"❌ 실패: {response.text[:300]}")
+        return False
 
 
 # ========================================
-# 메인 실행
+# 메인
 # ========================================
 if __name__ == "__main__":
     print("=" * 50)
@@ -284,8 +290,7 @@ if __name__ == "__main__":
 
     try:
         post = generate_post()
-        keyword = post["topic"]["keyword"]
-        images = get_images(keyword, count=2)
+        images = get_images(post["topic"]["keyword"], count=2)
         post_to_blogger(post, images)
         print(f"\n🎉 모든 작업 완료!")
 
