@@ -4,9 +4,6 @@ import requests
 import random
 from datetime import datetime
 
-# ========================================
-# 설정
-# ========================================
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
@@ -41,27 +38,20 @@ WRITING_STYLE = """
 독자에게 깊이 있는 정보를 따뜻하고 친절하게 전달하는 것이 목표입니다.
 
 글쓰기 원칙:
-1. 반드시 존댓말(~습니다, ~요, ~세요)을 사용하세요. 반말 금지.
-2. 첫 문장은 독자가 공감할 수 있는 질문이나 상황으로 시작하세요.
-3. 과학적 근거나 연구 결과를 자연스럽게 포함하세요.
-4. 한 단락은 반드시 3줄 이내로 짧게 끊어 쓰세요. 긴 단락 금지.
-5. 단락과 단락 사이는 반드시 빈 줄 하나를 넣으세요.
-6. 핵심 포인트는 번호 리스트로 정리하세요. 예:
-   1) 첫 번째 포인트
-   2) 두 번째 포인트
-   3) 세 번째 포인트
-7. 소제목 앞뒤로 반드시 빈 줄을 넣으세요.
-8. 글밥은 주제 깊이에 따라 자유롭게 조절하세요.
-   - medium: 1000~1500자
-   - long: 1500~2500자
+1. 반드시 순수한 한국어만 사용하세요. 한자, 일본어, 중국어 절대 금지.
+2. 전문 용어는 한글로 표기하고 괄호 안에 영어를 표기하세요. 예: 유산소 운동(Cardio)
+3. 반드시 존댓말을 사용하세요. 반말 금지.
+4. 첫 문장은 독자가 공감할 수 있는 질문이나 상황으로 시작하세요.
+5. 과학적 근거나 연구 결과를 자연스럽게 포함하세요.
+6. 한 단락은 반드시 3줄 이내로 짧게 끊어 쓰세요. 긴 단락 금지.
+7. 단락과 단락 사이는 반드시 빈 줄 하나를 넣으세요.
+8. 핵심 포인트는 번호 리스트로 정리하세요.
 9. 소제목은 [소제목] 형식으로 표시하세요.
-10. 마무리는 따뜻한 동기부여 문장으로 끝내세요.
-11. 유튜브 영상 원고로도 자연스럽게 읽힐 수 있도록 작성하세요.
+10. 글밥은 주제 깊이에 따라 자유롭게 조절하세요. medium: 1000~1500자, long: 1500~2500자
+11. 마무리는 따뜻한 동기부여 문장으로 끝내세요.
+12. 유튜브 영상 원고로도 자연스럽게 읽힐 수 있도록 작성하세요.
 """
 
-# ========================================
-# Google Access Token 발급
-# ========================================
 def get_access_token():
     print("[인증] Google Access Token 발급 중...")
     url = "https://oauth2.googleapis.com/token"
@@ -74,35 +64,26 @@ def get_access_token():
     response = requests.post(url, data=payload, timeout=10)
     if response.status_code != 200:
         raise Exception(f"토큰 발급 실패: {response.text}")
-    token = response.json()["access_token"]
-    print("[인증] Access Token 발급 완료!")
-    return token
+    print("[인증] 완료!")
+    return response.json()["access_token"]
 
-
-# ========================================
-# Groq으로 글 생성
-# ========================================
 def generate_with_groq(prompt):
     print("[AI] Groq 사용 중...")
     headers = {
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
-   payload = {
-        "kind": "blogger#post",
-        "title": post_data["title"],
-        "content": body_html,
-        "status": "LIVE",
+    payload = {
+        "model": GROQ_MODEL,
+        "messages": [{"role": "user", "content": prompt}],
+        "max_tokens": 3000,
+        "temperature": 0.8
     }
     response = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=30)
     if response.status_code != 200:
         raise Exception(f"Groq 오류: {response.status_code}")
     return response.json()["choices"][0]["message"]["content"]
 
-
-# ========================================
-# Gemini로 글 생성
-# ========================================
 def generate_with_gemini(prompt):
     print("[AI] Gemini 사용 중...")
     url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key={GEMINI_API_KEY}"
@@ -110,15 +91,11 @@ def generate_with_gemini(prompt):
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"temperature": 0.8, "maxOutputTokens": 3000}
     }
-   response = requests.post(url, headers=headers, json=payload, params={"isDraft": "false"}, timeout=30)
+    response = requests.post(url, json=payload, timeout=30)
     if response.status_code != 200:
         raise Exception(f"Gemini 오류: {response.status_code} {response.text[:200]}")
     return response.json()["candidates"][0]["content"]["parts"][0]["text"]
 
-
-# ========================================
-# 글 생성
-# ========================================
 def generate_post():
     topic = random.choice(TOPICS)
     print(f"[글 생성] 주제: {topic['title']}")
@@ -141,21 +118,11 @@ HTML 태그 없이 순수 텍스트로만 작성하세요.
 (본문 내용)
 """
 
-    today = datetime.now().day
-    full_text = ""
-
-    if today % 2 == 0:
-        try:
-            full_text = generate_with_groq(prompt)
-        except Exception as e:
-            print(f"[Groq 실패] {e} → Gemini로 전환")
-            full_text = generate_with_gemini(prompt)
-    else:
-        try:
-            full_text = generate_with_gemini(prompt)
-        except Exception as e:
-            print(f"[Gemini 실패] {e} → Groq으로 전환")
-            full_text = generate_with_groq(prompt)
+    try:
+        full_text = generate_with_gemini(prompt)
+    except Exception as e:
+        print(f"[Gemini 실패] {e} → Groq으로 전환")
+        full_text = generate_with_groq(prompt)
 
     lines = full_text.strip().split("\n")
     title = ""
@@ -180,10 +147,6 @@ HTML 태그 없이 순수 텍스트로만 작성하세요.
     print(f"[완료] 글자수: {len(body)}자")
     return {"title": title, "body": body, "topic": topic}
 
-
-# ========================================
-# Unsplash 이미지
-# ========================================
 def get_images(keyword, count=2):
     if not UNSPLASH_ACCESS_KEY:
         return []
@@ -211,10 +174,6 @@ def get_images(keyword, count=2):
         print(f"[이미지 오류] {e}")
         return []
 
-
-# ========================================
-# HTML 변환
-# ========================================
 def body_to_html(body, images):
     paragraphs = body.split("\n")
     html = ""
@@ -234,14 +193,11 @@ def body_to_html(body, images):
         if not para.strip():
             html += "<p style='margin:12px 0;'>&nbsp;</p>\n"
             continue
-
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
             html += f"<h2 style='margin-top:36px;margin-bottom:12px;font-size:22px;border-left:4px solid #4CAF50;padding-left:12px;'>{heading}</h2>\n"
-
-        elif para.strip().startswith(("1)", "2)", "3)", "4)", "5)", "6)", "7)", "8)", "9)")):
+        elif para.strip()[0] in "123456789" and para.strip()[1:3] in [") ", ". "]:
             html += f"<p style='margin:6px 0 6px 20px;line-height:1.9;'>{para}</p>\n"
-
         else:
             html += f"<p style='margin:10px 0;line-height:1.9;font-size:16px;'>{para}</p>\n"
 
@@ -255,12 +211,8 @@ def body_to_html(body, images):
 
     return html
 
-# ========================================
-# Blogger 포스팅
-# ========================================
 def post_to_blogger(post_data, images):
     print(f"\n[Blogger] 포스팅 시작...")
-
     access_token = get_access_token()
     body_html = body_to_html(post_data["body"], images)
 
@@ -273,10 +225,17 @@ def post_to_blogger(post_data, images):
         "kind": "blogger#post",
         "title": post_data["title"],
         "content": body_html,
+        "status": "LIVE",
     }
 
     print(f"[제목] {post_data['title']}")
-    response = requests.post(url, headers=headers, json=payload, timeout=30)
+    response = requests.post(
+        url,
+        headers=headers,
+        json=payload,
+        params={"isDraft": "false"},
+        timeout=30
+    )
     print(f"[응답] 상태코드: {response.status_code}")
 
     if response.status_code == 200:
@@ -288,10 +247,6 @@ def post_to_blogger(post_data, images):
         print(f"❌ 실패: {response.text[:300]}")
         return False
 
-
-# ========================================
-# 메인
-# ========================================
 if __name__ == "__main__":
     print("=" * 50)
     print(f"AutoBlog Blogger Publisher")
