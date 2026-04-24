@@ -34,47 +34,28 @@ TOPICS = [
     {"title": "단백질 섭취, 얼마나 어떻게 먹어야 하나", "keyword": "protein intake muscle building", "length": "medium"},
 ]
 
-WRITING_STYLE = """
-당신은 운동과학, 해부학, 생리학, 영양학을 깊이 이해하는 전문 건강 블로거입니다.
+WRITING_STYLE = (
+    "당신은 운동과학, 해부학, 생리학, 영양학을 깊이 이해하는 전문 건강 블로거입니다.\n\n"
+    "반드시 지켜야 할 원칙:\n"
+    "반드시 순수한 한국어만 사용하세요. 한자, 일본어, 중국어, 베트남어 등 외국어 절대 금지.\n"
+    "반드시 존댓말을 사용하세요. 반말 금지.\n"
+    "단계 번호나 지침 내용을 절대 본문에 노출하지 마세요. 자연스러운 글로만 작성하세요.\n"
+    "한 단락은 3줄에서 4줄 이내로 끊어 쓰세요.\n"
+    "단락 사이는 반드시 빈 줄을 넣으세요.\n"
+    "소제목은 [소제목] 형식으로 표시하세요.\n"
+    "medium 주제는 2500자에서 3500자, long 주제는 4000자에서 6000자로 작성하세요. 절대 짧게 쓰지 마세요.\n"
+    "각 소제목 아래 최소 3개에서 5개 단락을 작성하세요.\n"
+    "실천 목록은 최소 5가지 이상 제시하세요.\n"
+    "각 운동이나 방법의 효과, 작용 근육, 주의사항까지 상세히 설명하세요.\n\n"
+    "글의 흐름:\n"
+    "첫째, 누구나 공감할 수 있는 일상적인 질문이나 상황으로 시작하세요. 독자가 공감하게 만드세요.\n"
+    "둘째, 쉽고 친근한 언어로 기본 개념을 설명하세요. 전문 용어는 괄호 안에 한글 설명을 추가하세요. 예: 대퇴사두근(허벅지 앞쪽 근육)\n"
+    "셋째, 해부학, 생리학, 운동역학 관점에서 깊이 있게 설명하세요. 연구 결과를 인용하듯 근거를 제시하세요.\n"
+    "넷째, 구체적인 운동 목록을 번호로 정리하세요. 각 운동의 효과, 작용 근육, 세트 수, 횟수, 주의사항을 포함하세요.\n"
+    "다섯째, 운동과 연계된 영양 정보를 포함하세요. 단백질, 탄수화물, 수분 섭취 등 구체적인 가이드를 제시하세요.\n"
+    "마지막으로, 따뜻하고 동기부여가 되는 문장으로 끝내세요.\n"
+)
 
-절대 지켜야 할 원칙:
-- 반드시 순수한 한국어만 사용하세요. 한자, 일본어, 중국어, 베트남어 등 외국어 절대 금지.
-- 반드시 존댓말을 사용하세요. 반말 금지.
-- 단계 번호나 지침 내용을 절대 본문에 노출하지 마세요. 자연스러운 글로만 작성하세요.
-- 한 단락은 3~4줄 이내로 끊어 쓰세요.
-- 단락 사이는 반드시 빈 줄을 넣으세요.
-- 소제목은 [소제목] 형식으로 표시하세요.
-- 글밥: medium은 2500~3500자, long은 4000~6000자. 절대 짧게 쓰지 마세요.
-- 각 소제목 아래 최소 3~5개 단락을 작성하세요.
-- 실천 목록은 최소 5가지 이상 제시하세요.
-
-글의 흐름은 반드시 아래 순서로 자연스럽게 작성하세요:
-
-첫째, 누구나 공감할 수 있는 일상적인 질문이나 상황으로 시작하세요. 독자가 "맞아, 나도 이런 고민 해봤어"라고 느끼게 하세요.
-
-둘째, 쉽고 친근한 언어로 기본 개념을 설명하세요. 전문 용어는 반드시 괄호 안에 한글 설명을 추가하세요. 예: 대퇴사두근(허벅지 앞쪽 근육)
-
-셋째, 해부학, 생리학, 운동역학 관점에서 깊이 있게 설명하세요. 연구 결과나 논문을 인용하듯 근거를 제시하세요. 예: "2023년 국제 스포츠과학 저널에 따르면..."
-
-넷째, 구체적인 운동 목록을 번호로 정리하세요. 각 운동의 효과, 작용 근육, 세트 수, 횟수, 주의사항을 포함하세요.
-
-다섯째, 운동과 연계된 영양 정보를 포함하세요. 단백질, 탄수화물, 수분 섭취 등 구체적인 가이드를 제시하세요.
-
-마지막으로, 따뜻하고 동기부여가 되는 문장으로 끝내세요. 독자가 오늘 당장 실천하고 싶게 만드세요.
-"""
-
-추가 원칙:
-- 반드시 순수한 한국어만 사용하세요. 한자, 일본어 절대 금지.
-- 반드시 존댓말을 사용하세요. 반말 금지.
-- 한 단락은 3~4줄 이내로 끊어 쓰세요.
-- 단락 사이는 반드시 빈 줄을 넣으세요.
-- 소제목은 [소제목] 형식으로 표시하세요.
-- 글밥: medium은 2500~3500자, long은 4000~6000자
-- 절대 짧게 쓰지 마세요. 주제를 충분히 깊게 다뤄야 합니다.
-- 각 소제목 아래 최소 3~5개 단락을 작성하세요.
-- 실천 목록은 최소 5가지 이상 제시하세요.
-- 각 운동이나 방법의 효과, 작용 근육, 주의사항까지 상세히 설명하세요.
-"""
 
 def get_access_token():
     print("[인증] Google Access Token 발급 중...")
@@ -85,25 +66,27 @@ def get_access_token():
         "grant_type": "refresh_token"
     }, timeout=10)
     if response.status_code != 200:
-        raise Exception(f"토큰 발급 실패: {response.text}")
+        raise Exception("토큰 발급 실패: " + response.text)
     print("[인증] 완료!")
     return response.json()["access_token"]
 
+
 def generate_with_gemini(prompt):
     print("[AI] Gemini 사용 중...")
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key={GEMINI_API_KEY}"
+    url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent?key=" + GEMINI_API_KEY
     response = requests.post(url, json={
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"temperature": 0.85, "maxOutputTokens": 8000}
     }, timeout=120)
     if response.status_code != 200:
-        raise Exception(f"Gemini 오류: {response.status_code} {response.text[:200]}")
+        raise Exception("Gemini 오류: " + str(response.status_code) + " " + response.text[:200])
     return response.json()["candidates"][0]["content"]["parts"][0]["text"]
+
 
 def generate_with_groq(prompt):
     print("[AI] Groq 사용 중...")
     response = requests.post(GROQ_API_URL, headers={
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": "Bearer " + GROQ_API_KEY,
         "Content-Type": "application/json"
     }, json={
         "model": GROQ_MODEL,
@@ -112,33 +95,33 @@ def generate_with_groq(prompt):
         "temperature": 0.85
     }, timeout=120)
     if response.status_code != 200:
-        raise Exception(f"Groq 오류: {response.status_code}")
+        raise Exception("Groq 오류: " + str(response.status_code))
     return response.json()["choices"][0]["message"]["content"]
+
 
 def generate_post():
     topic = random.choice(TOPICS)
-    print(f"[글 생성] 주제: {topic['title']}")
-    length_guide = {"medium": "2500~3500자", "long": "4000~6000자"}
-    prompt = f"""{WRITING_STYLE}
+    print("[글 생성] 주제: " + topic["title"])
+    length_guide = {"medium": "2500자에서 3500자", "long": "4000자에서 6000자"}
+    prompt = (
+        WRITING_STYLE + "\n\n"
+        "주제: " + topic["title"] + "\n"
+        "목표 분량: " + length_guide[topic["length"]] + "\n\n"
+        "위 주제로 한국어 블로그 포스팅을 작성해주세요.\n"
+        "HTML 태그 없이 순수 텍스트로만 작성하세요.\n"
+        "소제목은 [소제목] 형식으로 표시하세요.\n"
+        "기승전결 구조로 가벼운 질문에서 시작해 점점 전문적으로 깊어지는 방식으로 작성하세요.\n"
+        "절대 짧게 끝내지 마세요. 목표 분량을 반드시 채워주세요.\n\n"
+        "반드시 아래 형식으로 출력하세요:\n"
+        "제목: (호기심을 자극하는 제목)\n"
+        "---\n"
+        "(본문 내용)\n"
+    )
 
-주제: {topic['title']}
-목표 분량: {length_guide[topic['length']]}
-
-위 주제로 한국어 블로그 포스팅을 작성해주세요.
-HTML 태그 없이 순수 텍스트로만 작성하세요.
-소제목은 [소제목] 형식으로 표시하세요.
-반드시 기승전결 구조로, 가벼운 질문에서 시작해 점점 전문적으로 깊어지는 방식으로 작성하세요.
-절대 짧게 끝내지 마세요. 목표 분량을 반드시 채워주세요.
-
-반드시 아래 형식으로 출력하세요:
-제목: (호기심을 자극하는 제목)
----
-(본문 내용)
-"""
     try:
         full_text = generate_with_gemini(prompt)
     except Exception as e:
-        print(f"[Gemini 실패] {e} → Groq으로 전환")
+        print("[Gemini 실패] " + str(e) + " → Groq으로 전환")
         full_text = generate_with_groq(prompt)
 
     lines = full_text.strip().split("\n")
@@ -159,9 +142,10 @@ HTML 태그 없이 순수 텍스트로만 작성하세요.
     if not body:
         body = full_text
 
-    print(f"[완료] 제목: {title}")
-    print(f"[완료] 글자수: {len(body)}자")
+    print("[완료] 제목: " + title)
+    print("[완료] 글자수: " + str(len(body)) + "자")
     return {"title": title, "body": body, "topic": topic}
+
 
 def get_images(keyword, count=2):
     if not UNSPLASH_ACCESS_KEY:
@@ -181,11 +165,12 @@ def get_images(keyword, count=2):
                 "author": photo["user"]["name"],
                 "author_url": photo["user"]["links"]["html"]
             })
-        print(f"[이미지] {len(images)}장 수집 완료")
+        print("[이미지] " + str(len(images)) + "장 수집 완료")
         return images
     except Exception as e:
-        print(f"[이미지 오류] {e}")
+        print("[이미지 오류] " + str(e))
         return []
+
 
 def body_to_html(body, images):
     paragraphs = body.split("\n")
@@ -196,8 +181,8 @@ def body_to_html(body, images):
     if images:
         img = images[0]
         html += '<div style="text-align:center;margin-bottom:30px;">'
-        html += f'<img src="{img["url"]}" alt="{img["alt"]}" style="max-width:100%;border-radius:8px;"/>'
-        html += f'<p style="font-size:12px;color:#888;margin-top:6px;">Photo by <a href="{img["author_url"]}">{img["author"]}</a> on Unsplash</p>'
+        html += '<img src="' + img["url"] + '" alt="' + img["alt"] + '" style="max-width:100%;border-radius:8px;"/>'
+        html += '<p style="font-size:12px;color:#888;margin-top:6px;">Photo by <a href="' + img["author_url"] + '">' + img["author"] + '</a> on Unsplash</p>'
         html += "</div>\n"
         img_index = 1
 
@@ -207,29 +192,30 @@ def body_to_html(body, images):
             continue
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
-            html += f'<h2 style="margin-top:40px;margin-bottom:14px;font-size:22px;border-left:4px solid #2e7d32;padding-left:14px;color:#1a1a1a;">{heading}</h2>\n'
+            html += '<h2 style="margin-top:40px;margin-bottom:14px;font-size:22px;border-left:4px solid #2e7d32;padding-left:14px;color:#1a1a1a;">' + heading + "</h2>\n"
         elif len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
-            html += f'<p style="margin:8px 0 8px 24px;line-height:2.0;color:#333;">{para}</p>\n'
+            html += '<p style="margin:8px 0 8px 24px;line-height:2.0;color:#333;">' + para + "</p>\n"
         else:
-            html += f'<p style="margin:12px 0;line-height:2.0;font-size:16px;color:#222;">{para}</p>\n'
+            html += '<p style="margin:12px 0;line-height:2.0;font-size:16px;color:#222;">' + para + "</p>\n"
 
         if i == mid and img_index < len(images):
             img = images[img_index]
             html += '<div style="text-align:center;margin:30px 0;">'
-            html += f'<img src="{img["url"]}" alt="{img["alt"]}" style="max-width:100%;border-radius:8px;"/>'
-            html += f'<p style="font-size:12px;color:#888;margin-top:6px;">Photo by <a href="{img["author_url"]}">{img["author"]}</a> on Unsplash</p>'
+            html += '<img src="' + img["url"] + '" alt="' + img["alt"] + '" style="max-width:100%;border-radius:8px;"/>'
+            html += '<p style="font-size:12px;color:#888;margin-top:6px;">Photo by <a href="' + img["author_url"] + '">' + img["author"] + '</a> on Unsplash</p>'
             html += "</div>\n"
             img_index += 1
 
     return html
 
+
 def post_to_blogger(post_data, images):
     print("\n[Blogger] 포스팅 시작...")
     access_token = get_access_token()
     body_html = body_to_html(post_data["body"], images)
-    url = f"https://www.googleapis.com/blogger/v3/blogs/{BLOG_ID}/posts?isDraft=false"
+    url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
     headers = {
-        "Authorization": f"Bearer {access_token}",
+        "Authorization": "Bearer " + access_token,
         "Content-Type": "application/json"
     }
     payload = {
@@ -238,22 +224,23 @@ def post_to_blogger(post_data, images):
         "content": body_html,
         "status": "LIVE"
     }
-    print(f"[제목] {post_data['title']}")
+    print("[제목] " + post_data["title"])
     response = requests.post(url, headers=headers, json=payload, timeout=30)
-    print(f"[응답] 상태코드: {response.status_code}")
+    print("[응답] 상태코드: " + str(response.status_code))
     if response.status_code == 200:
         result = response.json()
         print("\n✅ 발행 완료!")
-        print(f"   링크: {result.get('url', '')}")
+        print("   링크: " + result.get("url", ""))
         return True
     else:
-        print(f"❌ 실패: {response.text[:300]}")
+        print("❌ 실패: " + response.text[:300])
         return False
+
 
 if __name__ == "__main__":
     print("=" * 50)
-    print(f"AutoBlog Blogger Publisher")
-    print(f"실행 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("AutoBlog Blogger Publisher")
+    print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
     try:
         post = generate_post()
@@ -261,7 +248,7 @@ if __name__ == "__main__":
         post_to_blogger(post, images)
         print("\n🎉 모든 작업 완료!")
     except Exception as e:
-        print(f"\n💥 오류 발생: {e}")
+        print("\n💥 오류 발생: " + str(e))
         import traceback
         traceback.print_exc()
         exit(1)
