@@ -21,7 +21,7 @@ jobs:
           python-version: '3.10'
 
       - name: 패키지 설치
-        run: pip install requests
+        run: pip install requests google-auth google-auth-oauthlib google-api-python-client
 
       - name: 현재 코드 확인
         run: |
