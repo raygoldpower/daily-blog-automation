@@ -6,13 +6,12 @@ from datetime import datetime
 # ========================================
 # 설정
 # ========================================
-WP_URL = "https://min85power-gwtmy.wordpress.com"
-WP_USER = "min85power@gmail.com"
-WP_APP_PASSWORD = "jitr hp5j 3dv6 fx6f"
-
+BLOGGER_API_KEY = os.environ.get("BLOGGER_API_KEY", "")
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "llama-3.3-70b-versatile"
+
+BLOG_ID = "4393162034375416055"
 
 TOPICS = [
     "marketing trends",
@@ -70,7 +69,6 @@ Title: (write title here)
     result = response.json()
     full_text = result["choices"][0]["message"]["content"]
 
-    # 제목/본문 분리
     lines = full_text.strip().split("\n")
     title = ""
     body_lines = []
@@ -115,27 +113,40 @@ def body_to_html(body):
 
 
 # ========================================
-# WordPress에 포스팅
+# Blogger에 포스팅
 # ========================================
-def post_to_wordpress(post_data):
-    print(f"\n[WordPress] 포스팅 시작...")
+def post_to_blogger(post_data):
+    print(f"\n[Blogger] 포스팅 시작...")
 
-    api_url = f"{WP_URL}/wp-json/wp/v2/posts"
-    auth = (WP_USER, WP_APP_PASSWORD)
+    api_url = f"https://www.googleapis.com/blogger/v3/blogs/{BLOG_ID}/posts"
 
     body_html = body_to_html(post_data["body"])
 
     payload = {
+        "kind": "blogger#post",
         "title": post_data["title"],
         "content": body_html,
-        "status": "publish",
-        "format": "standard",
+    }
+
+    params = {
+        "key": BLOGGER_API_KEY,
+    }
+
+    headers = {
+        "Content-Type": "application/json",
     }
 
     print(f"[요청] POST {api_url}")
     print(f"[제목] {post_data['title']}")
 
-    response = requests.post(api_url, auth=auth, json=payload, timeout=30)
+    response = requests.post(
+        api_url,
+        params=params,
+        headers=headers,
+        json=payload,
+        timeout=30
+    )
+
     print(f"[응답] 상태코드: {response.status_code}")
 
     try:
@@ -144,24 +155,25 @@ def post_to_wordpress(post_data):
     except:
         print(f"[응답 텍스트] {response.text[:300]}")
 
-    if response.status_code == 201:
+    if response.status_code == 200:
         result = response.json()
         post_id = result.get("id", "")
-        post_link = result.get("link", "")
-        post_status = result.get("status", "")
+        post_url = result.get("url", "")
         print(f"\n✅ [성공] 발행 완료!")
         print(f"   ID: {post_id}")
-        print(f"   상태: {post_status}")
-        print(f"   링크: {post_link}")
+        print(f"   링크: {post_url}")
         return True
     elif response.status_code == 401:
-        print(f"❌ [실패] 인증 오류 — 애플리케이션 비밀번호 확인 필요")
+        print(f"❌ [실패] 인증 오류 — OAuth 토큰이 필요해요")
+        print(f"   Blogger API는 API 키만으로는 글 작성이 안 되고 OAuth가 필요합니다")
         return False
     elif response.status_code == 403:
         print(f"❌ [실패] 권한 오류")
+        print(f"   응답: {response.text[:200]}")
         return False
     else:
         print(f"❌ [실패] 오류: {response.status_code}")
+        print(f"   응답: {response.text[:300]}")
         return False
 
 
@@ -170,17 +182,16 @@ def post_to_wordpress(post_data):
 # ========================================
 if __name__ == "__main__":
     print("=" * 50)
-    print(f"AutoBlog WordPress Publisher")
+    print(f"AutoBlog Blogger Publisher")
     print(f"실행 시각: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 50)
 
     try:
         post = generate_post()
-        success = post_to_wordpress(post)
+        success = post_to_blogger(post)
 
         if success:
             print(f"\n🎉 모든 작업 완료!")
-            print(f"블로그: {WP_URL}")
         else:
             print(f"\n💥 발행 실패")
             exit(1)
