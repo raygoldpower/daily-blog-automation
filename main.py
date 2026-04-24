@@ -44,13 +44,19 @@ WRITING_STYLE = """
 1. 반드시 존댓말(~습니다, ~요, ~세요)을 사용하세요. 반말 금지.
 2. 첫 문장은 독자가 공감할 수 있는 질문이나 상황으로 시작하세요.
 3. 과학적 근거나 연구 결과를 자연스럽게 포함하세요.
-4. 실생활에서 바로 적용할 수 있는 구체적인 방법을 포함하세요.
-5. 글밥은 주제 깊이에 따라 자유롭게 조절하세요.
+4. 한 단락은 반드시 3줄 이내로 짧게 끊어 쓰세요. 긴 단락 금지.
+5. 단락과 단락 사이는 반드시 빈 줄 하나를 넣으세요.
+6. 핵심 포인트는 번호 리스트로 정리하세요. 예:
+   1) 첫 번째 포인트
+   2) 두 번째 포인트
+   3) 세 번째 포인트
+7. 소제목 앞뒤로 반드시 빈 줄을 넣으세요.
+8. 글밥은 주제 깊이에 따라 자유롭게 조절하세요.
    - medium: 1000~1500자
    - long: 1500~2500자
-6. 소제목은 [소제목] 형식으로 표시하세요.
-7. 마무리는 따뜻한 동기부여 문장으로 끝내세요.
-8. 유튜브 영상 원고로도 자연스럽게 읽힐 수 있도록 작성하세요.
+9. 소제목은 [소제목] 형식으로 표시하세요.
+10. 마무리는 따뜻한 동기부여 문장으로 끝내세요.
+11. 유튜브 영상 원고로도 자연스럽게 읽힐 수 있도록 작성하세요.
 """
 
 # ========================================
@@ -218,32 +224,36 @@ def body_to_html(body, images):
 
     if images:
         img = images[0]
-        html += f'''<div style="text-align:center;margin-bottom:20px;">
+        html += f'''<div style="text-align:center;margin-bottom:30px;">
 <img src="{img['url']}" alt="{img['alt']}" style="max-width:100%;border-radius:8px;"/>
-<p style="font-size:12px;color:#888;">Photo by <a href="{img['author_url']}">{img['author']}</a> on Unsplash</p>
+<p style="font-size:12px;color:#888;margin-top:6px;">Photo by <a href="{img['author_url']}">{img['author']}</a> on Unsplash</p>
 </div>\n'''
         img_index = 1
 
     for i, para in enumerate(paragraphs):
         if not para.strip():
-            html += "<p>&nbsp;</p>\n"
+            html += "<p style='margin:12px 0;'>&nbsp;</p>\n"
             continue
+
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
-            html += f"<h2><strong>{heading}</strong></h2>\n"
+            html += f"<h2 style='margin-top:36px;margin-bottom:12px;font-size:22px;border-left:4px solid #4CAF50;padding-left:12px;'>{heading}</h2>\n"
+
+        elif para.strip().startswith(("1)", "2)", "3)", "4)", "5)", "6)", "7)", "8)", "9)")):
+            html += f"<p style='margin:6px 0 6px 20px;line-height:1.9;'>{para}</p>\n"
+
         else:
-            html += f"<p>{para}</p>\n"
+            html += f"<p style='margin:10px 0;line-height:1.9;font-size:16px;'>{para}</p>\n"
 
         if i == mid and img_index < len(images):
             img = images[img_index]
-            html += f'''<div style="text-align:center;margin:20px 0;">
+            html += f'''<div style="text-align:center;margin:30px 0;">
 <img src="{img['url']}" alt="{img['alt']}" style="max-width:100%;border-radius:8px;"/>
-<p style="font-size:12px;color:#888;">Photo by <a href="{img['author_url']}">{img['author']}</a> on Unsplash</p>
+<p style="font-size:12px;color:#888;margin-top:6px;">Photo by <a href="{img['author_url']}">{img['author']}</a> on Unsplash</p>
 </div>\n'''
             img_index += 1
 
     return html
-
 
 # ========================================
 # Blogger 포스팅
