@@ -88,11 +88,11 @@ def generate_with_groq(prompt):
         "Authorization": f"Bearer {GROQ_API_KEY}",
         "Content-Type": "application/json"
     }
-    payload = {
-        "model": GROQ_MODEL,
-        "messages": [{"role": "user", "content": prompt}],
-        "max_tokens": 3000,
-        "temperature": 0.8
+   payload = {
+        "kind": "blogger#post",
+        "title": post_data["title"],
+        "content": body_html,
+        "status": "LIVE",
     }
     response = requests.post(GROQ_API_URL, headers=headers, json=payload, timeout=30)
     if response.status_code != 200:
@@ -110,7 +110,7 @@ def generate_with_gemini(prompt):
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"temperature": 0.8, "maxOutputTokens": 3000}
     }
-    response = requests.post(url, json=payload, timeout=30)
+   response = requests.post(url, headers=headers, json=payload, params={"isDraft": "false"}, timeout=30)
     if response.status_code != 200:
         raise Exception(f"Gemini 오류: {response.status_code} {response.text[:200]}")
     return response.json()["candidates"][0]["content"]["parts"][0]["text"]
