@@ -33,6 +33,13 @@ TOPICS = [
     {"title": "농구 3점슛 성공률을 높이는 신체역학", "keyword": "basketball three point shooting biomechanics", "sport": "농구", "series": "슈팅 마스터", "episode": 1},
 ]
 
+SPORT_EMOJI = {
+    "축구": "⚽",
+    "농구": "🏀",
+    "야구": "⚾",
+    "공통": "🏆"
+}
+
 
 def get_access_token():
     print("[인증] Google Access Token 발급 중...")
@@ -86,25 +93,34 @@ def generate_post():
 
     prompt = (
         "당신은 스포츠 과학, 운동역학, 해부학, 스포츠 심리학을 깊이 이해하는 전문 스포츠 블로거입니다.\n"
-        "경고: 한자, 일본어, 중국어 등 한국어가 아닌 문자는 절대 사용하지 마세요.\n"
-        "모든 단어는 반드시 한글 또는 영어 알파벳으로만 작성하세요.\n\n"
+        "한자, 일본어, 중국어 등 한국어가 아닌 문자는 절대 사용하지 마세요.\n\n"
         + series_info
         + "가장 중요한 원칙: 독자가 글의 주인공입니다.\n"
-        "글을 읽는 사람이 직접 변화하고 성장하는 느낌을 받아야 합니다.\n"
-        "메시의 드리블이 아니라, 당신의 드리블이 왜 느린지를 설명하세요.\n\n"
+        "글을 읽는 사람이 직접 변화하고 성장하는 느낌을 받아야 합니다.\n\n"
         "반드시 지켜야 할 원칙:\n"
         "반드시 존댓말을 사용하세요. 반말 금지.\n"
         "지침 내용을 절대 본문에 노출하지 마세요.\n"
         "한 단락은 3줄에서 4줄 이내로 끊어 쓰세요.\n"
         "단락 사이는 반드시 빈 줄을 넣으세요.\n"
-        "소제목은 [소제목] 형식으로 표시하세요.\n"
+        "소제목은 [소제목] 형식으로 표시하세요. 소제목 앞에 관련 이모지를 붙이세요.\n"
+        "예: [💪 핵심 근육 강화 훈련법], [🧠 심리적 준비 전략], [⚡ 스피드 향상 비결]\n"
         "4000자에서 6000자를 반드시 채워주세요. 절대 짧게 쓰지 마세요.\n"
         "각 소제목 아래 최소 4개에서 5개 단락을 작성하세요.\n"
         "실천 목록은 최소 5가지 이상 구체적으로 제시하세요.\n"
         "각 훈련법의 효과, 작용 근육, 횟수, 주의사항까지 상세히 설명하세요.\n\n"
+        "반드시 아래 요소들을 포함하세요:\n"
+        "1. 훈련 프로그램 표: [TABLE_START]와 [TABLE_END] 사이에 작성하세요.\n"
+        "형식: 훈련명|세트|횟수|휴식|효과 (각 행을 새 줄로 구분)\n"
+        "예:\n"
+        "[TABLE_START]\n"
+        "훈련명|세트|횟수|휴식|주요 효과\n"
+        "스쿼트 점프|3|12회|60초|하체 폭발력 강화\n"
+        "런지|3|10회|45초|균형감각 향상\n"
+        "[TABLE_END]\n\n"
+        "2. 핵심 포인트 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3가지 핵심만 작성\n\n"
         "글의 흐름 - 기승전결로 점점 깊어지게:\n"
         "1. 독자가 공감하는 문제나 고민으로 시작하세요.\n"
-        "2. 왜 그 문제가 생기는지 과학적으로 설명하세요. 해부학, 생리학, 운동역학 용어를 괄호로 설명하세요.\n"
+        "2. 왜 그 문제가 생기는지 과학적으로 설명하세요. 해부학, 생리학 용어를 괄호로 설명하세요.\n"
         "3. 연구 결과와 논문을 인용하듯 깊이 있는 근거를 제시하세요.\n"
         "4. 독자가 당장 실천할 수 있는 구체적인 훈련 프로그램을 번호로 제시하세요.\n"
         "5. 영양, 회복, 멘탈 관리까지 포괄적으로 다루세요.\n"
@@ -112,12 +128,6 @@ def generate_post():
         "종목: " + topic["sport"] + "\n"
         "주제: " + topic["title"] + "\n"
         "목표 분량: 4000자에서 6000자\n\n"
-        "위 주제로 한국어 블로그 포스팅을 작성해주세요.\n"
-        "HTML 태그 없이 순수 텍스트로만 작성하세요.\n"
-        "소제목은 [소제목] 형식으로 표시하세요.\n"
-        "독자가 글의 주인공이 되도록, 독자 중심으로 작성하세요.\n"
-        "기승전결 구조로 가벼운 공감에서 시작해 점점 전문적으로 깊어지세요.\n"
-        "절대 짧게 끝내지 마세요. 목표 분량을 반드시 채워주세요.\n\n"
         "반드시 아래 형식으로 출력하세요:\n"
         "제목: (독자의 클릭을 유도하는 강렬한 제목)\n"
         "---\n"
@@ -150,7 +160,7 @@ def generate_post():
     return {"title": title, "body": body, "topic": topic}
 
 
-def get_images(keyword, count=2):
+def get_images(keyword, count=3):
     if not UNSPLASH_ACCESS_KEY:
         return []
     try:
@@ -164,11 +174,12 @@ def get_images(keyword, count=2):
             },
             timeout=10
         )
+        data = response.json()
         images = []
-        for photo in response.json().get("results", []):
+        for photo in data.get("results", []):
             images.append({
                 "url": photo["urls"]["regular"],
-                "alt": photo.get("alt_description", keyword),
+                "alt": photo.get("alt_description", keyword) or keyword,
                 "author": photo["user"]["name"],
                 "author_url": photo["user"]["links"]["html"]
             })
@@ -179,24 +190,95 @@ def get_images(keyword, count=2):
         return []
 
 
-def body_to_html(body, images):
-    paragraphs = body.split("\n")
-    html = ""
-    mid = len(paragraphs) // 2
-    img_index = 0
+def make_table_html(table_text):
+    rows = [r.strip() for r in table_text.strip().split("\n") if r.strip()]
+    if not rows:
+        return ""
+    html = '<div style="overflow-x:auto;margin:24px 0;">'
+    html += '<table style="width:100%;border-collapse:collapse;font-size:15px;">'
+    for i, row in enumerate(rows):
+        cols = row.split("|")
+        html += "<tr>"
+        for col in cols:
+            if i == 0:
+                html += '<th style="background:#1565c0;color:#fff;padding:10px 14px;text-align:center;border:1px solid #1565c0;">' + col.strip() + "</th>"
+            else:
+                bg = "#f5f8ff" if i % 2 == 0 else "#ffffff"
+                html += '<td style="padding:9px 14px;text-align:center;border:1px solid #dde3f0;background:' + bg + ';">' + col.strip() + "</td>"
+        html += "</tr>"
+    html += "</table></div>\n"
+    return html
 
-    if images:
-        img = images[0]
-        html += '<div style="text-align:center;margin-bottom:30px;">'
-        html += '<img src="' + img["url"] + '" alt="' + str(img["alt"]) + '" style="max-width:100%;border-radius:8px;"/>'
-        html += '<p style="font-size:12px;color:#888;margin-top:6px;">Photo by <a href="' + img["author_url"] + '">' + img["author"] + '</a> on Unsplash</p>'
-        html += "</div>\n"
-        img_index = 1
+
+def make_summary_html(summary_text):
+    lines = [l.strip() for l in summary_text.strip().split("\n") if l.strip()]
+    html = '<div style="background:#e8f4fd;border-left:5px solid #1565c0;border-radius:8px;padding:20px 24px;margin:28px 0;">'
+    html += '<p style="font-weight:700;font-size:17px;color:#1565c0;margin-bottom:12px;">📌 핵심 포인트 요약</p>'
+    for line in lines:
+        html += '<p style="margin:6px 0;font-size:15px;color:#333;">✅ ' + line + "</p>"
+    html += "</div>\n"
+    return html
+
+
+def make_image_html(img, margin_top="0"):
+    html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
+    html += '<img src="' + img["url"] + '" alt="' + img["alt"] + '" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);"/>'
+    html += '<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="' + img["author_url"] + '" style="color:#999;">' + img["author"] + '</a> on Unsplash</p>'
+    html += "</div>\n"
+    return html
+
+
+def body_to_html(body, images, topic):
+    import re
+
+    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
+    series_badge = ""
+    if topic.get("series"):
+        series_badge = (
+            '<div style="display:inline-block;background:#1565c0;color:#fff;'
+            'font-size:13px;padding:4px 12px;border-radius:20px;margin-bottom:16px;">'
+            + sport_emoji + " " + topic["series"] + " " + str(topic["episode"]) + "편</div>\n"
+        )
+
+    html = series_badge
+
+    # 이미지 1 - 상단
+    if len(images) >= 1:
+        html += make_image_html(images[0])
+
+    # TABLE 파싱
+    table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
+    summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
+
+    table_match = table_pattern.search(body)
+    summary_match = summary_pattern.search(body)
+
+    table_html = make_table_html(table_match.group(1)) if table_match else ""
+    summary_html = make_summary_html(summary_match.group(1)) if summary_match else ""
+
+    # 특수 태그 제거
+    clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
+    clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
+
+    paragraphs = clean_body.split("\n")
+    total = len(paragraphs)
+    mid = total // 2
+    img_index = 1
+    image2_inserted = False
 
     for i, para in enumerate(paragraphs):
         if not para.strip():
             html += '<p style="margin:14px 0;">&nbsp;</p>\n'
             continue
+
+        if para.strip() == "[TABLE_PLACEHOLDER]":
+            html += table_html
+            continue
+
+        if para.strip() == "[SUMMARY_PLACEHOLDER]":
+            html += summary_html
+            continue
+
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
             html += '<h2 style="margin-top:40px;margin-bottom:14px;font-size:22px;border-left:4px solid #1565c0;padding-left:14px;color:#1a1a1a;">' + heading + "</h2>\n"
@@ -205,13 +287,14 @@ def body_to_html(body, images):
         else:
             html += '<p style="margin:12px 0;line-height:2.0;font-size:16px;color:#222;">' + para + "</p>\n"
 
-        if i == mid and img_index < len(images):
-            img = images[img_index]
-            html += '<div style="text-align:center;margin:30px 0;">'
-            html += '<img src="' + img["url"] + '" alt="' + str(img["alt"]) + '" style="max-width:100%;border-radius:8px;"/>'
-            html += '<p style="font-size:12px;color:#888;margin-top:6px;">Photo by <a href="' + img["author_url"] + '">' + img["author"] + '</a> on Unsplash</p>'
-            html += "</div>\n"
-            img_index += 1
+        # 이미지 2 - 중간
+        if i >= mid and not image2_inserted and len(images) >= 2:
+            html += make_image_html(images[1], margin_top="20px")
+            image2_inserted = True
+
+    # 이미지 3 - 하단 (있으면)
+    if len(images) >= 3:
+        html += make_image_html(images[2], margin_top="20px")
 
     return html
 
@@ -219,7 +302,7 @@ def body_to_html(body, images):
 def post_to_blogger(post_data, images):
     print("\n[Blogger] 포스팅 시작...")
     access_token = get_access_token()
-    body_html = body_to_html(post_data["body"], images)
+    body_html = body_to_html(post_data["body"], images, post_data["topic"])
     url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
     headers = {
         "Authorization": "Bearer " + access_token,
@@ -251,7 +334,7 @@ if __name__ == "__main__":
     print("=" * 50)
     try:
         post = generate_post()
-        images = get_images(post["topic"]["keyword"], count=2)
+        images = get_images(post["topic"]["keyword"], count=3)
         post_to_blogger(post, images)
         print("\n모든 작업 완료!")
     except Exception as e:
