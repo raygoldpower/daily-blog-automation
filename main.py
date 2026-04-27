@@ -51,7 +51,12 @@ def send_telegram_message(title, link):
         return
     message = f"📢 **[신규 포스팅 완료]**\n\n📌 **제목**: {title}\n\n🔗 **링크**: {link}"
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message, "parse_mode": "Markdown"}
+    message = (
+    f"📢 신규 포스팅 완료\n\n"
+    f"제목: {title}\n\n"
+    f"링크: {link}"
+)
+payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message}
     try:
         response = requests.post(url, json=payload, timeout=10)
         if response.status_code == 200:
