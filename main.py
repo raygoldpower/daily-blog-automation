@@ -49,22 +49,20 @@ def send_telegram_message(title, link):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("[텔레그램] 설정값이 없어 전송을 건너뜁니다.")
         return
-    message = f"📢 **[신규 포스팅 완료]**\n\n📌 **제목**: {title}\n\n🔗 **링크**: {link}"
-    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-    message = (
-    f"📢 신규 포스팅 완료\n\n"
-    f"제목: {title}\n\n"
-    f"링크: {link}"
-)
-payload = {"chat_id": TELEGRAM_CHAT_ID, "text": message}
+    message = "📢 신규 포스팅 완료\n\n제목: " + title + "\n\n링크: " + link
+    url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": message
+    }
     try:
         response = requests.post(url, json=payload, timeout=10)
         if response.status_code == 200:
             print("[텔레그램] 공유 성공!")
         else:
-            print(f"[텔레그램] 전송 실패: {response.text}")
+            print("[텔레그램] 전송 실패: " + response.text)
     except Exception as e:
-        print(f"[텔레그램] 오류: {e}")
+        print("[텔레그램] 오류: " + str(e))
 
 def get_access_token():
     print("[인증] Google Access Token 발급 중...")
