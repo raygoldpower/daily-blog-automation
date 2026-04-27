@@ -90,7 +90,7 @@ def generate_with_claude(prompt):
             "max_tokens": 8000,
             "messages": [{"role": "user", "content": prompt}]
         },
-        timeout=120
+        timeout=300
     )
     if response.status_code != 200:
         raise Exception("Claude 오류: " + str(response.status_code) + " " + response.text[:200])
