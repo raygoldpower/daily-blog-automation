@@ -56,6 +56,8 @@ def send_telegram_message(title, link):
         response = requests.post(url, json=payload, timeout=10)
         if response.status_code == 200:
             print("[텔레그램] 공유 성공!")
+        else:
+            print(f"[텔레그램] 전송 실패: {response.text}")
     except Exception as e:
         print(f"[텔레그램] 오류: {e}")
 
