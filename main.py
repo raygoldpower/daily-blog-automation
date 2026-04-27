@@ -10,6 +10,10 @@ GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
 GOOGLE_REFRESH_TOKEN = os.environ.get("GOOGLE_REFRESH_TOKEN", "")
 BLOG_ID = "4393162034375416055"
 
+# [추가] 텔레그램 설정값 가져오기
+TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
+
 TOPICS = [
     {"title": "당신의 드리블이 느린 진짜 이유", "keyword": "soccer dribbling speed technique", "sport": "축구", "series": "드리블 마스터", "episode": 1},
     {"title": "드리블 속도를 2배 높이는 발목 훈련법", "keyword": "soccer ankle dribbling training", "sport": "축구", "series": "드리블 마스터", "episode": 2},
@@ -40,7 +44,30 @@ SPORT_EMOJI = {
     "공통": "🏆"
 }
 
+# --- [새로 추가된 함수] 텔레그램 메시지 전송 ---
+def send_telegram_message(title, link):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print("[텔레그램] 설정값이 없어 전송을 건너뜁니다.")
+        return
 
+    message = f"📢 **[신규 포스팅 완료]**\n\n📌 **제목**: {title}\n\n🔗 **링크**: {link}"
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_CHAT_ID,
+        "text": message,
+        "parse_mode": "Markdown"
+    }
+    
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        if response.status_code == 200:
+            print("[텔레그램] 채널로 링크 전송 성공!")
+        else:
+            print(f"[텔레그램] 전송 실패: {response.text}")
+    except Exception as e:
+        print(f"[텔레그램] 오류 발생: {e}")
+
+# --- 기존 헬퍼 함수들 ---
 def get_access_token():
     print("[인증] Google Access Token 발급 중...")
     response = requests.post(
@@ -58,7 +85,6 @@ def get_access_token():
     print("[인증] 완료!")
     return response.json()["access_token"]
 
-
 def generate_with_claude(prompt):
     print("[AI] Claude 사용 중...")
     response = requests.post(
@@ -69,7 +95,7 @@ def generate_with_claude(prompt):
             "content-type": "application/json"
         },
         json={
-            "model": "claude-sonnet-4-20250514",
+            "model": "claude-3-5-sonnet-20241022", # 최신 모델명으로 수정 권장
             "max_tokens": 8000,
             "messages": [{"role": "user", "content": prompt}]
         },
@@ -78,7 +104,6 @@ def generate_with_claude(prompt):
     if response.status_code != 200:
         raise Exception("Claude 오류: " + str(response.status_code) + " " + response.text[:200])
     return response.json()["content"][0]["text"]
-
 
 def generate_post():
     topic = random.choice(TOPICS)
@@ -159,7 +184,6 @@ def generate_post():
     print("[완료] 글자수: " + str(len(body)) + "자")
     return {"title": title, "body": body, "topic": topic}
 
-
 def get_images(keyword, count=3):
     if not UNSPLASH_ACCESS_KEY:
         return []
@@ -189,7 +213,6 @@ def get_images(keyword, count=3):
         print("[이미지 오류] " + str(e))
         return []
 
-
 def make_table_html(table_text):
     rows = [r.strip() for r in table_text.strip().split("\n") if r.strip()]
     if not rows:
@@ -209,7 +232,6 @@ def make_table_html(table_text):
     html += "</table></div>\n"
     return html
 
-
 def make_summary_html(summary_text):
     lines = [l.strip() for l in summary_text.strip().split("\n") if l.strip()]
     html = '<div style="background:#e8f4fd;border-left:5px solid #1565c0;border-radius:8px;padding:20px 24px;margin:28px 0;">'
@@ -219,7 +241,6 @@ def make_summary_html(summary_text):
     html += "</div>\n"
     return html
 
-
 def make_image_html(img, margin_top="0"):
     html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
     html += '<img src="' + img["url"] + '" alt="' + img["alt"] + '" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);"/>'
@@ -227,10 +248,8 @@ def make_image_html(img, margin_top="0"):
     html += "</div>\n"
     return html
 
-
 def body_to_html(body, images, topic):
     import re
-
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
     series_badge = ""
     if topic.get("series"):
@@ -241,12 +260,9 @@ def body_to_html(body, images, topic):
         )
 
     html = series_badge
-
-    # 이미지 1 - 상단
     if len(images) >= 1:
         html += make_image_html(images[0])
 
-    # TABLE 파싱
     table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
 
@@ -256,29 +272,24 @@ def body_to_html(body, images, topic):
     table_html = make_table_html(table_match.group(1)) if table_match else ""
     summary_html = make_summary_html(summary_match.group(1)) if summary_match else ""
 
-    # 특수 태그 제거
     clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
 
     paragraphs = clean_body.split("\n")
     total = len(paragraphs)
     mid = total // 2
-    img_index = 1
     image2_inserted = False
 
     for i, para in enumerate(paragraphs):
         if not para.strip():
             html += '<p style="margin:14px 0;">&nbsp;</p>\n'
             continue
-
         if para.strip() == "[TABLE_PLACEHOLDER]":
             html += table_html
             continue
-
         if para.strip() == "[SUMMARY_PLACEHOLDER]":
             html += summary_html
             continue
-
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
             html += '<h2 style="margin-top:40px;margin-bottom:14px;font-size:22px;border-left:4px solid #1565c0;padding-left:14px;color:#1a1a1a;">' + heading + "</h2>\n"
@@ -287,18 +298,16 @@ def body_to_html(body, images, topic):
         else:
             html += '<p style="margin:12px 0;line-height:2.0;font-size:16px;color:#222;">' + para + "</p>\n"
 
-        # 이미지 2 - 중간
         if i >= mid and not image2_inserted and len(images) >= 2:
             html += make_image_html(images[1], margin_top="20px")
             image2_inserted = True
 
-    # 이미지 3 - 하단 (있으면)
     if len(images) >= 3:
         html += make_image_html(images[2], margin_top="20px")
 
     return html
 
-
+# --- 수정된 Blogger 발행 함수 ---
 def post_to_blogger(post_data, images):
     print("\n[Blogger] 포스팅 시작...")
     access_token = get_access_token()
@@ -314,13 +323,20 @@ def post_to_blogger(post_data, images):
         "content": body_html,
         "status": "LIVE"
     }
+    
     print("[제목] " + post_data["title"])
     response = requests.post(url, headers=headers, json=payload, timeout=30)
     print("[응답] 상태코드: " + str(response.status_code))
+    
     if response.status_code == 200:
         result = response.json()
+        post_url = result.get("url", "")
         print("\n발행 완료!")
-        print("   링크: " + result.get("url", ""))
+        print("   링크: " + post_url)
+        
+        # [수정된 부분] 블로그 발행 성공 후 텔레그램으로 전송
+        send_telegram_message(post_data["title"], post_url)
+        
         return True
     else:
         print("실패: " + response.text[:300])
