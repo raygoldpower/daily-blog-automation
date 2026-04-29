@@ -8,61 +8,75 @@ UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
 GOOGLE_REFRESH_TOKEN = os.environ.get("GOOGLE_REFRESH_TOKEN", "")
-BLOG_ID = "4393162034375416055"
-
-# [추가] 텔레그램 환경변수
 TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
-
-TOPICS = [
-    {"title": "당신의 드리블이 느린 진짜 이유", "keyword": "soccer dribbling speed technique", "sport": "축구", "series": "드리블 마스터", "episode": 1},
-    {"title": "드리블 속도를 2배 높이는 발목 훈련법", "keyword": "soccer ankle dribbling training", "sport": "축구", "series": "드리블 마스터", "episode": 2},
-    {"title": "메시가 수비수를 제치는 과학적 원리", "keyword": "soccer dribbling biomechanics agility", "sport": "축구", "series": "드리블 마스터", "episode": 3},
-    {"title": "농구 점프력, 타고나는 게 아니다", "keyword": "basketball jump training vertical leap", "sport": "농구", "series": "점프력 혁명", "episode": 1},
-    {"title": "당신의 점프력을 30% 높이는 8주 프로그램", "keyword": "basketball vertical jump program", "sport": "농구", "series": "점프력 혁명", "episode": 2},
-    {"title": "야구 타격 폼, 0.1초가 홈런을 결정한다", "keyword": "baseball batting form swing speed", "sport": "야구", "series": "타격의 과학", "episode": 1},
-    {"title": "배트 스피드를 높이는 상체 근력 훈련", "keyword": "baseball bat speed upper body strength", "sport": "야구", "series": "타격의 과학", "episode": 2},
-    {"title": "축구 스피드, 빠른 선수는 무엇이 다른가", "keyword": "soccer speed sprint training", "sport": "축구", "series": "스피드 혁명", "episode": 1},
-    {"title": "100미터를 1초 단축하는 가속 훈련법", "keyword": "sprint acceleration training technique", "sport": "공통", "series": "스피드 혁명", "episode": 2},
-    {"title": "농구 핸들링, 손이 아니라 뇌를 훈련하라", "keyword": "basketball ball handling brain training", "sport": "농구", "series": "핸들링 마스터", "episode": 1},
-    {"title": "수비수를 읽는 법, 스포츠 심리전의 모든 것", "keyword": "sports psychology reading opponent", "sport": "공통", "series": "심리전 전략", "episode": 1},
-    {"title": "압박 상황에서 최고의 퍼포먼스를 내는 법", "keyword": "sports performance under pressure psychology", "sport": "공통", "series": "심리전 전략", "episode": 2},
-    {"title": "팀 스포츠에서 나를 빛나게 하는 포지셔닝", "keyword": "team sports positioning strategy", "sport": "공통", "series": "전술 마스터", "episode": 1},
-    {"title": "패스 하나로 경기를 바꾸는 시야 훈련법", "keyword": "soccer basketball passing vision training", "sport": "공통", "series": "전술 마스터", "episode": 2},
-    {"title": "90분을 뛰어도 지치지 않는 지구력 훈련", "keyword": "soccer endurance stamina training", "sport": "축구", "series": "체력 마스터", "episode": 1},
-    {"title": "스포츠 선수의 체력을 결정하는 VO2max의 비밀", "keyword": "VO2max endurance sports training", "sport": "공통", "series": "체력 마스터", "episode": 2},
-    {"title": "민첩성 훈련, 방향 전환 속도를 높이는 과학", "keyword": "agility training change of direction speed", "sport": "공통", "series": "민첩성 혁명", "episode": 1},
-    {"title": "팀워크가 개인 기량을 끌어올리는 원리", "keyword": "team chemistry individual performance sports", "sport": "공통", "series": "팀 시너지", "episode": 1},
-    {"title": "축구 슈팅력, 발이 아니라 몸통이 결정한다", "keyword": "soccer shooting power core rotation", "sport": "축구", "series": "슈팅 마스터", "episode": 1},
-    {"title": "농구 3점슛 성공률을 높이는 신체역학", "keyword": "basketball three point shooting biomechanics", "sport": "농구", "series": "슈팅 마스터", "episode": 1},
-]
+FACEBOOK_PAGE_ID = os.environ.get("FACEBOOK_PAGE_ID", "")
+FACEBOOK_ACCESS_TOKEN = os.environ.get("FACEBOOK_ACCESS_TOKEN", "")
+BLOG_ID = "4393162034375416055"
 
 SPORT_EMOJI = {
     "축구": "⚽",
     "농구": "🏀",
     "야구": "⚾",
-    "공통": "🏆"
+    "공통": "🏆",
+    "근육학": "💪",
+    "재활": "🩺",
+    "영양": "🥗",
+    "심리": "🧠",
+    "체력": "🔥",
+    "유연성": "🤸"
 }
 
-# [추가] 텔레그램 발송 함수
-def send_telegram_message(title, link):
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        print("[텔레그램] 설정값이 없어 전송을 건너뜁니다.")
-        return
-    message = "📢 신규 포스팅 완료\n\n제목: " + title + "\n\n링크: " + link
-    url = "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage"
-    payload = {
-        "chat_id": TELEGRAM_CHAT_ID,
-        "text": message
-    }
-    try:
-        response = requests.post(url, json=payload, timeout=10)
-        if response.status_code == 200:
-            print("[텔레그램] 공유 성공!")
-        else:
-            print("[텔레그램] 전송 실패: " + response.text)
-    except Exception as e:
-        print("[텔레그램] 오류: " + str(e))
+TOPICS = [
+    # 축구 시리즈
+    {"title": "당신의 드리블이 느린 진짜 이유", "keyword": "soccer dribbling technique", "sport": "축구", "series": "드리블 마스터", "episode": 1},
+    {"title": "축구 스피드, 빠른 선수는 무엇이 다른가", "keyword": "soccer speed sprint", "sport": "축구", "series": "스피드 혁명", "episode": 1},
+    {"title": "축구 슈팅력, 발이 아니라 몸통이 결정한다", "keyword": "soccer shooting power core", "sport": "축구", "series": "슈팅 마스터", "episode": 1},
+    {"title": "90분을 뛰어도 지치지 않는 지구력 훈련", "keyword": "soccer endurance stamina", "sport": "축구", "series": "체력 마스터", "episode": 1},
+    # 농구 시리즈
+    {"title": "농구 점프력, 타고나는 게 아니다", "keyword": "basketball jump vertical leap", "sport": "농구", "series": "점프력 혁명", "episode": 1},
+    {"title": "농구 핸들링, 손이 아니라 뇌를 훈련하라", "keyword": "basketball ball handling", "sport": "농구", "series": "핸들링 마스터", "episode": 1},
+    {"title": "농구 3점슛 성공률을 높이는 신체역학", "keyword": "basketball three point shooting biomechanics", "sport": "농구", "series": "슈팅 마스터", "episode": 1},
+    # 야구 시리즈
+    {"title": "야구 타격 폼, 0.1초가 홈런을 결정한다", "keyword": "baseball batting swing speed", "sport": "야구", "series": "타격의 과학", "episode": 1},
+    {"title": "투수의 어깨를 지키는 회전근개 강화법", "keyword": "baseball pitcher shoulder rotator cuff", "sport": "야구", "series": "투구의 과학", "episode": 1},
+    # 근육학 시리즈
+    {"title": "대퇴사두근(허벅지 앞 근육)을 제대로 키우는 법", "keyword": "quadriceps muscle training strength", "sport": "근육학", "series": "근육 해부학", "episode": 1},
+    {"title": "햄스트링 부상을 예방하는 과학적 훈련법", "keyword": "hamstring injury prevention training", "sport": "근육학", "series": "근육 해부학", "episode": 2},
+    {"title": "코어 근육의 모든 것, 복횡근부터 다열근까지", "keyword": "core muscles transverse abdominis multifidus", "sport": "근육학", "series": "코어 과학", "episode": 1},
+    {"title": "어깨 근육 해부학, 삼각근과 회전근개의 역할", "keyword": "shoulder deltoid rotator cuff anatomy", "sport": "근육학", "series": "상체 해부학", "episode": 1},
+    {"title": "종아리 근육(비복근, 가자미근)과 폭발적 스피드의 관계", "keyword": "calf muscle gastrocnemius soleus speed", "sport": "근육학", "series": "하체 해부학", "episode": 1},
+    {"title": "근육 성장의 원리, 근비대를 유발하는 과학적 메커니즘", "keyword": "muscle hypertrophy growth mechanism", "sport": "근육학", "series": "근육 성장 과학", "episode": 1},
+    # 재활 시리즈
+    {"title": "무릎 통증의 진짜 원인, 슬개건염부터 반월판 손상까지", "keyword": "knee pain patellar tendinitis meniscus", "sport": "재활", "series": "부상 재활", "episode": 1},
+    {"title": "허리 통증을 없애는 요추 안정화 운동법", "keyword": "lower back pain lumbar stabilization", "sport": "재활", "series": "부상 재활", "episode": 2},
+    {"title": "발목 염좌 후 완벽하게 회복하는 재활 프로그램", "keyword": "ankle sprain rehabilitation recovery", "sport": "재활", "series": "부상 재활", "episode": 3},
+    {"title": "어깨 충돌 증후군, 올바른 재활과 예방법", "keyword": "shoulder impingement syndrome rehabilitation", "sport": "재활", "series": "부상 재활", "episode": 4},
+    # 영양 시리즈
+    {"title": "운동 전후 단백질 섭취, 얼마나 언제 먹어야 하나", "keyword": "protein intake pre post workout timing", "sport": "영양", "series": "스포츠 영양학", "episode": 1},
+    {"title": "탄수화물이 운동 퍼포먼스를 결정하는 이유", "keyword": "carbohydrates sports performance glycogen", "sport": "영양", "series": "스포츠 영양학", "episode": 2},
+    {"title": "크레아틴, 과학이 증명한 가장 효과적인 보충제", "keyword": "creatine supplement muscle strength science", "sport": "영양", "series": "보충제 과학", "episode": 1},
+    {"title": "수분 보충의 과학, 탈수가 운동 능력에 미치는 영향", "keyword": "hydration dehydration sports performance", "sport": "영양", "series": "스포츠 영양학", "episode": 3},
+    # 심리 시리즈
+    {"title": "스포츠 루틴의 힘, 프로 선수들이 경기 전 반복하는 이유", "keyword": "sports pre game routine psychology", "sport": "심리", "series": "스포츠 심리학", "episode": 1},
+    {"title": "압박 상황에서 최고의 퍼포먼스를 내는 멘탈 트레이닝", "keyword": "clutch performance mental training pressure", "sport": "심리", "series": "스포츠 심리학", "episode": 2},
+    {"title": "슬럼프를 극복하는 스포츠 심리학적 접근법", "keyword": "slump recovery sports psychology", "sport": "심리", "series": "스포츠 심리학", "episode": 3},
+    # 체력 시리즈
+    {"title": "VO2max란 무엇인가, 최대 산소 섭취량과 지구력의 관계", "keyword": "VO2max maximal oxygen uptake endurance", "sport": "체력", "series": "체력 과학", "episode": 1},
+    {"title": "무산소 역치(젖산 역치)를 높이는 훈련법", "keyword": "lactate threshold anaerobic training", "sport": "체력", "series": "체력 과학", "episode": 2},
+    {"title": "HIIT vs 저강도 유산소, 어떤 방법이 더 효과적인가", "keyword": "HIIT vs steady state cardio fat loss", "sport": "체력", "series": "유산소 과학", "episode": 1},
+    # 유연성 시리즈
+    {"title": "정적 스트레칭 vs 동적 스트레칭, 언제 무엇을 해야 하나", "keyword": "static dynamic stretching when to use", "sport": "유연성", "series": "유연성 과학", "episode": 1},
+    {"title": "고관절 가동성이 스포츠 퍼포먼스를 결정한다", "keyword": "hip mobility sports performance", "sport": "유연성", "series": "가동성 혁명", "episode": 1},
+    {"title": "폼롤러로 근막 이완하는 올바른 방법", "keyword": "foam roller myofascial release technique", "sport": "유연성", "series": "회복 과학", "episode": 1},
+    # 공통 시리즈
+    {"title": "수면이 운동 회복과 근육 성장에 미치는 놀라운 영향", "keyword": "sleep recovery muscle growth hormones", "sport": "공통", "series": "회복 과학", "episode": 1},
+    {"title": "과훈련 증후군(오버트레이닝)을 알아채는 방법과 대처법", "keyword": "overtraining syndrome symptoms recovery", "sport": "공통", "series": "회복 과학", "episode": 2},
+    {"title": "아이의 스포츠 재능을 과학적으로 발견하고 키우는 방법", "keyword": "youth athletic development talent", "sport": "공통", "series": "스포츠 발달", "episode": 1},
+    {"title": "나이가 들수록 꼭 해야 하는 기능성 운동의 모든 것", "keyword": "functional fitness aging sarcopenia", "sport": "공통", "series": "시니어 스포츠", "episode": 1},
+    {"title": "체형 불균형이 부상의 원인이다, 체형 분석과 교정 운동", "keyword": "postural imbalance injury prevention correction", "sport": "공통", "series": "체형 교정", "episode": 1},
+]
+
 
 def get_access_token():
     print("[인증] Google Access Token 발급 중...")
@@ -81,6 +95,7 @@ def get_access_token():
     print("[인증] 완료!")
     return response.json()["access_token"]
 
+
 def generate_with_claude(prompt):
     print("[AI] Claude 사용 중...")
     response = requests.post(
@@ -91,7 +106,7 @@ def generate_with_claude(prompt):
             "content-type": "application/json"
         },
         json={
-            "model": "claude-sonnet-4-20250514", # 원본 모델명 유지
+            "model": "claude-sonnet-4-20250514",
             "max_tokens": 8000,
             "messages": [{"role": "user", "content": prompt}]
         },
@@ -100,6 +115,7 @@ def generate_with_claude(prompt):
     if response.status_code != 200:
         raise Exception("Claude 오류: " + str(response.status_code) + " " + response.text[:200])
     return response.json()["content"][0]["text"]
+
 
 def generate_post():
     topic = random.choice(TOPICS)
@@ -113,40 +129,41 @@ def generate_post():
         )
 
     prompt = (
-        "당신은 스포츠 과학, 운동역학, 해부학, 스포츠 심리학을 깊이 이해하는 전문 스포츠 블로거입니다.\n"
+        "당신은 스포츠 과학, 운동역학, 해부학, 근육학, 스포츠 영양학, 스포츠 심리학을 깊이 이해하는 전문 블로거입니다.\n"
         "한자, 일본어, 중국어 등 한국어가 아닌 문자는 절대 사용하지 마세요.\n\n"
         + series_info
         + "가장 중요한 원칙: 독자가 글의 주인공입니다.\n"
         "글을 읽는 사람이 직접 변화하고 성장하는 느낌을 받아야 합니다.\n\n"
+        "전문 용어 사용 원칙:\n"
+        "근육 이름은 한글 명칭과 영문을 함께 표기하세요. 예: 대퇴사두근(Quadriceps), 햄스트링(Hamstrings)\n"
+        "해부학 용어는 정확하게 사용하고 괄호 안에 쉬운 설명을 추가하세요.\n"
+        "연구 결과 인용 시 구체적인 수치와 출처를 명시하세요. 예: 2022년 Journal of Strength에 따르면\n\n"
         "반드시 지켜야 할 원칙:\n"
         "반드시 존댓말을 사용하세요. 반말 금지.\n"
         "지침 내용을 절대 본문에 노출하지 마세요.\n"
         "한 단락은 3줄에서 4줄 이내로 끊어 쓰세요.\n"
         "단락 사이는 반드시 빈 줄을 넣으세요.\n"
         "소제목은 [소제목] 형식으로 표시하세요. 소제목 앞에 관련 이모지를 붙이세요.\n"
-        "예: [💪 핵심 근육 강화 훈련법], [🧠 심리적 준비 전략], [⚡ 스피드 향상 비결]\n"
         "4000자에서 6000자를 반드시 채워주세요. 절대 짧게 쓰지 마세요.\n"
         "각 소제목 아래 최소 4개에서 5개 단락을 작성하세요.\n"
         "실천 목록은 최소 5가지 이상 구체적으로 제시하세요.\n"
-        "각 훈련법의 효과, 작용 근육, 횟수, 주의사항까지 상세히 설명하세요.\n\n"
+        "각 훈련법의 효과, 작용 근육(정확한 해부학 명칭), 횟수, 주의사항까지 상세히 설명하세요.\n\n"
         "반드시 아래 요소들을 포함하세요:\n"
         "1. 훈련 프로그램 표: [TABLE_START]와 [TABLE_END] 사이에 작성하세요.\n"
-        "형식: 훈련명|세트|횟수|휴식|효과 (각 행을 새 줄로 구분)\n"
-        "예:\n"
+        "형식: 훈련명|세트|횟수/시간|휴식|주요 작용 근육|효과\n"
         "[TABLE_START]\n"
-        "훈련명|세트|횟수|휴식|주요 효과\n"
-        "스쿼트 점프|3|12회|60초|하체 폭발력 강화\n"
-        "런지|3|10회|45초|균형감각 향상\n"
+        "훈련명|세트|횟수|휴식|주요 작용 근육|효과\n"
+        "예시운동|3|12회|60초|대퇴사두근|하체 강화\n"
         "[TABLE_END]\n\n"
         "2. 핵심 포인트 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3가지 핵심만 작성\n\n"
         "글의 흐름 - 기승전결로 점점 깊어지게:\n"
         "1. 독자가 공감하는 문제나 고민으로 시작하세요.\n"
-        "2. 왜 그 문제가 생기는지 과학적으로 설명하세요. 해부학, 생리학 용어를 괄호로 설명하세요.\n"
-        "3. 연구 결과와 논문을 인용하듯 깊이 있는 근거를 제시하세요.\n"
+        "2. 왜 그 문제가 생기는지 해부학, 생리학, 운동역학으로 과학적으로 설명하세요.\n"
+        "3. 최신 연구 결과와 논문을 인용하듯 구체적 수치로 근거를 제시하세요.\n"
         "4. 독자가 당장 실천할 수 있는 구체적인 훈련 프로그램을 번호로 제시하세요.\n"
         "5. 영양, 회복, 멘탈 관리까지 포괄적으로 다루세요.\n"
         "6. 독자가 오늘 당장 변화를 시작하고 싶게 만드는 마무리로 끝내세요.\n\n"
-        "종목: " + topic["sport"] + "\n"
+        "카테고리: " + topic["sport"] + "\n"
         "주제: " + topic["title"] + "\n"
         "목표 분량: 4000자에서 6000자\n\n"
         "반드시 아래 형식으로 출력하세요:\n"
@@ -263,11 +280,9 @@ def body_to_html(body, images, topic):
 
     html = series_badge
 
-    # 이미지 1 - 상단
     if len(images) >= 1:
         html += make_image_html(images[0])
 
-    # TABLE 파싱
     table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
 
@@ -277,28 +292,23 @@ def body_to_html(body, images, topic):
     table_html = make_table_html(table_match.group(1)) if table_match else ""
     summary_html = make_summary_html(summary_match.group(1)) if summary_match else ""
 
-    # 특수 태그 제거
     clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
 
     paragraphs = clean_body.split("\n")
-    total = len(paragraphs)
-    mid = total // 2
+    mid = len(paragraphs) // 2
     image2_inserted = False
 
     for i, para in enumerate(paragraphs):
         if not para.strip():
             html += '<p style="margin:14px 0;">&nbsp;</p>\n'
             continue
-
         if para.strip() == "[TABLE_PLACEHOLDER]":
             html += table_html
             continue
-
         if para.strip() == "[SUMMARY_PLACEHOLDER]":
             html += summary_html
             continue
-
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
             html += '<h2 style="margin-top:40px;margin-bottom:14px;font-size:22px;border-left:4px solid #1565c0;padding-left:14px;color:#1a1a1a;">' + heading + "</h2>\n"
@@ -307,16 +317,66 @@ def body_to_html(body, images, topic):
         else:
             html += '<p style="margin:12px 0;line-height:2.0;font-size:16px;color:#222;">' + para + "</p>\n"
 
-        # 이미지 2 - 중간
         if i >= mid and not image2_inserted and len(images) >= 2:
             html += make_image_html(images[1], margin_top="20px")
             image2_inserted = True
 
-    # 이미지 3 - 하단 (있으면)
     if len(images) >= 3:
         html += make_image_html(images[2], margin_top="20px")
 
     return html
+
+
+def send_telegram(title, post_url, topic):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print("[텔레그램] 설정값 없음 - 건너뜀")
+        return
+    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
+    message = (
+        sport_emoji + " 새 포스팅 알림\n\n"
+        + "📌 " + title + "\n\n"
+        + "🔗 " + post_url
+    )
+    try:
+        response = requests.post(
+            "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": message},
+            timeout=10
+        )
+        if response.status_code == 200:
+            print("[텔레그램] 공유 성공!")
+        else:
+            print("[텔레그램] 실패: " + response.text[:200])
+    except Exception as e:
+        print("[텔레그램 오류] " + str(e))
+
+
+def send_facebook(title, post_url, topic):
+    if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
+        print("[페이스북] 설정값 없음 - 건너뜀")
+        return
+    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
+    message = (
+        sport_emoji + " 새 포스팅\n\n"
+        + title + "\n\n"
+        + "자세히 읽기 👉 " + post_url
+    )
+    try:
+        response = requests.post(
+            "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
+            data={
+                "message": message,
+                "link": post_url,
+                "access_token": FACEBOOK_ACCESS_TOKEN
+            },
+            timeout=10
+        )
+        if response.status_code == 200:
+            print("[페이스북] 공유 성공!")
+        else:
+            print("[페이스북] 실패: " + response.text[:200])
+    except Exception as e:
+        print("[페이스북 오류] " + str(e))
 
 
 def post_to_blogger(post_data, images):
@@ -342,10 +402,8 @@ def post_to_blogger(post_data, images):
         post_url = result.get("url", "")
         print("\n발행 완료!")
         print("   링크: " + post_url)
-        
-        # [원본 로직 유지하며 텔레그램 연동 추가]
-        send_telegram_message(post_data["title"], post_url)
-        
+        send_telegram(post_data["title"], post_url, post_data["topic"])
+        send_facebook(post_data["title"], post_url, post_data["topic"])
         return True
     else:
         print("실패: " + response.text[:300])
