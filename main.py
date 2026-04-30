@@ -3,7 +3,9 @@ import requests
 import random
 from datetime import datetime
 import json
+import re
 
+# 설정값 (환경 변수)
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
@@ -116,14 +118,12 @@ TOPICS = [
 
 USED_TOPICS_FILE = "used_topics.json"
 
-
 def load_used_topics():
     try:
         with open(USED_TOPICS_FILE, "r") as f:
             return json.load(f)
     except Exception:
         return []
-
 
 def save_used_topic(title):
     used = load_used_topics()
@@ -135,7 +135,6 @@ def save_used_topic(title):
             json.dump(used, f, ensure_ascii=False)
     except Exception as e:
         print("[중복방지] 저장 실패: " + str(e))
-
 
 def pick_topic():
     used = load_used_topics()
@@ -152,9 +151,7 @@ def pick_topic():
     save_used_topic(topic["title"])
     return topic
 
-
 def get_access_token():
-    print("[인증] Google Access Token 발급 중...")
     response = requests.post(
         "https://oauth2.googleapis.com/token",
         data={
@@ -167,12 +164,9 @@ def get_access_token():
     )
     if response.status_code != 200:
         raise Exception("토큰 발급 실패: " + response.text)
-    print("[인증] 완료!")
     return response.json()["access_token"]
 
-
 def generate_with_claude(prompt):
-    print("[AI] Claude 사용 중...")
     response = requests.post(
         "https://api.anthropic.com/v1/messages",
         headers={
@@ -181,7 +175,7 @@ def generate_with_claude(prompt):
             "content-type": "application/json"
         },
         json={
-            "model": "claude-sonnet-4-20250514",
+            "model": "claude-3-5-sonnet-20240620",
             "max_tokens": 4000,
             "messages": [{"role": "user", "content": prompt}]
         },
@@ -190,7 +184,6 @@ def generate_with_claude(prompt):
     if response.status_code != 200:
         raise Exception("Claude 오류: " + str(response.status_code) + " " + response.text[:200])
     return response.json()["content"][0]["text"]
-
 
 def generate_post():
     topic = pick_topic()
@@ -203,30 +196,25 @@ def generate_post():
             "이전 편보다 심화된 내용을 다루세요.\n\n"
         )
 
-    # 기존의 전문성 원칙 + 매거진 레이아웃을 결합한 프롬프트
     prompt = (
         "당신은 스포츠 과학 전문 매거진의 수석 에디터입니다.\n"
         "한국어만 사용하세요. 한자, 일본어 등 외국 문자 절대 금지.\n\n"
         + series_info +
         "핵심 매거진 구조:\n"
         "1. 제목: 독자의 궁금증을 유발하고 클릭을 유도하는 강력한 훅(Hook)을 포함하세요.\n"
-        "2. 첫 문장: 독자가 겪는 구체적 상황을 1~2줄로 짧게 묘사하며 공감을 유도하세요.\n"
-        "3. 임팩트 키워드: 핵심 주제를 관통하는 단어 하나를 [KEYWORD]단어[/KEYWORD] 형식으로 크게 제시하세요.\n"
-        "4. 키워드 설명: 해당 키워드가 왜 중요한지 보통 크기로 짧고 굵게 설명하세요.\n\n"
-        
-        "본문 집필 원칙 (깊이 수치화):\n"
-        "- [소제목1] 원리 설명: 왜 그 문제가 생기는지 생리학/해부학/역학으로 깊이 설명하세요.\n"
-        "- [소제목2] 심화 분석: 기초 설명을 넘어 메커니즘을 파고드세요.\n"
-        "- [소제목3] 전문 근거: 최신 연구 결과나 해부학적 근거를 인용하여 전문성을 보여주세요.\n"
-        "- 전문 용어는 반드시 괄호 안에 쉬운 설명을 추가하세요. 예: 대퇴사두근(허벅지 앞 근육)\n"
-        "- 2500자에서 3500자로 작성하여 매거진다운 깊이를 유지하세요.\n\n"
-        
+        "2. 첫 문장: 독자가 겪는 상황에 깊이 공감하는 1~2줄의 짧고 강한 문장으로 시작하세요.\n"
+        "3. 임팩트 키워드: 주제의 핵심 단어 하나를 [KEYWORD]단어[/KEYWORD] 형식으로 크게 작성하세요.\n"
+        "4. 키워드 풀어쓰기: 해당 키워드가 왜 중요한지 보통 크기로 짧게 설명하세요.\n\n"
+        "본문 전개 지침:\n"
+        "- [소제목1] 기초 원리: 생리학/역학적 원리를 깊이 있게 설명하세요.\n"
+        "- [소제목2] 심화 분석: 기초를 넘어 더 깊은 메커니즘을 파고드세요.\n"
+        "- [소제목3] 전문 근거: 최신 연구 결과나 해부학적 근거를 제시하세요.\n"
+        "- 전문 용어는 반드시 괄호 안에 쉬운 설명을 추가하세요.\n\n"
         "실전 및 마무리:\n"
         "- 추천 운동 표: [TABLE_START]와 [TABLE_END] 사이에 '훈련명|세트|횟수|휴식|작용 근육|효과' 형식으로 작성하세요.\n"
-        "- 운동 보완 설명: 표에 제시된 운동의 실천 팁을 상세히 덧붙이세요.\n"
-        "- 결론 및 조언: 오늘 당장 할 수 있는 행동 하나를 전문가로서 강하고 간결하게 조언하세요.\n"
-        "- 핵심 요약: 반드시 [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄로 작성하세요.\n\n"
-        
+        "- 운동 보완 설명: 표에 제시된 각 운동의 핵심 팁을 덧붙이세요.\n"
+        "- 결론 및 조언: 전문가로서 독자에게 전하는 강하고 간결한 조언으로 마무리하세요.\n"
+        "- 핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄로 작성하세요.\n\n"
         f"카테고리: {topic['sport']}\n"
         f"주제: {topic['title']}\n\n"
         "출력 형식:\n"
@@ -236,9 +224,6 @@ def generate_post():
     )
 
     full_text = generate_with_claude(prompt)
-    # ... 이후 처리 로직 (이전 답변 참고)
- 
-
     lines = full_text.strip().split("\n")
     title = ""
     body_lines = []
@@ -253,19 +238,14 @@ def generate_post():
             body_lines.append(line)
 
     body = "\n".join(body_lines).strip()
-    if not title:
-        title = topic["title"]
-    if not body:
-        body = full_text
+    if not title: title = topic["title"]
+    if not body: body = full_text
 
     print("[완료] 제목: " + title)
-    print("[완료] 글자수: " + str(len(body)) + "자")
     return {"title": title, "body": body, "topic": topic}
 
-
 def get_images(keyword, count=3):
-    if not UNSPLASH_ACCESS_KEY:
-        return []
+    if not UNSPLASH_ACCESS_KEY: return []
     try:
         response = requests.get(
             "https://api.unsplash.com/search/photos",
@@ -286,261 +266,146 @@ def get_images(keyword, count=3):
                 "author": photo["user"]["name"],
                 "author_url": photo["user"]["links"]["html"]
             })
-        print("[이미지] " + str(len(images)) + "장 수집 완료")
         return images
-    except Exception as e:
-        print("[이미지 오류] " + str(e))
+    except Exception:
         return []
-
 
 def make_table_html(table_text):
     rows = [r.strip() for r in table_text.strip().split("\n") if r.strip()]
-    if not rows:
-        return ""
-    html = '<div style="overflow-x:auto;margin:24px 0;">'
-    html += '<table style="width:100%;border-collapse:collapse;font-size:15px;">'
+    if not rows: return ""
+    html = '<div style="overflow-x:auto;margin:24px 0;"><table style="width:100%;border-collapse:collapse;font-size:15px;">'
     for i, row in enumerate(rows):
         cols = row.split("|")
         html += "<tr>"
         for col in cols:
             if i == 0:
-                html += '<th style="background:#1565c0;color:#fff;padding:10px 14px;text-align:center;border:1px solid #1565c0;">' + col.strip() + "</th>"
+                html += f'<th style="background:#1565c0;color:#fff;padding:10px 14px;border:1px solid #1565c0;">{col.strip()}</th>'
             else:
                 bg = "#f5f8ff" if i % 2 == 0 else "#ffffff"
-                html += '<td style="padding:9px 14px;text-align:center;border:1px solid #dde3f0;background:' + bg + ';">' + col.strip() + "</td>"
+                html += f'<td style="padding:9px 14px;text-align:center;border:1px solid #dde3f0;background:{bg};">{col.strip()}</td>'
         html += "</tr>"
     html += "</table></div>\n"
     return html
-
 
 def make_summary_html(summary_text):
     lines = [l.strip() for l in summary_text.strip().split("\n") if l.strip()]
     html = '<div style="background:#e8f4fd;border-left:5px solid #1565c0;border-radius:8px;padding:20px 24px;margin:28px 0;">'
     html += '<p style="font-weight:700;font-size:17px;color:#1565c0;margin-bottom:12px;">📌 핵심 요약</p>'
     for line in lines:
-        html += '<p style="margin:6px 0;font-size:15px;color:#333;">✅ ' + line + "</p>"
+        html += f'<p style="margin:6px 0;font-size:15px;color:#333;">✅ {line}</p>'
     html += "</div>\n"
     return html
-
 
 def make_image_html(img, margin_top="0"):
-    html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
-    html += '<img src="' + img["url"] + '" alt="' + img["alt"] + '" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);"/>'
-    html += '<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="' + img["author_url"] + '" style="color:#999;">' + img["author"] + '</a> on Unsplash</p>'
-    html += "</div>\n"
-    return html
-
+    return (
+        f'<div style="text-align:center;margin:30px 0;margin-top:{margin_top};">'
+        f'<img src="{img["url"]}" alt="{img["alt"]}" style="max-width:100%;border-radius:10px;"/>'
+        f'<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="{img["author_url"]}">{img["author"]}</a></p></div>\n'
+    )
 
 def body_to_html(body, images, topic):
-    import re
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
 
-    # 1. 임팩트 키워드 스타일링 ([KEYWORD]단어[/KEYWORD] 처리)
+    # 1. 임팩트 키워드 스타일링
     keyword_pattern = re.compile(r'\[KEYWORD\](.*?)\[/KEYWORD\]', re.DOTALL)
     def style_keyword(match):
         word = match.group(1).strip()
         return (
             f'<div style="text-align:center; margin:50px 0;">'
             f'<p style="font-size:14px; color:#666; margin-bottom:10px;">Focus Keyword</p>'
-            f'<span style="font-size:42px; font-weight:900; color:#1565c0; '
-            f'letter-spacing:-1px; border-bottom:6px solid #1565c0; padding-bottom:5px;">'
-            f'{word}</span></div>'
+            f'<span style="font-size:42px; font-weight:900; color:#1565c0; letter-spacing:-1px; border-bottom:6px solid #1565c0; padding-bottom:5px;">{word}</span>'
+            f'</div>'
         )
     body = keyword_pattern.sub(style_keyword, body)
 
-    # 시리즈 배지
+    # 2. 초기 HTML 구성 (배지 + 상단 이미지)
     series_badge = ""
     if topic.get("series"):
         series_badge = (
-            '<div style="display:inline-block;background:#1565c0;color:#fff;'
-            'font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:20px;font-weight:600;">'
-            + sport_emoji + " " + topic["series"] + " " + str(topic["episode"]) + "편</div>\n"
+            f'<div style="display:inline-block;background:#1565c0;color:#fff;font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:20px;">'
+            f'{sport_emoji} {topic["series"]} {topic["episode"]}편</div>\n'
         )
-
+    
     html = series_badge
-
-    # 상단 이미지
     if len(images) >= 1:
         html += make_image_html(images[0])
 
-    # 표 및 요약 파싱
+    # 3. 특수 요소 파싱 (표, 요약)
     table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
-
-    table_match = table_pattern.search(body)
-    summary_match = summary_pattern.search(body)
-
-    table_html = make_table_html(table_match.group(1)) if table_match else ""
-    summary_html = make_summary_html(summary_match.group(1)) if summary_match else ""
+    
+    table_html = make_table_html(table_pattern.search(body).group(1)) if table_pattern.search(body) else ""
+    summary_html = make_summary_html(summary_pattern.search(body).group(1)) if summary_pattern.search(body) else ""
 
     clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
 
-    # 본문 렌더링
+    # 4. 문단 렌더링
     paragraphs = clean_body.split("\n")
     for para in paragraphs:
         text = para.strip()
         if not text:
+            html += '<div style="margin:10px 0;"></div>'
             continue
         
         if text == "[TABLE_PLACEHOLDER]":
             html += table_html
-        elif text == "[SUMMARY_PLACEHOLDER]":
+            continue
+        if text == "[SUMMARY_PLACEHOLDER]":
             html += summary_html
-        elif text.startswith("[") and "]" in text:  # 소제목
-            heading = text.strip("[]")
-            html += f'<h2 style="margin-top:40px; font-size:24px; border-left:8px solid #1565c0; padding-left:15px;">{heading}</h2>'
-        else:
-            html += f'<p style="line-height:1.8; margin-bottom:20px; font-size:16px; color:#333;">{text}</p>'
-
-    return html
-        # 번호 리스트
-        if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
-            html += (
-                '<div style="display:flex;align-items:flex-start;margin:10px 0;padding:12px 16px;'
-                'background:#f5f8ff;border-radius:8px;">'
-                '<span style="color:#1565c0;font-weight:700;margin-right:12px;font-size:16px;">'
-                + para.strip()[0] + '.</span>'
-                '<span style="color:#333;font-size:16px;line-height:1.8;">'
-                + para.strip()[2:].strip() + '</span></div>\n'
-            )
             continue
 
-        # 일반 단락
-        para_count += 1
-        # 3번째 단락마다 핵심 문장 강조 (첫 단락 제외)
-        if para_count % 4 == 0 and para_count > 1 and len(para.strip()) > 30:
-            html += (
-                '<div style="border-left:4px solid #1565c0;padding:14px 20px;margin:20px 0;'
-                'background:#f0f4ff;border-radius:0 8px 8px 0;">'
-                '<p style="margin:0;font-size:16px;line-height:1.9;color:#1a1a2e;font-weight:500;">'
-                + para.strip() + '</p></div>\n'
-            )
+        if text.startswith("[") and "]" in text:
+            heading = text.strip("[]")
+            html += f'<h2 style="margin-top:40px; font-size:24px; border-left:8px solid #1565c0; padding-left:15px; font-weight:700;">{heading}</h2>'
+        elif len(text) > 2 and text[0].isdigit() and text[1] in [".", ")"]:
+            html += f'<div style="background:#f5f8ff; padding:15px; border-radius:8px; margin:10px 0;"><b>{text[0]}.</b> {text[2:].strip()}</div>'
         else:
-            html += (
-                '<p style="margin:14px 0;line-height:1.9;font-size:16px;color:#333;">'
-                + para.strip() + '</p>\n'
-            )
+            html += f'<p style="line-height:1.9; margin:15px 0; font-size:16px;">{text}</p>'
 
-        # 중간 이미지
-        if i >= mid and not image2_inserted and len(images) >= 2:
-            html += make_image_html(images[1], margin_top="20px")
-            image2_inserted = True
-
-    # 하단 이미지
-    if len(images) >= 3:
-        html += make_image_html(images[2], margin_top="20px")
-
+    if len(images) >= 2:
+        html += make_image_html(images[1], margin_top="20px")
+    
     return html
 
-
 def send_telegram(title, post_url, topic):
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        print("[텔레그램] 설정값 없음 - 건너뜀")
-        return
-    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
-    message = (
-        sport_emoji + " 새 포스팅\n\n"
-        + "📌 " + title + "\n\n"
-        + "🔗 " + post_url
-    )
-    try:
-        response = requests.post(
-            "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
-            json={"chat_id": TELEGRAM_CHAT_ID, "text": message},
-            timeout=10
-        )
-        if response.status_code == 200:
-            print("[텔레그램] 공유 성공!")
-        else:
-            print("[텔레그램] 실패: " + response.text[:200])
-    except Exception as e:
-        print("[텔레그램 오류] " + str(e))
-
+    if not TELEGRAM_BOT_TOKEN: return
+    msg = f"{SPORT_EMOJI.get(topic['sport'], '🏆')} 새 포스팅\n\n📌 {title}\n🔗 {post_url}"
+    requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage", json={"chat_id": TELEGRAM_CHAT_ID, "text": msg})
 
 def send_facebook(title, post_url, topic):
-    if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
-        print("[페이스북] 설정값 없음 - 건너뜀")
-        return
-    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
-    message = (
-        sport_emoji + " 새 포스팅\n\n"
-        + title + "\n\n"
-        + "자세히 읽기 👉 " + post_url
-    )
+    if not FACEBOOK_PAGE_ID: return
+    msg = f"{SPORT_EMOJI.get(topic['sport'], '🏆')} {title}\n자세히 읽기 👉 {post_url}"
+    requests.post(f"https://graph.facebook.com/v19.0/{FACEBOOK_PAGE_ID}/feed", data={"message": msg, "link": post_url, "access_token": FACEBOOK_ACCESS_TOKEN})
+
+def post_to_blogger(post_data, images):
     try:
-        response = requests.post(
-            "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
-            data={
-                "message": message,
-                "link": post_url,
-                "access_token": FACEBOOK_ACCESS_TOKEN
-            },
-            timeout=10
-        )
-        if response.status_code == 200:
-            print("[페이스북] 공유 성공!")
-        else:
-            print("[페이스북] 실패: " + response.text[:200])
+        token = get_access_token()
+        body_html = body_to_html(post_data["body"], images, post_data["topic"])
+        payload = {
+            "kind": "blogger#post",
+            "title": post_data["title"],
+            "content": body_html,
+            "labels": [post_data["topic"]["sport"], post_data["topic"]["series"]],
+            "status": "LIVE"
+        }
+        headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+        res = requests.post(f"https://www.googleapis.com/blogger/v3/blogs/{BLOG_ID}/posts", headers=headers, json=payload)
+        if res.status_code == 200:
+            post_url = res.json().get("url")
+            print(f"발행 성공: {post_url}")
+            send_telegram(post_data["title"], post_url, post_data["topic"])
+            send_facebook(post_data["title"], post_url, post_data["topic"])
+            return True
     except Exception as e:
-        print("[페이스북 오류] " + str(e))
-
-
-def post_to_blogger(post_data, images, retry=2):
-    print("\n[Blogger] 포스팅 시작...")
-    topic = post_data["topic"]
-    labels = [topic["sport"], topic["series"]]
-
-    for attempt in range(1, retry + 2):
-        try:
-            access_token = get_access_token()
-            body_html = body_to_html(post_data["body"], images, topic)
-            url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
-            headers = {
-                "Authorization": "Bearer " + access_token,
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "kind": "blogger#post",
-                "title": post_data["title"],
-                "content": body_html,
-                "labels": labels,
-                "status": "LIVE"
-            }
-            print("[시도 " + str(attempt) + "] 제목: " + post_data["title"])
-            response = requests.post(url, headers=headers, json=payload, timeout=30)
-            print("[응답] 상태코드: " + str(response.status_code))
-            if response.status_code == 200:
-                result = response.json()
-                post_url = result.get("url", "")
-                print("\n발행 완료!")
-                print("   링크: " + post_url)
-                send_telegram(post_data["title"], post_url, topic)
-                send_facebook(post_data["title"], post_url, topic)
-                return True
-            else:
-                print("실패: " + response.text[:300])
-                if attempt <= retry:
-                    print("[재시도] " + str(attempt) + "번째 재시도 중...")
-        except Exception as e:
-            print("[오류] " + str(e))
-            if attempt <= retry:
-                print("[재시도] " + str(attempt) + "번째 재시도 중...")
+        print(f"포스팅 실패: {e}")
     return False
 
-
 if __name__ == "__main__":
-    print("=" * 50)
-    print("AutoBlog Sports Publisher - Claude Edition")
-    print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print("=" * 50)
+    print(f"AutoBlog 시작: {datetime.now()}")
     try:
         post = generate_post()
         images = get_images(post["topic"]["keyword"], count=3)
         post_to_blogger(post, images)
-        print("\n모든 작업 완료!")
     except Exception as e:
-        print("\n오류 발생: " + str(e))
-        import traceback
-        traceback.print_exc()
-        exit(1)
+        print(f"오류: {e}")
