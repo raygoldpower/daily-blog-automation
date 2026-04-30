@@ -16,58 +16,103 @@ FACEBOOK_ACCESS_TOKEN = os.environ.get("FACEBOOK_ACCESS_TOKEN", "")
 BLOG_ID = "4393162034375416055"
 
 SPORT_EMOJI = {
-    "축구": "⚽",
-    "농구": "🏀",
-    "야구": "⚾",
-    "공통": "🏆",
-    "근육학": "💪",
-    "재활": "🩺",
-    "영양": "🥗",
-    "심리": "🧠",
-    "체력": "🔥",
-    "유연성": "🤸"
+    "축구": "⚽", "농구": "🏀", "야구": "⚾", "공통": "🏆",
+    "근육학": "💪", "재활": "🩺", "영양": "🥗", "심리": "🧠",
+    "체력": "🔥", "유연성": "🤸", "생리학": "🫀", "물리치료": "🏥",
+    "역학": "⚙️", "해부학": "🦴", "신체균형": "⚖️", "스포츠의학": "🩻",
 }
 
 TOPICS = [
-    {"title": "당신의 드리블이 느린 진짜 이유", "keyword": "soccer dribbling technique", "sport": "축구", "series": "드리블 마스터", "episode": 1},
-    {"title": "축구 스피드, 빠른 선수는 무엇이 다른가", "keyword": "soccer speed sprint", "sport": "축구", "series": "스피드 혁명", "episode": 1},
-    {"title": "축구 슈팅력, 발이 아니라 몸통이 결정한다", "keyword": "soccer shooting power core", "sport": "축구", "series": "슈팅 마스터", "episode": 1},
-    {"title": "90분을 뛰어도 지치지 않는 지구력 훈련", "keyword": "soccer endurance stamina", "sport": "축구", "series": "체력 마스터", "episode": 1},
-    {"title": "농구 점프력, 타고나는 게 아니다", "keyword": "basketball jump vertical leap", "sport": "농구", "series": "점프력 혁명", "episode": 1},
-    {"title": "농구 핸들링, 손이 아니라 뇌를 훈련하라", "keyword": "basketball ball handling", "sport": "농구", "series": "핸들링 마스터", "episode": 1},
-    {"title": "농구 3점슛 성공률을 높이는 신체역학", "keyword": "basketball three point shooting biomechanics", "sport": "농구", "series": "슈팅 마스터", "episode": 1},
-    {"title": "야구 타격 폼, 0.1초가 홈런을 결정한다", "keyword": "baseball batting swing speed", "sport": "야구", "series": "타격의 과학", "episode": 1},
-    {"title": "투수의 어깨를 지키는 회전근개 강화법", "keyword": "baseball pitcher shoulder rotator cuff", "sport": "야구", "series": "투구의 과학", "episode": 1},
-    {"title": "대퇴사두근(허벅지 앞 근육)을 제대로 키우는 법", "keyword": "quadriceps muscle training strength", "sport": "근육학", "series": "근육 해부학", "episode": 1},
-    {"title": "햄스트링 부상을 예방하는 과학적 훈련법", "keyword": "hamstring injury prevention training", "sport": "근육학", "series": "근육 해부학", "episode": 2},
-    {"title": "코어 근육의 모든 것, 복횡근부터 다열근까지", "keyword": "core muscles transverse abdominis multifidus", "sport": "근육학", "series": "코어 과학", "episode": 1},
-    {"title": "어깨 근육 해부학, 삼각근과 회전근개의 역할", "keyword": "shoulder deltoid rotator cuff anatomy", "sport": "근육학", "series": "상체 해부학", "episode": 1},
-    {"title": "종아리 근육(비복근, 가자미근)과 폭발적 스피드의 관계", "keyword": "calf muscle gastrocnemius soleus speed", "sport": "근육학", "series": "하체 해부학", "episode": 1},
-    {"title": "근육 성장의 원리, 근비대를 유발하는 과학적 메커니즘", "keyword": "muscle hypertrophy growth mechanism", "sport": "근육학", "series": "근육 성장 과학", "episode": 1},
-    {"title": "무릎 통증의 진짜 원인, 슬개건염부터 반월판 손상까지", "keyword": "knee pain patellar tendinitis meniscus", "sport": "재활", "series": "부상 재활", "episode": 1},
-    {"title": "허리 통증을 없애는 요추 안정화 운동법", "keyword": "lower back pain lumbar stabilization", "sport": "재활", "series": "부상 재활", "episode": 2},
-    {"title": "발목 염좌 후 완벽하게 회복하는 재활 프로그램", "keyword": "ankle sprain rehabilitation recovery", "sport": "재활", "series": "부상 재활", "episode": 3},
-    {"title": "어깨 충돌 증후군, 올바른 재활과 예방법", "keyword": "shoulder impingement syndrome rehabilitation", "sport": "재활", "series": "부상 재활", "episode": 4},
-    {"title": "운동 전후 단백질 섭취, 얼마나 언제 먹어야 하나", "keyword": "protein intake pre post workout timing", "sport": "영양", "series": "스포츠 영양학", "episode": 1},
-    {"title": "탄수화물이 운동 퍼포먼스를 결정하는 이유", "keyword": "carbohydrates sports performance glycogen", "sport": "영양", "series": "스포츠 영양학", "episode": 2},
-    {"title": "크레아틴, 과학이 증명한 가장 효과적인 보충제", "keyword": "creatine supplement muscle strength science", "sport": "영양", "series": "보충제 과학", "episode": 1},
-    {"title": "수분 보충의 과학, 탈수가 운동 능력에 미치는 영향", "keyword": "hydration dehydration sports performance", "sport": "영양", "series": "스포츠 영양학", "episode": 3},
-    {"title": "스포츠 루틴의 힘, 프로 선수들이 경기 전 반복하는 이유", "keyword": "sports pre game routine psychology", "sport": "심리", "series": "스포츠 심리학", "episode": 1},
-    {"title": "압박 상황에서 최고의 퍼포먼스를 내는 멘탈 트레이닝", "keyword": "clutch performance mental training pressure", "sport": "심리", "series": "스포츠 심리학", "episode": 2},
-    {"title": "슬럼프를 극복하는 스포츠 심리학적 접근법", "keyword": "slump recovery sports psychology", "sport": "심리", "series": "스포츠 심리학", "episode": 3},
-    {"title": "VO2max란 무엇인가, 최대 산소 섭취량과 지구력의 관계", "keyword": "VO2max maximal oxygen uptake endurance", "sport": "체력", "series": "체력 과학", "episode": 1},
-    {"title": "무산소 역치(젖산 역치)를 높이는 훈련법", "keyword": "lactate threshold anaerobic training", "sport": "체력", "series": "체력 과학", "episode": 2},
-    {"title": "HIIT vs 저강도 유산소, 어떤 방법이 더 효과적인가", "keyword": "HIIT vs steady state cardio fat loss", "sport": "체력", "series": "유산소 과학", "episode": 1},
-    {"title": "정적 스트레칭 vs 동적 스트레칭, 언제 무엇을 해야 하나", "keyword": "static dynamic stretching when to use", "sport": "유연성", "series": "유연성 과학", "episode": 1},
-    {"title": "고관절 가동성이 스포츠 퍼포먼스를 결정한다", "keyword": "hip mobility sports performance", "sport": "유연성", "series": "가동성 혁명", "episode": 1},
-    {"title": "폼롤러로 근막 이완하는 올바른 방법", "keyword": "foam roller myofascial release technique", "sport": "유연성", "series": "회복 과학", "episode": 1},
-    {"title": "수면이 운동 회복과 근육 성장에 미치는 놀라운 영향", "keyword": "sleep recovery muscle growth hormones", "sport": "공통", "series": "회복 과학", "episode": 1},
-    {"title": "과훈련 증후군(오버트레이닝)을 알아채는 방법과 대처법", "keyword": "overtraining syndrome symptoms recovery", "sport": "공통", "series": "회복 과학", "episode": 2},
-    {"title": "아이의 스포츠 재능을 과학적으로 발견하고 키우는 방법", "keyword": "youth athletic development talent", "sport": "공통", "series": "스포츠 발달", "episode": 1},
-    {"title": "나이가 들수록 꼭 해야 하는 기능성 운동의 모든 것", "keyword": "functional fitness aging sarcopenia", "sport": "공통", "series": "시니어 스포츠", "episode": 1},
-    {"title": "체형 불균형이 부상의 원인이다, 체형 분석과 교정 운동", "keyword": "postural imbalance injury prevention correction", "sport": "공통", "series": "체형 교정", "episode": 1},
+    # 축구
+    {"title": "드리블 속도 올리는 발목 가동성 훈련 3가지", "keyword": "soccer dribbling ankle mobility", "sport": "축구", "series": "드리블 마스터", "episode": 1},
+    {"title": "축구 순간 스피드 높이는 가속 훈련법", "keyword": "soccer acceleration sprint training", "sport": "축구", "series": "스피드 혁명", "episode": 1},
+    {"title": "축구 슈팅력을 높이는 고관절 회전 훈련", "keyword": "soccer shooting hip rotation power", "sport": "축구", "series": "슈팅 마스터", "episode": 1},
+    {"title": "전반 90분 체력 유지하는 지구력 훈련 루틴", "keyword": "soccer endurance 90 minutes stamina", "sport": "축구", "series": "체력 마스터", "episode": 1},
+    {"title": "축구 선수 무릎 부상 예방 스쿼트 변형 동작", "keyword": "soccer knee injury prevention squat", "sport": "축구", "series": "부상 예방", "episode": 1},
+    # 농구
+    {"title": "농구 점프력 높이는 플라이오메트릭 훈련 루틴", "keyword": "basketball jump plyometric training", "sport": "농구", "series": "점프력 혁명", "episode": 1},
+    {"title": "농구 핸들링 실력 올리는 뇌 훈련법", "keyword": "basketball dribbling brain hand coordination", "sport": "농구", "series": "핸들링 마스터", "episode": 1},
+    {"title": "3점슛 성공률 높이는 손목 스냅 훈련", "keyword": "basketball three point wrist snap shooting", "sport": "농구", "series": "슈팅 마스터", "episode": 1},
+    # 야구
+    {"title": "배트 스피드 높이는 하체 회전 훈련", "keyword": "baseball bat speed hip rotation", "sport": "야구", "series": "타격의 과학", "episode": 1},
+    {"title": "투수 어깨 부상 막는 회전근개 강화 운동", "keyword": "baseball pitcher rotator cuff injury prevention", "sport": "야구", "series": "투구의 과학", "episode": 1},
+    # 근육학
+    {"title": "허벅지 앞 근육 키우는 스쿼트 변형 4가지", "keyword": "quadriceps squat variation muscle building", "sport": "근육학", "series": "근육 해부학", "episode": 1},
+    {"title": "햄스트링 파열 막는 편심성 수축 훈련법", "keyword": "hamstring eccentric training injury prevention", "sport": "근육학", "series": "근육 해부학", "episode": 2},
+    {"title": "복횡근 활성화로 허리 통증 잡는 방법", "keyword": "transverse abdominis core activation back pain", "sport": "근육학", "series": "코어 과학", "episode": 1},
+    {"title": "삼각근 3개 부위 균형 있게 키우는 훈련", "keyword": "deltoid three heads shoulder training", "sport": "근육학", "series": "상체 해부학", "episode": 1},
+    {"title": "종아리 근육 강화로 발목 부상 예방하기", "keyword": "calf muscle ankle stability injury prevention", "sport": "근육학", "series": "하체 해부학", "episode": 1},
+    {"title": "근육 성장 원리, 단백질 합성을 극대화하는 자극법", "keyword": "muscle protein synthesis hypertrophy", "sport": "근육학", "series": "근육 성장 과학", "episode": 1},
+    {"title": "전거근 약화가 어깨 통증을 만드는 이유", "keyword": "serratus anterior weakness shoulder pain", "sport": "근육학", "series": "상체 해부학", "episode": 2},
+    {"title": "중둔근 강화로 무릎 통증과 골반 불균형 잡기", "keyword": "gluteus medius knee pain pelvic balance", "sport": "근육학", "series": "하체 해부학", "episode": 2},
+    # 재활
+    {"title": "무릎 연골 보호하는 슬개건염 재활 운동 순서", "keyword": "patellar tendinitis rehabilitation exercise", "sport": "재활", "series": "부상 재활", "episode": 1},
+    {"title": "허리 디스크 통증 줄이는 요추 안정화 운동", "keyword": "lumbar disc stabilization exercise", "sport": "재활", "series": "부상 재활", "episode": 2},
+    {"title": "발목 염좌 후 빠른 복귀를 위한 재활 단계", "keyword": "ankle sprain rehabilitation return to sport", "sport": "재활", "series": "부상 재활", "episode": 3},
+    {"title": "어깨 충돌 증후군 재활, 병원 가기 전 할 수 있는 것", "keyword": "shoulder impingement home rehabilitation", "sport": "재활", "series": "부상 재활", "episode": 4},
+    {"title": "아킬레스건 통증 있을 때 하면 안 되는 운동", "keyword": "achilles tendinopathy exercise avoid", "sport": "재활", "series": "부상 재활", "episode": 5},
+    # 영양
+    {"title": "운동 1시간 전 뭘 먹어야 할까, 탄수화물 타이밍", "keyword": "pre workout meal carbohydrate timing", "sport": "영양", "series": "스포츠 영양학", "episode": 1},
+    {"title": "탄수화물이 운동 퍼포먼스를 결정하는 과학적 이유", "keyword": "carbohydrate glycogen sports performance", "sport": "영양", "series": "스포츠 영양학", "episode": 2},
+    {"title": "크레아틴 복용법, 언제 얼마나 먹어야 효과적인가", "keyword": "creatine dosage timing supplement", "sport": "영양", "series": "보충제 과학", "episode": 1},
+    {"title": "운동 중 수분 보충 타이밍과 양, 탈수 막는 방법", "keyword": "hydration during exercise timing amount", "sport": "영양", "series": "스포츠 영양학", "episode": 3},
+    {"title": "단백질 하루 섭취량, 체중별 정확한 계산법", "keyword": "protein daily intake calculation body weight", "sport": "영양", "series": "스포츠 영양학", "episode": 4},
+    {"title": "운동 후 회복 빠르게 하는 영양 조합 3가지", "keyword": "post workout recovery nutrition combination", "sport": "영양", "series": "스포츠 영양학", "episode": 5},
+    # 심리
+    {"title": "경기 전 긴장 푸는 루틴, 프로 선수들의 비밀", "keyword": "pre game routine anxiety control athletes", "sport": "심리", "series": "스포츠 심리학", "episode": 1},
+    {"title": "압박 상황에서 집중력 유지하는 멘탈 훈련법", "keyword": "focus under pressure mental training sports", "sport": "심리", "series": "스포츠 심리학", "episode": 2},
+    {"title": "운동 슬럼프 극복하는 심리학적 접근 3단계", "keyword": "sports slump recovery psychology steps", "sport": "심리", "series": "스포츠 심리학", "episode": 3},
+    {"title": "이미지 트레이닝이 실제 운동 실력을 올리는 원리", "keyword": "mental imagery visualization sports performance", "sport": "심리", "series": "스포츠 심리학", "episode": 4},
+    # 체력
+    {"title": "VO2max 높이는 인터벌 훈련 방법과 강도 설정", "keyword": "VO2max interval training intensity", "sport": "체력", "series": "체력 과학", "episode": 1},
+    {"title": "젖산 역치 높이는 훈련으로 지구력 올리기", "keyword": "lactate threshold training endurance", "sport": "체력", "series": "체력 과학", "episode": 2},
+    {"title": "HIIT 운동 효과 극대화하는 휴식 시간 설정법", "keyword": "HIIT rest interval optimization fat loss", "sport": "체력", "series": "유산소 과학", "episode": 1},
+    {"title": "심박수 구간별 운동 강도 설정하는 방법", "keyword": "heart rate zone exercise intensity training", "sport": "체력", "series": "체력 과학", "episode": 3},
+    # 유연성
+    {"title": "운동 전 동적 스트레칭 루틴, 부상 예방 효과", "keyword": "dynamic stretching warm up injury prevention", "sport": "유연성", "series": "유연성 과학", "episode": 1},
+    {"title": "고관절 유연성 높이는 스트레칭 5가지", "keyword": "hip flexor mobility stretching exercises", "sport": "유연성", "series": "가동성 혁명", "episode": 1},
+    {"title": "폼롤러로 근막 이완하는 올바른 방법과 주의사항", "keyword": "foam rolling myofascial release technique", "sport": "유연성", "series": "회복 과학", "episode": 1},
+    {"title": "흉추 가동성 높이면 어깨 통증이 사라지는 이유", "keyword": "thoracic spine mobility shoulder pain", "sport": "유연성", "series": "가동성 혁명", "episode": 2},
+    # 생리학
+    {"title": "운동할 때 근육에서 실제로 일어나는 일", "keyword": "muscle physiology exercise ATP energy", "sport": "생리학", "series": "운동 생리학", "episode": 1},
+    {"title": "유산소 운동 중 지방이 타는 정확한 원리", "keyword": "fat oxidation aerobic exercise physiology", "sport": "생리학", "series": "운동 생리학", "episode": 2},
+    {"title": "수면 중 성장호르몬이 근육을 키우는 메커니즘", "keyword": "growth hormone sleep muscle recovery", "sport": "생리학", "series": "운동 생리학", "episode": 3},
+    {"title": "운동 후 통증(DOMS)이 생기는 진짜 이유와 해결법", "keyword": "DOMS delayed onset muscle soreness cause", "sport": "생리학", "series": "운동 생리학", "episode": 4},
+    {"title": "심장이 운동에 적응하는 방식, 운동성 심비대", "keyword": "cardiac adaptation exercise athlete heart", "sport": "생리학", "series": "운동 생리학", "episode": 5},
+    {"title": "코르티솔이 높으면 근육이 빠지는 이유", "keyword": "cortisol muscle loss stress hormone", "sport": "생리학", "series": "운동 생리학", "episode": 6},
+    # 물리치료
+    {"title": "어깨 통증 있을 때 물리치료사가 먼저 확인하는 것", "keyword": "shoulder pain physical therapy assessment", "sport": "물리치료", "series": "물리치료 가이드", "episode": 1},
+    {"title": "무릎 통증 자가 진단, 병원 가야 할 신호", "keyword": "knee pain self diagnosis when to see doctor", "sport": "물리치료", "series": "물리치료 가이드", "episode": 2},
+    {"title": "테니스 엘보 치료, 집에서 할 수 있는 운동", "keyword": "tennis elbow treatment home exercise", "sport": "물리치료", "series": "물리치료 가이드", "episode": 3},
+    {"title": "족저근막염 아침 통증 줄이는 스트레칭 루틴", "keyword": "plantar fasciitis morning stretching routine", "sport": "물리치료", "series": "물리치료 가이드", "episode": 4},
+    {"title": "거북목 교정 운동, 하루 5분으로 효과 보기", "keyword": "forward head posture correction exercise", "sport": "물리치료", "series": "물리치료 가이드", "episode": 5},
+    # 역학 (스포츠 역학)
+    {"title": "달리기 자세 분석, 무릎에 가해지는 충격 줄이기", "keyword": "running biomechanics knee impact reduction", "sport": "역학", "series": "스포츠 역학", "episode": 1},
+    {"title": "스쿼트할 때 무릎이 안쪽으로 무너지는 원인", "keyword": "squat knee valgus cause biomechanics", "sport": "역학", "series": "스포츠 역학", "episode": 2},
+    {"title": "데드리프트 허리 부상 막는 척추 중립 자세", "keyword": "deadlift spine neutral position injury prevention", "sport": "역학", "series": "스포츠 역학", "episode": 3},
+    {"title": "점프 착지 자세가 전방십자인대 부상을 결정한다", "keyword": "landing mechanics ACL injury prevention", "sport": "역학", "series": "스포츠 역학", "episode": 4},
+    # 해부학
+    {"title": "무릎 관절 구조, 왜 이렇게 자주 다칠까", "keyword": "knee joint anatomy structure injury", "sport": "해부학", "series": "스포츠 해부학", "episode": 1},
+    {"title": "어깨 관절 360도 움직임이 가능한 이유와 약점", "keyword": "shoulder joint anatomy mobility instability", "sport": "해부학", "series": "스포츠 해부학", "episode": 2},
+    {"title": "발의 아치 구조가 달리기에 미치는 영향", "keyword": "foot arch structure running performance", "sport": "해부학", "series": "스포츠 해부학", "episode": 3},
+    {"title": "척추 디스크 구조와 압력이 가해지는 자세", "keyword": "spinal disc anatomy pressure posture", "sport": "해부학", "series": "스포츠 해부학", "episode": 4},
+    # 신체균형
+    {"title": "골반 틀어짐이 허리·무릎 통증을 만드는 연결고리", "keyword": "pelvic tilt imbalance lower back knee pain", "sport": "신체균형", "series": "체형 교정", "episode": 1},
+    {"title": "한쪽 어깨가 낮은 이유, 척추측만증 자가 체크법", "keyword": "shoulder uneven scoliosis self check", "sport": "신체균형", "series": "체형 교정", "episode": 2},
+    {"title": "평발이 운동 능력에 미치는 영향과 교정 방법", "keyword": "flat feet sports performance correction", "sport": "신체균형", "series": "체형 교정", "episode": 3},
+    {"title": "X자 다리 교정 운동, 중둔근부터 강화해야 하는 이유", "keyword": "knock knees correction gluteus medius", "sport": "신체균형", "series": "체형 교정", "episode": 4},
+    # 스포츠의학
+    {"title": "성장판 손상 없이 청소년이 안전하게 운동하는 방법", "keyword": "youth athlete growth plate safe training", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 1},
+    {"title": "열사병 위험 신호, 여름 운동 시 주의사항", "keyword": "heat stroke warning signs summer exercise", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 2},
+    {"title": "운동 중 갑자기 쥐가 나는 이유와 예방법", "keyword": "exercise cramp cause prevention electrolyte", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 3},
+    {"title": "과훈련 증후군 자가 체크, 지금 쉬어야 할 신호", "keyword": "overtraining syndrome self check recovery", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 4},
+    # 공통
+    {"title": "수면 7시간이 근육 성장과 체력에 미치는 영향", "keyword": "sleep 7 hours muscle growth performance", "sport": "공통", "series": "회복 과학", "episode": 1},
+    {"title": "나이 들수록 근육이 빠지는 이유와 막는 방법", "keyword": "sarcopenia aging muscle loss prevention", "sport": "공통", "series": "시니어 스포츠", "episode": 1},
+    {"title": "아이 운동 시작 나이, 종목별 적합한 시기", "keyword": "youth sports age appropriate training", "sport": "공통", "series": "스포츠 발달", "episode": 1},
+    {"title": "운동 초보자가 첫 달에 반드시 지켜야 할 원칙", "keyword": "beginner exercise first month principles", "sport": "공통", "series": "운동 입문", "episode": 1},
+    {"title": "체중 감량과 근육 증가를 동시에 하는 방법", "keyword": "body recomposition fat loss muscle gain", "sport": "공통", "series": "운동 입문", "episode": 2},
 ]
-
 
 USED_TOPICS_FILE = "used_topics.json"
 
@@ -83,9 +128,8 @@ def load_used_topics():
 def save_used_topic(title):
     used = load_used_topics()
     used.append(title)
-    # 최근 50개만 유지 (주제가 37개니까 충분)
-    if len(used) > 50:
-        used = used[-50:]
+    if len(used) > 80:
+        used = used[-80:]
     try:
         with open(USED_TOPICS_FILE, "w") as f:
             json.dump(used, f, ensure_ascii=False)
@@ -156,53 +200,43 @@ def generate_post():
     if topic["episode"] > 1:
         series_info = (
             "이 글은 " + topic["series"] + " 시리즈 " + str(topic["episode"]) + "편입니다. "
-            + "이전 편의 내용을 자연스럽게 이어받아 더 심화된 내용을 다루세요.\n\n"
+            + "이전 편보다 심화된 내용을 다루세요.\n\n"
         )
 
     prompt = (
-        "당신은 스포츠 과학, 운동역학, 해부학, 근육학, 스포츠 영양학, 스포츠 심리학을 깊이 이해하는 전문 블로거입니다.\n"
-        "한자, 일본어, 중국어 등 한국어가 아닌 문자는 절대 사용하지 마세요.\n\n"
+        "당신은 스포츠 과학, 운동역학, 해부학, 근육학, 생리학, 물리치료학, 스포츠의학을 깊이 이해하는 전문 블로거입니다.\n"
+        "한국어만 사용하세요. 한자, 일본어 등 외국 문자 절대 금지.\n\n"
         + series_info
-        + "가장 중요한 원칙: 독자가 글의 주인공입니다.\n"
-        "글을 읽는 사람이 직접 변화하고 성장하는 느낌을 받아야 합니다.\n\n"
-        "전문 용어 사용 원칙:\n"
-        "근육 이름은 한글 명칭과 영문을 함께 표기하세요. 예: 대퇴사두근(Quadriceps), 햄스트링(Hamstrings)\n"
-        "해부학 용어는 정확하게 사용하고 괄호 안에 쉬운 설명을 추가하세요.\n"
-        "연구 결과 인용 시 구체적인 수치와 출처를 명시하세요. 예: 2022년 Journal of Strength에 따르면\n\n"
-        "반드시 지켜야 할 원칙:\n"
-        "반드시 존댓말을 사용하세요. 반말 금지.\n"
-        "지침 내용을 절대 본문에 노출하지 마세요.\n"
-        "한 단락은 3줄에서 4줄 이내로 끊어 쓰세요.\n"
-        "단락 사이는 반드시 빈 줄을 넣으세요.\n"
-        "소제목은 [소제목] 형식으로 표시하세요. 소제목 앞에 관련 이모지를 붙이세요.\n"
-        "1500자에서 2000자로 작성하세요. 절대 늘리지 마세요.\n"
-        "소제목은 최대 3개만 사용하세요.\n"
-        "각 소제목 아래 단락은 최대 3개까지만 작성하세요.\n"
-        "실천 목록은 3가지만 핵심으로 제시하세요.\n"
-        "한 단락에 수치는 최대 1개만 사용하세요.\n"
-        "첫 문장은 독자의 구체적인 상황을 묘사하되 '~하신 적', '~겠죠', '~겁니다' 같은 추측형 표현 금지.\n"
-        "마무리 문장은 뻔한 격언이나 명언 형식 절대 금지. 독자가 오늘 당장 할 수 있는 한 가지 행동으로 끝내세요.\n"
-        "AI가 쓴 것처럼 보이는 나열식 문장 금지. 사람이 직접 경험한 것처럼 자연스럽게 쓰세요.\n\n"
-        "반드시 아래 요소들을 포함하세요:\n"
-        "1. 훈련 프로그램 표: [TABLE_START]와 [TABLE_END] 사이에 작성하세요.\n"
-        "형식: 훈련명|세트|횟수/시간|휴식|주요 작용 근육|효과\n"
+        + "핵심 원칙:\n"
+        "독자가 글의 주인공입니다. 독자가 직접 변화하는 느낌을 줘야 합니다.\n"
+        "전문 용어는 반드시 괄호 안에 쉬운 설명을 추가하세요. 예: 대퇴사두근(허벅지 앞 근육)\n"
+        "수치는 글 전체에서 최대 3개만 사용하세요. 나열 금지.\n"
+        "한 단락은 3~4줄 이내. 단락 사이 빈 줄 필수.\n"
+        "소제목은 [소제목] 형식, 앞에 이모지 붙이세요. 최대 3개.\n"
+        "1500자에서 2000자. 절대 넘지 마세요.\n"
+        "첫 문장은 독자가 겪는 구체적 상황을 직접 묘사하세요. 질문형 금지.\n"
+        "마무리는 오늘 당장 할 수 있는 행동 한 가지로 끝내세요. 격언 금지.\n"
+        "AI가 쓴 티 나는 나열식 표현 금지. 자연스럽게 쓰세요.\n\n"
+        "포함할 요소:\n"
+        "훈련/실천 표: [TABLE_START]와 [TABLE_END] 사이에 작성\n"
+        "형식: 훈련명|세트|횟수|휴식|효과\n"
         "[TABLE_START]\n"
-        "훈련명|세트|횟수|휴식|주요 작용 근육|효과\n"
-        "예시운동|3|12회|60초|대퇴사두근|하체 강화\n"
+        "훈련명|세트|횟수|휴식|효과\n"
+        "예시|3|12회|60초|예시효과\n"
         "[TABLE_END]\n\n"
-        "2. 핵심 포인트 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3가지 핵심만 작성\n\n"
-        "글의 흐름:\n"
-        "1. 첫 문장은 독자가 겪었을 법한 구체적인 상황을 직접 묘사하세요. '~하신 적 있으신가요?' 같은 질문 형식 금지.\n"
-        "2. 원인을 과학적으로 설명하되 핵심 수치 1~2개만 사용하세요. 수치 나열 금지.\n"
-        "3. 실천법 3가지를 구체적으로 제시하세요.\n"
-        "4. 마무리는 독자가 오늘 당장 할 수 있는 행동 한 가지로 끝내세요.\n\n"
+        "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄 이내\n\n"
+        "글 흐름:\n"
+        "1. 독자가 겪는 상황 직접 묘사로 시작\n"
+        "2. 원인을 과학적으로 설명 (수치 1개만)\n"
+        "3. 실천법 3가지 구체적으로 제시\n"
+        "4. 오늘 당장 할 수 있는 행동 하나로 마무리\n\n"
         "카테고리: " + topic["sport"] + "\n"
         "주제: " + topic["title"] + "\n"
-        "목표 분량: 1500자에서 2500자\n\n"
-        "반드시 아래 형식으로 출력하세요:\n"
-        "제목: (독자의 클릭을 유도하는 강렬한 제목)\n"
+        "SEO 핵심 키워드를 제목에 자연스럽게 포함하세요.\n\n"
+        "출력 형식:\n"
+        "제목: (검색에 잘 걸리는 구체적인 제목)\n"
         "---\n"
-        "(본문 내용)"
+        "(본문)"
     )
 
     full_text = generate_with_claude(prompt)
@@ -284,7 +318,7 @@ def make_table_html(table_text):
 def make_summary_html(summary_text):
     lines = [l.strip() for l in summary_text.strip().split("\n") if l.strip()]
     html = '<div style="background:#e8f4fd;border-left:5px solid #1565c0;border-radius:8px;padding:20px 24px;margin:28px 0;">'
-    html += '<p style="font-weight:700;font-size:17px;color:#1565c0;margin-bottom:12px;">📌 핵심 포인트 요약</p>'
+    html += '<p style="font-weight:700;font-size:17px;color:#1565c0;margin-bottom:12px;">📌 핵심 요약</p>'
     for line in lines:
         html += '<p style="margin:6px 0;font-size:15px;color:#333;">✅ ' + line + "</p>"
     html += "</div>\n"
@@ -366,7 +400,7 @@ def send_telegram(title, post_url, topic):
         return
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
     message = (
-        sport_emoji + " 새 포스팅 알림\n\n"
+        sport_emoji + " 새 포스팅\n\n"
         + "📌 " + title + "\n\n"
         + "🔗 " + post_url
     )
