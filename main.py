@@ -228,6 +228,7 @@ def generate_post():
         "[TABLE_START]\n"
         "훈련명|세트|횟수|휴식|작용 근육|효과\n"
         "예시|3|12회|60초|대퇴사두근|하체 강화\n"
+        "요약 태그는 반드시 [SUMMARY_START]로 시작하고 [SUMMARY_END]로 닫으세요. START로 두 번 쓰지 마세요.\n"
         "[TABLE_END]\n\n"
         "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄로 핵심만\n\n"
         "글 흐름:\n"
