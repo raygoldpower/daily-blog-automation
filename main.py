@@ -120,12 +120,18 @@ def generate_post():
         "2. 첫 글: 독자가 겪는 상황에 깊이 공감하는 1~2줄의 짧고 강한 문장으로 시작하세요.\n"
         "3. 임팩트 키워드: 본문의 핵심 주제를 관통하는 단어 하나를 [KEYWORD]단어[/KEYWORD] 형식으로 크게 제시하세요.\n"
         "4. 키워드 설명: 해당 키워드가 왜 중요한지 보통 크기로 짧고 굵게 설명하세요.\n\n"
+        "독자가 글의 주인공입니다. 독자가 직접 변화하고 성장하는 느낌을 줘야 합니다.\n"
+        "전문 블로그답게 깊이 있게 쓰세요. 기초 설명에 그치지 말고 메커니즘과 원리까지 파고드세요.\n"        
+        "첫 문장은 독자가 겪는 구체적 상황을 직접 묘사하세요. 질문형 금지.\n"
+        "연구 결과나 수치를 인용할 때는 출처와 함께 구체적으로 제시하세요.\n"      
+        "마무리는 오늘 당장 할 수 있는 행동 한 가지로 끝내세요. 격언 금지.\n"
+        "AI가 쓴 티 나는 나열식 표현 금지. 자연스럽게 쓰세요.\n\n"
         "본문 집필 원칙 (원본 유지):\n"
         "독자가 글의 주인공입니다. 기초 설명에 그치지 말고 메커니즘과 원리까지 파고드세요.\n"
         "전문 용어는 반드시 괄호 안에 쉬운 설명을 추가하세요.\n"
         "연구 결과나 수치를 인용할 때는 출처와 함께 구체적으로 제시하세요.\n"
         "한 단락은 3~4줄 이내. 단락 사이 빈 줄 필수.\n"
-        "[소제목1] 원리 설명, [소제목2] 심화 분석, [소제목3] 전문 근거 순으로 내용의 깊이를 점점 더하세요.\n"
+        "[소제목1] 원리 설명, [소제목2] 심화 분석, [소제목3] 전문 근거 순으로 내용의 깊이를 점점 더하세요,소제목앞에 이모지로 가독성 증가.\n"
         "2500자에서 3500자로 작성하세요.\n\n"
         "실전 및 마무리:\n"
         "훈련/실천 표: [TABLE_START]와 [TABLE_END] 사이에 '훈련명|세트|횟수|휴식|작용 근육|효과' 형식으로 작성하세요.\n"
@@ -277,11 +283,13 @@ def body_to_html(body, images, topic):
             html += table_html
         elif text == "[SUMMARY_PLACEHOLDER]":
             html += summary_html
-        elif text.startswith("[") and "]" in text: # 소제목
+        if text.startswith("[") and "]" in text:
             heading = text.strip("[]")
             html += (
-                f'<h2 style="margin-top:48px; margin-bottom:16px; font-size:22px; font-weight:700; '
-                f'background:linear-gradient(90deg,#1565c0,#1976d2); color:#fff; padding:12px 20px; border-radius:8px;">{heading}</h2>'
+                f'<h2 style="margin-top:50px; margin-bottom:20px; font-size:26px; font-weight:800; '
+                f'background:linear-gradient(90deg,#1565c0,#003c8f); color:#fff; '
+                f'padding:15px 25px; border-radius:10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); '
+                f'display:block; letter-spacing:-0.5px;">{heading}</h2>'
             )
         elif len(text) > 2 and text[0].isdigit() and text[1] in [".", ")"]: # 번호 리스트
             html += (
