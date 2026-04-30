@@ -142,7 +142,7 @@ def generate_with_claude(prompt):
         },
         json={
             "model": "claude-sonnet-4-20250514",
-            "max_tokens": 8000,
+            "max_tokens": 4000,
             "messages": [{"role": "user", "content": prompt}]
         },
         timeout=300
@@ -195,7 +195,7 @@ def generate_post():
         "6. 전망: 앞으로 어떻게 될 것인가\n\n"
         "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3가지 핵심만 작성\n\n"
         "카테고리: " + topic["category"] + "\n"
-        "목표 분량: 2500자에서 4000자\n\n"
+        "목표 분량: 1500자에서 2500자\n\n"
         "반드시 아래 형식으로 출력하세요:\n"
         "제목: (팩트 기반의 강렬하고 정확한 제목)\n"
         "---\n"
