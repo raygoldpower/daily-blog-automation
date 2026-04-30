@@ -228,9 +228,14 @@ def generate_post():
         "[TABLE_START]\n"
         "훈련명|세트|횟수|휴식|작용 근육|효과\n"
         "예시|3|12회|60초|대퇴사두근|하체 강화\n"
-        "요약 태그는 반드시 [SUMMARY_START]로 시작하고 [SUMMARY_END]로 닫으세요. START로 두 번 쓰지 마세요.\n"
         "[TABLE_END]\n\n"
-        "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄로 핵심만\n\n"
+        "핵심 요약: 반드시 [SUMMARY_START]로 시작하고 [SUMMARY_END]로 닫으세요.\n"
+        "[SUMMARY_START]\n"
+        "첫 번째 핵심\n"
+        "두 번째 핵심\n"
+        "세 번째 핵심\n"
+        "[SUMMARY_END]\n"
+        "절대 [SUMMARY_START]를 두 번 쓰지 마세요.\n\n"
         "글 흐름:\n"
         "1. 독자가 겪는 구체적 상황 묘사로 시작\n"
         "2. 왜 그 문제가 생기는지 생리학/해부학/역학으로 깊이 설명\n"
@@ -344,19 +349,23 @@ def body_to_html(body, images, topic):
     import re
 
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
+
+    # 시리즈 배지
     series_badge = ""
     if topic.get("series"):
         series_badge = (
             '<div style="display:inline-block;background:#1565c0;color:#fff;'
-            'font-size:13px;padding:4px 12px;border-radius:20px;margin-bottom:16px;">'
+            'font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:20px;font-weight:600;">'
             + sport_emoji + " " + topic["series"] + " " + str(topic["episode"]) + "편</div>\n"
         )
 
     html = series_badge
 
+    # 상단 이미지
     if len(images) >= 1:
         html += make_image_html(images[0])
 
+    # 패턴 파싱
     table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
 
@@ -369,32 +378,82 @@ def body_to_html(body, images, topic):
     clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
 
+    # 목차 자동 생성
+    headings = re.findall(r'\[([^\]]+)\]', clean_body)
+    headings = [h for h in headings if h not in ["TABLE_PLACEHOLDER", "SUMMARY_PLACEHOLDER"]]
+    if headings:
+        toc = '<div style="background:#f8f9ff;border:1px solid #dde3f0;border-radius:10px;padding:20px 24px;margin:24px 0;">'
+        toc += '<p style="font-weight:700;font-size:15px;color:#1565c0;margin-bottom:12px;">📋 목차</p>'
+        toc += '<ol style="margin:0;padding-left:20px;">'
+        for h in headings:
+            clean_h = re.sub(r'^[^\w가-힣]+', '', h).strip()
+            toc += '<li style="margin:6px 0;font-size:15px;color:#444;line-height:1.6;">' + clean_h + '</li>'
+        toc += '</ol></div>\n'
+        html += toc
+
     paragraphs = clean_body.split("\n")
     mid = len(paragraphs) // 2
     image2_inserted = False
+    para_count = 0
 
     for i, para in enumerate(paragraphs):
         if not para.strip():
-            html += '<p style="margin:14px 0;">&nbsp;</p>\n'
+            html += '<div style="margin:10px 0;"></div>\n'
             continue
+
         if para.strip() == "[TABLE_PLACEHOLDER]":
             html += table_html
             continue
+
         if para.strip() == "[SUMMARY_PLACEHOLDER]":
             html += summary_html
             continue
+
+        # 소제목
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
-            html += '<h2 style="margin-top:40px;margin-bottom:14px;font-size:22px;border-left:4px solid #1565c0;padding-left:14px;color:#1a1a1a;">' + heading + "</h2>\n"
-        elif len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
-            html += '<p style="margin:8px 0 8px 24px;line-height:2.0;color:#333;">' + para + "</p>\n"
-        else:
-            html += '<p style="margin:12px 0;line-height:2.0;font-size:16px;color:#222;">' + para + "</p>\n"
+            html += (
+                '<h2 style="margin-top:48px;margin-bottom:16px;font-size:22px;font-weight:700;'
+                'background:linear-gradient(90deg,#1565c0,#1976d2);'
+                'color:#fff;padding:12px 20px;border-radius:8px;">'
+                + heading + "</h2>\n"
+            )
+            continue
 
+        # 번호 리스트
+        if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
+            html += (
+                '<div style="display:flex;align-items:flex-start;margin:10px 0;padding:12px 16px;'
+                'background:#f5f8ff;border-radius:8px;">'
+                '<span style="color:#1565c0;font-weight:700;margin-right:12px;font-size:16px;">'
+                + para.strip()[0] + '.</span>'
+                '<span style="color:#333;font-size:16px;line-height:1.8;">'
+                + para.strip()[2:].strip() + '</span></div>\n'
+            )
+            continue
+
+        # 일반 단락
+        para_count += 1
+        # 3번째 단락마다 핵심 문장 강조 (첫 단락 제외)
+        if para_count % 4 == 0 and para_count > 1 and len(para.strip()) > 30:
+            html += (
+                '<div style="border-left:4px solid #1565c0;padding:14px 20px;margin:20px 0;'
+                'background:#f0f4ff;border-radius:0 8px 8px 0;">'
+                '<p style="margin:0;font-size:16px;line-height:1.9;color:#1a1a2e;font-weight:500;">'
+                + para.strip() + '</p></div>\n'
+            )
+        else:
+            html += (
+                '<p style="margin:14px 0;line-height:1.9;font-size:16px;color:#333;">'
+                + para.strip() + '</p>\n'
+            )
+
+        # 중간 이미지
         if i >= mid and not image2_inserted and len(images) >= 2:
             html += make_image_html(images[1], margin_top="20px")
             image2_inserted = True
 
+    # 하단 이미지
     if len(images) >= 3:
         html += make_image_html(images[2], margin_top="20px")
 
