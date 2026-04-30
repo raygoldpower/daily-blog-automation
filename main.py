@@ -2,6 +2,7 @@ import os
 import requests
 import random
 from datetime import datetime
+import json
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
@@ -28,54 +29,84 @@ SPORT_EMOJI = {
 }
 
 TOPICS = [
-    # 축구 시리즈
     {"title": "당신의 드리블이 느린 진짜 이유", "keyword": "soccer dribbling technique", "sport": "축구", "series": "드리블 마스터", "episode": 1},
     {"title": "축구 스피드, 빠른 선수는 무엇이 다른가", "keyword": "soccer speed sprint", "sport": "축구", "series": "스피드 혁명", "episode": 1},
     {"title": "축구 슈팅력, 발이 아니라 몸통이 결정한다", "keyword": "soccer shooting power core", "sport": "축구", "series": "슈팅 마스터", "episode": 1},
     {"title": "90분을 뛰어도 지치지 않는 지구력 훈련", "keyword": "soccer endurance stamina", "sport": "축구", "series": "체력 마스터", "episode": 1},
-    # 농구 시리즈
     {"title": "농구 점프력, 타고나는 게 아니다", "keyword": "basketball jump vertical leap", "sport": "농구", "series": "점프력 혁명", "episode": 1},
     {"title": "농구 핸들링, 손이 아니라 뇌를 훈련하라", "keyword": "basketball ball handling", "sport": "농구", "series": "핸들링 마스터", "episode": 1},
     {"title": "농구 3점슛 성공률을 높이는 신체역학", "keyword": "basketball three point shooting biomechanics", "sport": "농구", "series": "슈팅 마스터", "episode": 1},
-    # 야구 시리즈
     {"title": "야구 타격 폼, 0.1초가 홈런을 결정한다", "keyword": "baseball batting swing speed", "sport": "야구", "series": "타격의 과학", "episode": 1},
     {"title": "투수의 어깨를 지키는 회전근개 강화법", "keyword": "baseball pitcher shoulder rotator cuff", "sport": "야구", "series": "투구의 과학", "episode": 1},
-    # 근육학 시리즈
     {"title": "대퇴사두근(허벅지 앞 근육)을 제대로 키우는 법", "keyword": "quadriceps muscle training strength", "sport": "근육학", "series": "근육 해부학", "episode": 1},
     {"title": "햄스트링 부상을 예방하는 과학적 훈련법", "keyword": "hamstring injury prevention training", "sport": "근육학", "series": "근육 해부학", "episode": 2},
     {"title": "코어 근육의 모든 것, 복횡근부터 다열근까지", "keyword": "core muscles transverse abdominis multifidus", "sport": "근육학", "series": "코어 과학", "episode": 1},
     {"title": "어깨 근육 해부학, 삼각근과 회전근개의 역할", "keyword": "shoulder deltoid rotator cuff anatomy", "sport": "근육학", "series": "상체 해부학", "episode": 1},
     {"title": "종아리 근육(비복근, 가자미근)과 폭발적 스피드의 관계", "keyword": "calf muscle gastrocnemius soleus speed", "sport": "근육학", "series": "하체 해부학", "episode": 1},
     {"title": "근육 성장의 원리, 근비대를 유발하는 과학적 메커니즘", "keyword": "muscle hypertrophy growth mechanism", "sport": "근육학", "series": "근육 성장 과학", "episode": 1},
-    # 재활 시리즈
     {"title": "무릎 통증의 진짜 원인, 슬개건염부터 반월판 손상까지", "keyword": "knee pain patellar tendinitis meniscus", "sport": "재활", "series": "부상 재활", "episode": 1},
     {"title": "허리 통증을 없애는 요추 안정화 운동법", "keyword": "lower back pain lumbar stabilization", "sport": "재활", "series": "부상 재활", "episode": 2},
     {"title": "발목 염좌 후 완벽하게 회복하는 재활 프로그램", "keyword": "ankle sprain rehabilitation recovery", "sport": "재활", "series": "부상 재활", "episode": 3},
     {"title": "어깨 충돌 증후군, 올바른 재활과 예방법", "keyword": "shoulder impingement syndrome rehabilitation", "sport": "재활", "series": "부상 재활", "episode": 4},
-    # 영양 시리즈
     {"title": "운동 전후 단백질 섭취, 얼마나 언제 먹어야 하나", "keyword": "protein intake pre post workout timing", "sport": "영양", "series": "스포츠 영양학", "episode": 1},
     {"title": "탄수화물이 운동 퍼포먼스를 결정하는 이유", "keyword": "carbohydrates sports performance glycogen", "sport": "영양", "series": "스포츠 영양학", "episode": 2},
     {"title": "크레아틴, 과학이 증명한 가장 효과적인 보충제", "keyword": "creatine supplement muscle strength science", "sport": "영양", "series": "보충제 과학", "episode": 1},
     {"title": "수분 보충의 과학, 탈수가 운동 능력에 미치는 영향", "keyword": "hydration dehydration sports performance", "sport": "영양", "series": "스포츠 영양학", "episode": 3},
-    # 심리 시리즈
     {"title": "스포츠 루틴의 힘, 프로 선수들이 경기 전 반복하는 이유", "keyword": "sports pre game routine psychology", "sport": "심리", "series": "스포츠 심리학", "episode": 1},
     {"title": "압박 상황에서 최고의 퍼포먼스를 내는 멘탈 트레이닝", "keyword": "clutch performance mental training pressure", "sport": "심리", "series": "스포츠 심리학", "episode": 2},
     {"title": "슬럼프를 극복하는 스포츠 심리학적 접근법", "keyword": "slump recovery sports psychology", "sport": "심리", "series": "스포츠 심리학", "episode": 3},
-    # 체력 시리즈
     {"title": "VO2max란 무엇인가, 최대 산소 섭취량과 지구력의 관계", "keyword": "VO2max maximal oxygen uptake endurance", "sport": "체력", "series": "체력 과학", "episode": 1},
     {"title": "무산소 역치(젖산 역치)를 높이는 훈련법", "keyword": "lactate threshold anaerobic training", "sport": "체력", "series": "체력 과학", "episode": 2},
     {"title": "HIIT vs 저강도 유산소, 어떤 방법이 더 효과적인가", "keyword": "HIIT vs steady state cardio fat loss", "sport": "체력", "series": "유산소 과학", "episode": 1},
-    # 유연성 시리즈
     {"title": "정적 스트레칭 vs 동적 스트레칭, 언제 무엇을 해야 하나", "keyword": "static dynamic stretching when to use", "sport": "유연성", "series": "유연성 과학", "episode": 1},
     {"title": "고관절 가동성이 스포츠 퍼포먼스를 결정한다", "keyword": "hip mobility sports performance", "sport": "유연성", "series": "가동성 혁명", "episode": 1},
     {"title": "폼롤러로 근막 이완하는 올바른 방법", "keyword": "foam roller myofascial release technique", "sport": "유연성", "series": "회복 과학", "episode": 1},
-    # 공통 시리즈
     {"title": "수면이 운동 회복과 근육 성장에 미치는 놀라운 영향", "keyword": "sleep recovery muscle growth hormones", "sport": "공통", "series": "회복 과학", "episode": 1},
     {"title": "과훈련 증후군(오버트레이닝)을 알아채는 방법과 대처법", "keyword": "overtraining syndrome symptoms recovery", "sport": "공통", "series": "회복 과학", "episode": 2},
     {"title": "아이의 스포츠 재능을 과학적으로 발견하고 키우는 방법", "keyword": "youth athletic development talent", "sport": "공통", "series": "스포츠 발달", "episode": 1},
     {"title": "나이가 들수록 꼭 해야 하는 기능성 운동의 모든 것", "keyword": "functional fitness aging sarcopenia", "sport": "공통", "series": "시니어 스포츠", "episode": 1},
     {"title": "체형 불균형이 부상의 원인이다, 체형 분석과 교정 운동", "keyword": "postural imbalance injury prevention correction", "sport": "공통", "series": "체형 교정", "episode": 1},
 ]
+
+
+USED_TOPICS_FILE = "used_topics.json"
+
+
+def load_used_topics():
+    try:
+        with open(USED_TOPICS_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
+def save_used_topic(title):
+    used = load_used_topics()
+    used.append(title)
+    # 최근 50개만 유지 (주제가 37개니까 충분)
+    if len(used) > 50:
+        used = used[-50:]
+    try:
+        with open(USED_TOPICS_FILE, "w") as f:
+            json.dump(used, f, ensure_ascii=False)
+    except Exception as e:
+        print("[중복방지] 저장 실패: " + str(e))
+
+
+def pick_topic():
+    used = load_used_topics()
+    available = [t for t in TOPICS if t["title"] not in used]
+    if not available:
+        print("[중복방지] 모든 주제 사용 완료, 초기화합니다.")
+        available = TOPICS
+        try:
+            with open(USED_TOPICS_FILE, "w") as f:
+                json.dump([], f)
+        except Exception:
+            pass
+    topic = random.choice(available)
+    save_used_topic(topic["title"])
+    return topic
 
 
 def get_access_token():
@@ -107,7 +138,7 @@ def generate_with_claude(prompt):
         },
         json={
             "model": "claude-sonnet-4-20250514",
-            "max_tokens": 8000,
+            "max_tokens": 4000,
             "messages": [{"role": "user", "content": prompt}]
         },
         timeout=300
@@ -118,7 +149,7 @@ def generate_with_claude(prompt):
 
 
 def generate_post():
-    topic = random.choice(TOPICS)
+    topic = pick_topic()
     print("[글 생성] 주제: " + topic["title"])
 
     series_info = ""
@@ -144,7 +175,7 @@ def generate_post():
         "한 단락은 3줄에서 4줄 이내로 끊어 쓰세요.\n"
         "단락 사이는 반드시 빈 줄을 넣으세요.\n"
         "소제목은 [소제목] 형식으로 표시하세요. 소제목 앞에 관련 이모지를 붙이세요.\n"
-        "4000자에서 6000자를 반드시 채워주세요. 절대 짧게 쓰지 마세요.\n"
+        "1500자에서 2500자로 작성하세요. 핵심만 간결하게 전달하세요.\n"
         "각 소제목 아래 최소 4개에서 5개 단락을 작성하세요.\n"
         "실천 목록은 최소 5가지 이상 구체적으로 제시하세요.\n"
         "각 훈련법의 효과, 작용 근육(정확한 해부학 명칭), 횟수, 주의사항까지 상세히 설명하세요.\n\n"
@@ -165,7 +196,7 @@ def generate_post():
         "6. 독자가 오늘 당장 변화를 시작하고 싶게 만드는 마무리로 끝내세요.\n\n"
         "카테고리: " + topic["sport"] + "\n"
         "주제: " + topic["title"] + "\n"
-        "목표 분량: 4000자에서 6000자\n\n"
+        "목표 분량: 1500자에서 2500자\n\n"
         "반드시 아래 형식으로 출력하세요:\n"
         "제목: (독자의 클릭을 유도하는 강렬한 제목)\n"
         "---\n"
@@ -379,35 +410,47 @@ def send_facebook(title, post_url, topic):
         print("[페이스북 오류] " + str(e))
 
 
-def post_to_blogger(post_data, images):
+def post_to_blogger(post_data, images, retry=2):
     print("\n[Blogger] 포스팅 시작...")
-    access_token = get_access_token()
-    body_html = body_to_html(post_data["body"], images, post_data["topic"])
-    url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
-    headers = {
-        "Authorization": "Bearer " + access_token,
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "kind": "blogger#post",
-        "title": post_data["title"],
-        "content": body_html,
-        "status": "LIVE"
-    }
-    print("[제목] " + post_data["title"])
-    response = requests.post(url, headers=headers, json=payload, timeout=30)
-    print("[응답] 상태코드: " + str(response.status_code))
-    if response.status_code == 200:
-        result = response.json()
-        post_url = result.get("url", "")
-        print("\n발행 완료!")
-        print("   링크: " + post_url)
-        send_telegram(post_data["title"], post_url, post_data["topic"])
-        send_facebook(post_data["title"], post_url, post_data["topic"])
-        return True
-    else:
-        print("실패: " + response.text[:300])
-        return False
+    topic = post_data["topic"]
+    labels = [topic["sport"], topic["series"]]
+
+    for attempt in range(1, retry + 2):
+        try:
+            access_token = get_access_token()
+            body_html = body_to_html(post_data["body"], images, topic)
+            url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
+            headers = {
+                "Authorization": "Bearer " + access_token,
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "kind": "blogger#post",
+                "title": post_data["title"],
+                "content": body_html,
+                "labels": labels,
+                "status": "LIVE"
+            }
+            print("[시도 " + str(attempt) + "] 제목: " + post_data["title"])
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
+            print("[응답] 상태코드: " + str(response.status_code))
+            if response.status_code == 200:
+                result = response.json()
+                post_url = result.get("url", "")
+                print("\n발행 완료!")
+                print("   링크: " + post_url)
+                send_telegram(post_data["title"], post_url, topic)
+                send_facebook(post_data["title"], post_url, topic)
+                return True
+            else:
+                print("실패: " + response.text[:300])
+                if attempt <= retry:
+                    print("[재시도] " + str(attempt) + "번째 재시도 중...")
+        except Exception as e:
+            print("[오류] " + str(e))
+            if attempt <= retry:
+                print("[재시도] " + str(attempt) + "번째 재시도 중...")
+    return False
 
 
 if __name__ == "__main__":
