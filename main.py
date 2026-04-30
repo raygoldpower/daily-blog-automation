@@ -199,76 +199,36 @@ def generate_post():
     series_info = ""
     if topic["episode"] > 1:
         series_info = (
-            "이 글은 " + topic["series"] + " 시리즈 " + str(topic["episode"]) + "편입니다. "
-            + "이전 편보다 심화된 내용을 다루세요.\n\n"
+            f"이 글은 {topic['series']} 시리즈 {topic['episode']}편입니다. "
+            "이전 편보다 심화된 내용을 다루세요.\n\n"
         )
 
+    # 기존의 전문성 원칙 + 매거진 레이아웃을 결합한 프롬프트
     prompt = (
-        "당신은 스포츠 과학, 운동역학, 해부학, 근육학, 생리학, 물리치료학, 스포츠의학을 깊이 이해하는 전문 블로거입니다.\n"
-
-        "1. 구조 (반드시 준수):\n"
-        "- 제목: 독자의 궁금증을 유발하고 클릭을 유도하는 강력한 훅(Hook)을 포함하세요.\n"
-        "- 첫 문장: 독자의 상황에 깊이 공감하는 1~2줄의 짧고 강렬한 문장.\n"
-        "- 임팩트 키워드: 본문의 핵심 주제를 관통하는 단어 하나를 [KEYWORD]단어[/KEYWORD] 형식으로 크게 제시하세요.\n"
-        "- 키워드 설명: 해당 키워드가 왜 중요한지 보통 크기로 짧고 굵게 설명하세요.\n\n"
-        
-        "2. 본문 전개 (깊이의 심화):\n"
-        "- [소제목1] 원리 설명: 기초적인 생리학/역학적 원리를 설명하세요.\n"
-        "- [소제목2] 심화 내용: 원리에서 확장된 더 깊은 메커니즘을 다루세요.\n"
-        "- [소제목3] 전문 근거: 최신 연구 결과나 데이터, 해부학적 근거를 제시하여 신뢰도를 높이세요.\n\n"
-        
-        "3. 실전 및 마무리:\n"
-        "- 추천 운동 표: [TABLE_START]와 [TABLE_END] 사이에 작성 (훈련명|세트|횟수|휴식|작용 근육|효과).\n"
-        "- 운동 보완 설명: 표에 적힌 운동들을 수행할 때 주의할 점이나 팁을 추가하세요.\n"
-        "- 결론 및 조언: 전문가로서 독자에게 전하는 강하고 간결한 조언.\n"
-        "- 핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄로 작성.\n\n"
-        
-        "4. 스타일 지침:\n"
-        "- 전문 용어는 반드시 괄호 안에 쉬운 설명을 추가하세요.\n"
-        "- 문장은 간결하게, 단락 사이 빈 줄은 필수입니다.\n"
-        "- 한국어만 사용하고 외국 문자는 절대 금지합니다.\n\n"
-        f"카테고리: {topic['sport']} / 주제: {topic['title']}"
-    )
+        "당신은 스포츠 과학 전문 매거진의 수석 에디터입니다.\n"
         "한국어만 사용하세요. 한자, 일본어 등 외국 문자 절대 금지.\n\n"
-        + series_info
-        + "핵심 원칙:\n"
-        "독자가 글의 주인공입니다. 독자가 직접 변화하고 성장하는 느낌을 줘야 합니다.\n"
-        "전문 블로그답게 깊이 있게 쓰세요. 기초 설명에 그치지 말고 메커니즘과 원리까지 파고드세요.\n"
-        "전문 용어는 반드시 괄호 안에 쉬운 설명을 추가하세요. 예: 대퇴사두근(허벅지 앞 근육)\n"
-        "연구 결과나 수치를 인용할 때는 출처와 함께 구체적으로 제시하세요.\n"
-        "한 단락은 3~4줄 이내. 단락 사이 빈 줄 필수.\n"
-        "소제목은 [소제목] 형식, 앞에 이모지 붙이세요.\n"
-        "2500자에서 3500자로 작성하세요. 깊이 있는 내용을 충분히 전달하세요.\n"
-        "첫 문장은 독자가 겪는 구체적 상황을 직접 묘사하세요. 질문형 금지.\n"
-        "마무리는 오늘 당장 할 수 있는 행동 한 가지로 끝내세요. 격언 금지.\n"
-        "AI가 쓴 티 나는 나열식 표현 금지. 자연스럽게 쓰세요.\n\n"
-        "글의 깊이 기준:\n"
-        "단순 방법 나열이 아니라 왜 그 방법이 효과적인지 생리학/해부학/역학적으로 설명하세요.\n"
-        "독자가 읽고 나서 '이런 원리였구나'라고 느끼게 만드세요.\n"
-        "실제 현장에서 쓰이는 전문적인 내용을 포함하세요.\n\n"
-        "포함할 요소:\n"
-        "훈련/실천 표: [TABLE_START]와 [TABLE_END] 사이에 작성\n"
-        "형식: 훈련명|세트|횟수|휴식|작용 근육|효과\n"
-        "[TABLE_START]\n"
-        "훈련명|세트|횟수|휴식|작용 근육|효과\n"
-        "예시|3|12회|60초|대퇴사두근|하체 강화\n"
-        "[TABLE_END]\n\n"
-        "핵심 요약: 반드시 [SUMMARY_START]로 시작하고 [SUMMARY_END]로 닫으세요.\n"
-        "[SUMMARY_START]\n"
-        "첫 번째 핵심\n"
-        "두 번째 핵심\n"
-        "세 번째 핵심\n"
-        "[SUMMARY_END]\n"
-        "절대 [SUMMARY_START]를 두 번 쓰지 마세요.\n\n"
-        "글 흐름:\n"
-        "1. 독자가 겪는 구체적 상황 묘사로 시작\n"
-        "2. 왜 그 문제가 생기는지 생리학/해부학/역학으로 깊이 설명\n"
-        "3. 최신 연구 결과를 근거로 제시\n"
-        "4. 실천법을 원리와 함께 구체적으로 제시\n"
-        "5. 오늘 당장 할 수 있는 행동 하나로 마무리\n\n"
-        "카테고리: " + topic["sport"] + "\n"
-        "주제: " + topic["title"] + "\n"
-        "SEO 핵심 키워드를 제목에 자연스럽게 포함하세요.\n\n"
+        + series_info +
+        "핵심 매거진 구조:\n"
+        "1. 제목: 독자의 궁금증을 유발하고 클릭을 유도하는 강력한 훅(Hook)을 포함하세요.\n"
+        "2. 첫 문장: 독자가 겪는 구체적 상황을 1~2줄로 짧게 묘사하며 공감을 유도하세요.\n"
+        "3. 임팩트 키워드: 핵심 주제를 관통하는 단어 하나를 [KEYWORD]단어[/KEYWORD] 형식으로 크게 제시하세요.\n"
+        "4. 키워드 설명: 해당 키워드가 왜 중요한지 보통 크기로 짧고 굵게 설명하세요.\n\n"
+        
+        "본문 집필 원칙 (깊이 수치화):\n"
+        "- [소제목1] 원리 설명: 왜 그 문제가 생기는지 생리학/해부학/역학으로 깊이 설명하세요.\n"
+        "- [소제목2] 심화 분석: 기초 설명을 넘어 메커니즘을 파고드세요.\n"
+        "- [소제목3] 전문 근거: 최신 연구 결과나 해부학적 근거를 인용하여 전문성을 보여주세요.\n"
+        "- 전문 용어는 반드시 괄호 안에 쉬운 설명을 추가하세요. 예: 대퇴사두근(허벅지 앞 근육)\n"
+        "- 2500자에서 3500자로 작성하여 매거진다운 깊이를 유지하세요.\n\n"
+        
+        "실전 및 마무리:\n"
+        "- 추천 운동 표: [TABLE_START]와 [TABLE_END] 사이에 '훈련명|세트|횟수|휴식|작용 근육|효과' 형식으로 작성하세요.\n"
+        "- 운동 보완 설명: 표에 제시된 운동의 실천 팁을 상세히 덧붙이세요.\n"
+        "- 결론 및 조언: 오늘 당장 할 수 있는 행동 하나를 전문가로서 강하고 간결하게 조언하세요.\n"
+        "- 핵심 요약: 반드시 [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄로 작성하세요.\n\n"
+        
+        f"카테고리: {topic['sport']}\n"
+        f"주제: {topic['title']}\n\n"
         "출력 형식:\n"
         "제목: (검색에 잘 걸리는 구체적인 제목)\n"
         "---\n"
@@ -276,6 +236,8 @@ def generate_post():
     )
 
     full_text = generate_with_claude(prompt)
+    # ... 이후 처리 로직 (이전 답변 참고)
+ 
 
     lines = full_text.strip().split("\n")
     title = ""
@@ -371,14 +333,20 @@ def make_image_html(img, margin_top="0"):
 
 def body_to_html(body, images, topic):
     import re
-    keyword_pattern = re.compile(r'\[KEYWORD\](.*?)\[/KEYWORD\]', re.DOTALL)
-    
-    def style_keyword(match):
-        word = match.group(1)
-        return f'<div style="text-align:center; margin:40px 0;"><span style="font-size:48px; font-weight:900; color:#1565c0; letter-spacing:-1px; border-bottom:5px solid #1565c0;">{word}</span></div>'
-
-    body = keyword_pattern.sub(style_keyword, body)
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
+
+    # 1. 임팩트 키워드 스타일링 ([KEYWORD]단어[/KEYWORD] 처리)
+    keyword_pattern = re.compile(r'\[KEYWORD\](.*?)\[/KEYWORD\]', re.DOTALL)
+    def style_keyword(match):
+        word = match.group(1).strip()
+        return (
+            f'<div style="text-align:center; margin:50px 0;">'
+            f'<p style="font-size:14px; color:#666; margin-bottom:10px;">Focus Keyword</p>'
+            f'<span style="font-size:42px; font-weight:900; color:#1565c0; '
+            f'letter-spacing:-1px; border-bottom:6px solid #1565c0; padding-bottom:5px;">'
+            f'{word}</span></div>'
+        )
+    body = keyword_pattern.sub(style_keyword, body)
 
     # 시리즈 배지
     series_badge = ""
@@ -395,7 +363,7 @@ def body_to_html(body, images, topic):
     if len(images) >= 1:
         html += make_image_html(images[0])
 
-    # 패턴 파싱
+    # 표 및 요약 파싱
     table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
 
@@ -408,48 +376,24 @@ def body_to_html(body, images, topic):
     clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
 
-    # 목차 자동 생성
-    headings = re.findall(r'\[([^\]]+)\]', clean_body)
-    headings = [h for h in headings if h not in ["TABLE_PLACEHOLDER", "SUMMARY_PLACEHOLDER"]]
-    if headings:
-        toc = '<div style="background:#f8f9ff;border:1px solid #dde3f0;border-radius:10px;padding:20px 24px;margin:24px 0;">'
-        toc += '<p style="font-weight:700;font-size:15px;color:#1565c0;margin-bottom:12px;">📋 목차</p>'
-        toc += '<ol style="margin:0;padding-left:20px;">'
-        for h in headings:
-            clean_h = re.sub(r'^[^\w가-힣]+', '', h).strip()
-            toc += '<li style="margin:6px 0;font-size:15px;color:#444;line-height:1.6;">' + clean_h + '</li>'
-        toc += '</ol></div>\n'
-        html += toc
-
+    # 본문 렌더링
     paragraphs = clean_body.split("\n")
-    mid = len(paragraphs) // 2
-    image2_inserted = False
-    para_count = 0
-
-    for i, para in enumerate(paragraphs):
-        if not para.strip():
-            html += '<div style="margin:10px 0;"></div>\n'
+    for para in paragraphs:
+        text = para.strip()
+        if not text:
             continue
-
-        if para.strip() == "[TABLE_PLACEHOLDER]":
+        
+        if text == "[TABLE_PLACEHOLDER]":
             html += table_html
-            continue
-
-        if para.strip() == "[SUMMARY_PLACEHOLDER]":
+        elif text == "[SUMMARY_PLACEHOLDER]":
             html += summary_html
-            continue
+        elif text.startswith("[") and "]" in text:  # 소제목
+            heading = text.strip("[]")
+            html += f'<h2 style="margin-top:40px; font-size:24px; border-left:8px solid #1565c0; padding-left:15px;">{heading}</h2>'
+        else:
+            html += f'<p style="line-height:1.8; margin-bottom:20px; font-size:16px; color:#333;">{text}</p>'
 
-        # 소제목
-        if para.startswith("[") and "]" in para:
-            heading = para.strip("[]").strip()
-            html += (
-                '<h2 style="margin-top:48px;margin-bottom:16px;font-size:22px;font-weight:700;'
-                'background:linear-gradient(90deg,#1565c0,#1976d2);'
-                'color:#fff;padding:12px 20px;border-radius:8px;">'
-                + heading + "</h2>\n"
-            )
-            continue
-
+    return html
         # 번호 리스트
         if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
             html += (
