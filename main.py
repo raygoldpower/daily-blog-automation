@@ -205,6 +205,30 @@ def generate_post():
 
     prompt = (
         "당신은 스포츠 과학, 운동역학, 해부학, 근육학, 생리학, 물리치료학, 스포츠의학을 깊이 이해하는 전문 블로거입니다.\n"
+
+        "1. 구조 (반드시 준수):\n"
+        "- 제목: 독자의 궁금증을 유발하고 클릭을 유도하는 강력한 훅(Hook)을 포함하세요.\n"
+        "- 첫 문장: 독자의 상황에 깊이 공감하는 1~2줄의 짧고 강렬한 문장.\n"
+        "- 임팩트 키워드: 본문의 핵심 주제를 관통하는 단어 하나를 [KEYWORD]단어[/KEYWORD] 형식으로 크게 제시하세요.\n"
+        "- 키워드 설명: 해당 키워드가 왜 중요한지 보통 크기로 짧고 굵게 설명하세요.\n\n"
+        
+        "2. 본문 전개 (깊이의 심화):\n"
+        "- [소제목1] 원리 설명: 기초적인 생리학/역학적 원리를 설명하세요.\n"
+        "- [소제목2] 심화 내용: 원리에서 확장된 더 깊은 메커니즘을 다루세요.\n"
+        "- [소제목3] 전문 근거: 최신 연구 결과나 데이터, 해부학적 근거를 제시하여 신뢰도를 높이세요.\n\n"
+        
+        "3. 실전 및 마무리:\n"
+        "- 추천 운동 표: [TABLE_START]와 [TABLE_END] 사이에 작성 (훈련명|세트|횟수|휴식|작용 근육|효과).\n"
+        "- 운동 보완 설명: 표에 적힌 운동들을 수행할 때 주의할 점이나 팁을 추가하세요.\n"
+        "- 결론 및 조언: 전문가로서 독자에게 전하는 강하고 간결한 조언.\n"
+        "- 핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄로 작성.\n\n"
+        
+        "4. 스타일 지침:\n"
+        "- 전문 용어는 반드시 괄호 안에 쉬운 설명을 추가하세요.\n"
+        "- 문장은 간결하게, 단락 사이 빈 줄은 필수입니다.\n"
+        "- 한국어만 사용하고 외국 문자는 절대 금지합니다.\n\n"
+        f"카테고리: {topic['sport']} / 주제: {topic['title']}"
+    )
         "한국어만 사용하세요. 한자, 일본어 등 외국 문자 절대 금지.\n\n"
         + series_info
         + "핵심 원칙:\n"
@@ -347,7 +371,13 @@ def make_image_html(img, margin_top="0"):
 
 def body_to_html(body, images, topic):
     import re
+    keyword_pattern = re.compile(r'\[KEYWORD\](.*?)\[/KEYWORD\]', re.DOTALL)
+    
+    def style_keyword(match):
+        word = match.group(1)
+        return f'<div style="text-align:center; margin:40px 0;"><span style="font-size:48px; font-weight:900; color:#1565c0; letter-spacing:-1px; border-bottom:5px solid #1565c0;">{word}</span></div>'
 
+    body = keyword_pattern.sub(style_keyword, body)
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
 
     # 시리즈 배지
