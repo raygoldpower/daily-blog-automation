@@ -464,17 +464,17 @@ def get_images_pixabay(keyword, count=3):
 def get_images(keyword, count=3, title="", category=""):
     print("[이미지 검색] 키워드: " + keyword)
 
-    images = get_images_unsplash(img_keyword, count)
+    images = get_images_unsplash(keyword, count)
     if images:
         print("[이미지] Unsplash " + str(len(images)) + "장")
         return images
 
-    images = get_images_pexels(img_keyword, count)
+    images = get_images_pexels(keyword, count)
     if images:
         print("[이미지] Pexels " + str(len(images)) + "장")
         return images
 
-    images = get_images_pixabay(img_keyword, count)
+    images = get_images_pixabay(keyword, count)
     if images:
         print("[이미지] Pixabay " + str(len(images)) + "장")
         return images
