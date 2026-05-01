@@ -270,7 +270,7 @@ def collect_news(category):
         return search_claude_web(category)
 
     news_context = "=== 오늘(" + TODAY + ") 수집된 뉴스 ===\n"
-    for i, news in enumerate(all_news[:14]):
+    for i, news in enumerate(all_news[:5]):
         news_context += str(i+1) + ". " + news + "\n"
 
     print("[수집 완료] 총 " + str(len(all_news)) + "개")
