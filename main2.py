@@ -174,6 +174,49 @@ def search_newsapi(query, page_size=3):
     return []
 
 
+def search_claude_web(category):
+    print("[Claude 웹검색] API 수집 실패 - 웹검색으로 전환...")
+    category_map = {
+        "스포츠이슈": "오늘 한국 스포츠 핫이슈 뉴스 축구 야구 농구",
+        "경제뉴스": "오늘 한국 경제 핫이슈 주식 부동산 금리",
+        "전국이슈": "오늘 한국 사회 핫이슈 정치 사건사고",
+        "연예이슈": "오늘 한국 연예 핫이슈 K팝 드라마 연예인"
+    }
+    query = category_map.get(category, "오늘 한국 핫이슈 뉴스")
+    payload = {
+        "model": "claude-sonnet-4-20250514",
+        "max_tokens": 1000,
+        "tools": [{"type": "web_search_20250305", "name": "web_search"}],
+        "messages": [{"role": "user", "content": (
+            "오늘(" + TODAY + ") 기준으로 다음 키워드를 검색해서 "
+            "실제 뉴스에서 확인된 핵심 팩트 5가지만 요약해줘. "
+            "루머나 추측 금지. 출처 언론사 표기 필수.\n\n검색: " + query
+        )}]
+    }
+    try:
+        response = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": ANTHROPIC_API_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            },
+            json=payload,
+            timeout=60
+        )
+        if response.status_code == 200:
+            content = response.json().get("content", [])
+            result = ""
+            for block in content:
+                if block.get("type") == "text":
+                    result += block.get("text", "")
+            print("[Claude 웹검색] 수집 완료")
+            return "=== 오늘(" + TODAY + ") 웹검색 수집 뉴스 ===\n" + result
+    except Exception as e:
+        print("[Claude 웹검색 오류] " + str(e))
+    return ""
+
+
 def collect_news(category):
     print("[뉴스 수집] 카테고리: " + category)
     keywords = CATEGORY_KEYWORDS[category]
@@ -192,8 +235,8 @@ def collect_news(category):
     all_news = naver_results1 + naver_results2 + google_results + newsapi_results
 
     if not all_news:
-        print("[경고] 수집된 뉴스 없음")
-        return "오늘 " + category + " 분야 최신 뉴스"
+        print("[경고] API 수집 실패 - Claude 웹검색으로 전환")
+        return search_claude_web(category)
 
     news_context = "=== 오늘(" + TODAY + ") 수집된 뉴스 ===\n"
     for i, news in enumerate(all_news[:14]):
