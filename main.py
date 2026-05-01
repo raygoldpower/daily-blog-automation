@@ -317,9 +317,169 @@ def generate_post():
     return {"title": title, "body": body, "topic": topic}
 
 
-def get_images(keyword, count=3):
+def get_image_keyword_from_title(title, category):
+    """제목에서 이미지 검색 키워드 추출"""
+    keyword_map = {
+        "축구": "soccer football player",
+        "야구": "baseball player",
+        "농구": "basketball player",
+        "손흥민": "soccer player football",
+        "류현진": "baseball pitcher",
+        "코스피": "stock market chart",
+        "부동산": "real estate building",
+        "금리": "finance money banking",
+        "환율": "currency exchange money",
+        "드라마": "korean drama tv",
+        "아이돌": "kpop concert music",
+        "연예": "entertainment stage performance",
+        "사건": "police investigation",
+        "정치": "government politics",
+        "경제": "business finance economy",
+        "스포츠이슈": "sports athlete action",
+        "경제뉴스": "business finance economy",
+        "전국이슈": "city korea urban",
+        "연예이슈": "stage performance music",
+        "근육": "muscle fitness gym",
+        "재활": "physical therapy rehabilitation",
+        "축구": "soccer training",
+        "농구": "basketball court",
+    }
+    for kor, eng in keyword_map.items():
+        if kor in title or kor in category:
+            return eng
+    category_defaults = {
+        "스포츠이슈": "sports athlete action",
+        "경제뉴스": "business finance economy",
+        "전국이슈": "city korea urban street",
+        "연예이슈": "stage performance music concert",
+        "축구": "soccer football",
+        "농구": "basketball",
+        "야구": "baseball",
+        "근육학": "fitness muscle gym",
+        "재활": "physical therapy",
+        "영양": "nutrition healthy food",
+        "심리": "mental health mindset",
+        "체력": "endurance running fitness",
+        "유연성": "stretching yoga flexibility",
+        "생리학": "human body science",
+        "물리치료": "physical therapy clinic",
+        "역학": "biomechanics movement",
+        "해부학": "anatomy body",
+        "신체균형": "balance posture body",
+        "스포츠의학": "sports medicine doctor",
+        "공통": "fitness sports health",
+    }
+    return category_defaults.get(category, "sports fitness health")
+
+
+def get_images_unsplash(keyword, count=3):
     if not UNSPLASH_ACCESS_KEY:
         return []
+    try:
+        response = requests.get(
+            "https://api.unsplash.com/search/photos",
+            params={"query": keyword, "per_page": count, "orientation": "landscape", "client_id": UNSPLASH_ACCESS_KEY},
+            timeout=10
+        )
+        if response.status_code == 200:
+            images = []
+            for photo in response.json().get("results", []):
+                images.append({
+                    "url": photo["urls"]["regular"],
+                    "alt": photo.get("alt_description", keyword) or keyword,
+                    "author": photo["user"]["name"],
+                    "author_url": photo["user"]["links"]["html"],
+                    "source": "Unsplash"
+                })
+            return images
+    except Exception as e:
+        print("[Unsplash 오류] " + str(e))
+    return []
+
+
+def get_images_pexels(keyword, count=3):
+    pexels_key = os.environ.get("PEXELS_API_KEY", "")
+    if not pexels_key:
+        return []
+    try:
+        response = requests.get(
+            "https://api.pexels.com/v1/search",
+            headers={"Authorization": pexels_key},
+            params={"query": keyword, "per_page": count, "orientation": "landscape"},
+            timeout=10
+        )
+        if response.status_code == 200:
+            images = []
+            for photo in response.json().get("photos", []):
+                images.append({
+                    "url": photo["src"]["large"],
+                    "alt": photo.get("alt", keyword) or keyword,
+                    "author": photo["photographer"],
+                    "author_url": photo["photographer_url"],
+                    "source": "Pexels"
+                })
+            return images
+    except Exception as e:
+        print("[Pexels 오류] " + str(e))
+    return []
+
+
+def get_images_pixabay(keyword, count=3):
+    pixabay_key = os.environ.get("PIXABAY_API_KEY", "")
+    if not pixabay_key:
+        return []
+    try:
+        response = requests.get(
+            "https://pixabay.com/api/",
+            params={
+                "key": pixabay_key,
+                "q": keyword,
+                "image_type": "photo",
+                "orientation": "horizontal",
+                "per_page": count,
+                "safesearch": "true"
+            },
+            timeout=10
+        )
+        if response.status_code == 200:
+            images = []
+            for hit in response.json().get("hits", []):
+                images.append({
+                    "url": hit["webformatURL"],
+                    "alt": keyword,
+                    "author": hit["user"],
+                    "author_url": "https://pixabay.com/users/" + hit["user"] + "-" + str(hit["user_id"]),
+                    "source": "Pixabay"
+                })
+            return images
+    except Exception as e:
+        print("[Pixabay 오류] " + str(e))
+    return []
+
+
+def get_images(keyword, count=3, title="", category=""):
+    if title or category:
+        keyword = get_image_keyword_from_title(title, category)
+    print("[이미지 검색] 키워드: " + keyword)
+
+    images = get_images_unsplash(keyword, count)
+    if images:
+        print("[이미지] Unsplash " + str(len(images)) + "장")
+        return images
+
+    images = get_images_pexels(keyword, count)
+    if images:
+        print("[이미지] Pexels " + str(len(images)) + "장")
+        return images
+
+    images = get_images_pixabay(keyword, count)
+    if images:
+        print("[이미지] Pixabay " + str(len(images)) + "장")
+        return images
+
+    print("[이미지] 모든 소스 실패")
+    return []
+
     try:
         response = requests.get(
             "https://api.unsplash.com/search/photos",
@@ -620,7 +780,7 @@ if __name__ == "__main__":
     print("=" * 50)
     try:
         post = generate_post()
-        images = get_images(post["topic"]["keyword"], count=3)
+        images = get_images(post["topic"]["keyword"], count=3, title=post["title"], category=post["topic"]["sport"])
         post_to_blogger(post, images)
         print("\n모든 작업 완료!")
     except Exception as e:
