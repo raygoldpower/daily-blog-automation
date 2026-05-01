@@ -211,6 +211,7 @@ def search_claude_web(category):
                 if block.get("type") == "text":
                     result += block.get("text", "")
             print("[Claude 웹검색] 수집 완료")
+            time.sleep(30)
             return "=== 오늘(" + TODAY + ") 웹검색 수집 뉴스 ===\n" + result
     except Exception as e:
         print("[Claude 웹검색 오류] " + str(e))
