@@ -132,24 +132,32 @@ def search_news(query):
 
 
 def generate_with_claude(prompt):
+    import time
     print("[AI] Claude 글 생성 중...")
-    response = requests.post(
-        "https://api.anthropic.com/v1/messages",
-        headers={
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json"
-        },
-        json={
-            "model": "claude-sonnet-4-20250514",
-            "max_tokens": 4000,
-            "messages": [{"role": "user", "content": prompt}]
-        },
-        timeout=300
-    )
-    if response.status_code != 200:
-        raise Exception("Claude 오류: " + str(response.status_code))
-    return response.json()["content"][0]["text"]
+    for attempt in range(3):
+        response = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": ANTHROPIC_API_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            },
+            json={
+                "model": "claude-sonnet-4-20250514",
+                "max_tokens": 4000,
+                "messages": [{"role": "user", "content": prompt}]
+            },
+            timeout=300
+        )
+        if response.status_code == 200:
+            return response.json()["content"][0]["text"]
+        elif response.status_code == 429:
+            wait = 60 * (attempt + 1)
+            print("[429] 속도 제한 - " + str(wait) + "초 대기 후 재시도...")
+            time.sleep(wait)
+        else:
+            raise Exception("Claude 오류: " + str(response.status_code))
+    raise Exception("Claude 오류: 최대 재시도 횟수 초과")
 
 
 def generate_post():
@@ -195,7 +203,7 @@ def generate_post():
         "6. 전망: 앞으로 어떻게 될 것인가\n\n"
         "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3가지 핵심만 작성\n\n"
         "카테고리: " + topic["category"] + "\n"
-        "목표 분량: 1500자에서 2500자\n\n"
+        "목표 분량: 2500자에서 4000자\n\n"
         "반드시 아래 형식으로 출력하세요:\n"
         "제목: (팩트 기반의 강렬하고 정확한 제목)\n"
         "---\n"
