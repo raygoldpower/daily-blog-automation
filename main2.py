@@ -2,6 +2,7 @@ import os
 import requests
 import random
 from datetime import datetime
+import time
 import json
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
@@ -13,285 +14,356 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 FACEBOOK_PAGE_ID = os.environ.get("FACEBOOK_PAGE_ID", "")
 FACEBOOK_ACCESS_TOKEN = os.environ.get("FACEBOOK_ACCESS_TOKEN", "")
-BLOG_ID = "4393162034375416055"
+NAVER_CLIENT_ID = os.environ.get("NAVER_CLIENT_ID", "")
+NAVER_CLIENT_SECRET = os.environ.get("NAVER_CLIENT_SECRET", "")
+GOOGLE_SEARCH_API_KEY = os.environ.get("GOOGLE_SEARCH_API_KEY", "")
+GOOGLE_SEARCH_ENGINE_ID = os.environ.get("GOOGLE_SEARCH_ENGINE_ID", "")
+NEWSAPI_KEY = os.environ.get("NEWSAPI_KEY", "")
+BLOG_ID = "8468892944117983817"
 
-SPORT_EMOJI = {
-    "축구": "⚽", "농구": "🏀", "야구": "⚾", "공통": "🏆",
-    "근육학": "💪", "재활": "🩺", "영양": "🥗", "심리": "🧠",
-    "체력": "🔥", "유연성": "🤸", "생리학": "🫀", "물리치료": "🏥",
-    "역학": "⚙️", "해부학": "🦴", "신체균형": "⚖️", "스포츠의학": "🩻",
+TODAY = datetime.now().strftime("%Y년 %m월 %d일")
+TODAY_EN = datetime.now().strftime("%Y-%m-%d")
+
+CATEGORY_EMOJI = {
+    "스포츠이슈": "⚽",
+    "경제뉴스": "💰",
+    "전국이슈": "🌍",
+    "연예이슈": "🎭"
 }
 
-TOPICS = [
-    # 축구
-    {"title": "드리블 속도 올리는 발목 가동성 훈련 3가지", "keyword": "soccer dribbling ankle mobility", "sport": "축구", "series": "드리블 마스터", "episode": 1},
-    {"title": "축구 순간 스피드 높이는 가속 훈련법", "keyword": "soccer acceleration sprint training", "sport": "축구", "series": "스피드 혁명", "episode": 1},
-    {"title": "축구 슈팅력을 높이는 고관절 회전 훈련", "keyword": "soccer shooting hip rotation power", "sport": "축구", "series": "슈팅 마스터", "episode": 1},
-    {"title": "전반 90분 체력 유지하는 지구력 훈련 루틴", "keyword": "soccer endurance 90 minutes stamina", "sport": "축구", "series": "체력 마스터", "episode": 1},
-    {"title": "축구 선수 무릎 부상 예방 스쿼트 변형 동작", "keyword": "soccer knee injury prevention squat", "sport": "축구", "series": "부상 예방", "episode": 1},
-    # 농구
-    {"title": "농구 점프력 높이는 플라이오메트릭 훈련 루틴", "keyword": "basketball jump plyometric training", "sport": "농구", "series": "점프력 혁명", "episode": 1},
-    {"title": "농구 핸들링 실력 올리는 뇌 훈련법", "keyword": "basketball dribbling brain hand coordination", "sport": "농구", "series": "핸들링 마스터", "episode": 1},
-    {"title": "3점슛 성공률 높이는 손목 스냅 훈련", "keyword": "basketball three point wrist snap shooting", "sport": "농구", "series": "슈팅 마스터", "episode": 1},
-    # 야구
-    {"title": "배트 스피드 높이는 하체 회전 훈련", "keyword": "baseball bat speed hip rotation", "sport": "야구", "series": "타격의 과학", "episode": 1},
-    {"title": "투수 어깨 부상 막는 회전근개 강화 운동", "keyword": "baseball pitcher rotator cuff injury prevention", "sport": "야구", "series": "투구의 과학", "episode": 1},
-    # 근육학
-    {"title": "허벅지 앞 근육 키우는 스쿼트 변형 4가지", "keyword": "quadriceps squat variation muscle building", "sport": "근육학", "series": "근육 해부학", "episode": 1},
-    {"title": "햄스트링 파열 막는 편심성 수축 훈련법", "keyword": "hamstring eccentric training injury prevention", "sport": "근육학", "series": "근육 해부학", "episode": 2},
-    {"title": "복횡근 활성화로 허리 통증 잡는 방법", "keyword": "transverse abdominis core activation back pain", "sport": "근육학", "series": "코어 과학", "episode": 1},
-    {"title": "삼각근 3개 부위 균형 있게 키우는 훈련", "keyword": "deltoid three heads shoulder training", "sport": "근육학", "series": "상체 해부학", "episode": 1},
-    {"title": "종아리 근육 강화로 발목 부상 예방하기", "keyword": "calf muscle ankle stability injury prevention", "sport": "근육학", "series": "하체 해부학", "episode": 1},
-    {"title": "근육 성장 원리, 단백질 합성을 극대화하는 자극법", "keyword": "muscle protein synthesis hypertrophy", "sport": "근육학", "series": "근육 성장 과학", "episode": 1},
-    {"title": "전거근 약화가 어깨 통증을 만드는 이유", "keyword": "serratus anterior weakness shoulder pain", "sport": "근육학", "series": "상체 해부학", "episode": 2},
-    {"title": "중둔근 강화로 무릎 통증과 골반 불균형 잡기", "keyword": "gluteus medius knee pain pelvic balance", "sport": "근육학", "series": "하체 해부학", "episode": 2},
-    # 재활
-    {"title": "무릎 연골 보호하는 슬개건염 재활 운동 순서", "keyword": "patellar tendinitis rehabilitation exercise", "sport": "재활", "series": "부상 재활", "episode": 1},
-    {"title": "허리 디스크 통증 줄이는 요추 안정화 운동", "keyword": "lumbar disc stabilization exercise", "sport": "재활", "series": "부상 재활", "episode": 2},
-    {"title": "발목 염좌 후 빠른 복귀를 위한 재활 단계", "keyword": "ankle sprain rehabilitation return to sport", "sport": "재활", "series": "부상 재활", "episode": 3},
-    {"title": "어깨 충돌 증후군 재활, 병원 가기 전 할 수 있는 것", "keyword": "shoulder impingement home rehabilitation", "sport": "재활", "series": "부상 재활", "episode": 4},
-    {"title": "아킬레스건 통증 있을 때 하면 안 되는 운동", "keyword": "achilles tendinopathy exercise avoid", "sport": "재활", "series": "부상 재활", "episode": 5},
-    # 영양
-    {"title": "운동 1시간 전 뭘 먹어야 할까, 탄수화물 타이밍", "keyword": "pre workout meal carbohydrate timing", "sport": "영양", "series": "스포츠 영양학", "episode": 1},
-    {"title": "탄수화물이 운동 퍼포먼스를 결정하는 과학적 이유", "keyword": "carbohydrate glycogen sports performance", "sport": "영양", "series": "스포츠 영양학", "episode": 2},
-    {"title": "크레아틴 복용법, 언제 얼마나 먹어야 효과적인가", "keyword": "creatine dosage timing supplement", "sport": "영양", "series": "보충제 과학", "episode": 1},
-    {"title": "운동 중 수분 보충 타이밍과 양, 탈수 막는 방법", "keyword": "hydration during exercise timing amount", "sport": "영양", "series": "스포츠 영양학", "episode": 3},
-    {"title": "단백질 하루 섭취량, 체중별 정확한 계산법", "keyword": "protein daily intake calculation body weight", "sport": "영양", "series": "스포츠 영양학", "episode": 4},
-    {"title": "운동 후 회복 빠르게 하는 영양 조합 3가지", "keyword": "post workout recovery nutrition combination", "sport": "영양", "series": "스포츠 영양학", "episode": 5},
-    # 심리
-    {"title": "경기 전 긴장 푸는 루틴, 프로 선수들의 비밀", "keyword": "pre game routine anxiety control athletes", "sport": "심리", "series": "스포츠 심리학", "episode": 1},
-    {"title": "압박 상황에서 집중력 유지하는 멘탈 훈련법", "keyword": "focus under pressure mental training sports", "sport": "심리", "series": "스포츠 심리학", "episode": 2},
-    {"title": "운동 슬럼프 극복하는 심리학적 접근 3단계", "keyword": "sports slump recovery psychology steps", "sport": "심리", "series": "스포츠 심리학", "episode": 3},
-    {"title": "이미지 트레이닝이 실제 운동 실력을 올리는 원리", "keyword": "mental imagery visualization sports performance", "sport": "심리", "series": "스포츠 심리학", "episode": 4},
-    # 체력
-    {"title": "VO2max 높이는 인터벌 훈련 방법과 강도 설정", "keyword": "VO2max interval training intensity", "sport": "체력", "series": "체력 과학", "episode": 1},
-    {"title": "젖산 역치 높이는 훈련으로 지구력 올리기", "keyword": "lactate threshold training endurance", "sport": "체력", "series": "체력 과학", "episode": 2},
-    {"title": "HIIT 운동 효과 극대화하는 휴식 시간 설정법", "keyword": "HIIT rest interval optimization fat loss", "sport": "체력", "series": "유산소 과학", "episode": 1},
-    {"title": "심박수 구간별 운동 강도 설정하는 방법", "keyword": "heart rate zone exercise intensity training", "sport": "체력", "series": "체력 과학", "episode": 3},
-    # 유연성
-    {"title": "운동 전 동적 스트레칭 루틴, 부상 예방 효과", "keyword": "dynamic stretching warm up injury prevention", "sport": "유연성", "series": "유연성 과학", "episode": 1},
-    {"title": "고관절 유연성 높이는 스트레칭 5가지", "keyword": "hip flexor mobility stretching exercises", "sport": "유연성", "series": "가동성 혁명", "episode": 1},
-    {"title": "폼롤러로 근막 이완하는 올바른 방법과 주의사항", "keyword": "foam rolling myofascial release technique", "sport": "유연성", "series": "회복 과학", "episode": 1},
-    {"title": "흉추 가동성 높이면 어깨 통증이 사라지는 이유", "keyword": "thoracic spine mobility shoulder pain", "sport": "유연성", "series": "가동성 혁명", "episode": 2},
-    # 생리학
-    {"title": "운동할 때 근육에서 실제로 일어나는 일", "keyword": "muscle physiology exercise ATP energy", "sport": "생리학", "series": "운동 생리학", "episode": 1},
-    {"title": "유산소 운동 중 지방이 타는 정확한 원리", "keyword": "fat oxidation aerobic exercise physiology", "sport": "생리학", "series": "운동 생리학", "episode": 2},
-    {"title": "수면 중 성장호르몬이 근육을 키우는 메커니즘", "keyword": "growth hormone sleep muscle recovery", "sport": "생리학", "series": "운동 생리학", "episode": 3},
-    {"title": "운동 후 통증(DOMS)이 생기는 진짜 이유와 해결법", "keyword": "DOMS delayed onset muscle soreness cause", "sport": "생리학", "series": "운동 생리학", "episode": 4},
-    {"title": "심장이 운동에 적응하는 방식, 운동성 심비대", "keyword": "cardiac adaptation exercise athlete heart", "sport": "생리학", "series": "운동 생리학", "episode": 5},
-    {"title": "코르티솔이 높으면 근육이 빠지는 이유", "keyword": "cortisol muscle loss stress hormone", "sport": "생리학", "series": "운동 생리학", "episode": 6},
-    # 물리치료
-    {"title": "어깨 통증 있을 때 물리치료사가 먼저 확인하는 것", "keyword": "shoulder pain physical therapy assessment", "sport": "물리치료", "series": "물리치료 가이드", "episode": 1},
-    {"title": "무릎 통증 자가 진단, 병원 가야 할 신호", "keyword": "knee pain self diagnosis when to see doctor", "sport": "물리치료", "series": "물리치료 가이드", "episode": 2},
-    {"title": "테니스 엘보 치료, 집에서 할 수 있는 운동", "keyword": "tennis elbow treatment home exercise", "sport": "물리치료", "series": "물리치료 가이드", "episode": 3},
-    {"title": "족저근막염 아침 통증 줄이는 스트레칭 루틴", "keyword": "plantar fasciitis morning stretching routine", "sport": "물리치료", "series": "물리치료 가이드", "episode": 4},
-    {"title": "거북목 교정 운동, 하루 5분으로 효과 보기", "keyword": "forward head posture correction exercise", "sport": "물리치료", "series": "물리치료 가이드", "episode": 5},
-    # 역학
-    {"title": "달리기 자세 분석, 무릎에 가해지는 충격 줄이기", "keyword": "running biomechanics knee impact reduction", "sport": "역학", "series": "스포츠 역학", "episode": 1},
-    {"title": "스쿼트할 때 무릎이 안쪽으로 무너지는 원인", "keyword": "squat knee valgus cause biomechanics", "sport": "역학", "series": "스포츠 역학", "episode": 2},
-    {"title": "데드리프트 허리 부상 막는 척추 중립 자세", "keyword": "deadlift spine neutral position injury prevention", "sport": "역학", "series": "스포츠 역학", "episode": 3},
-    {"title": "점프 착지 자세가 전방십자인대 부상을 결정한다", "keyword": "landing mechanics ACL injury prevention", "sport": "역학", "series": "스포츠 역학", "episode": 4},
-    # 해부학
-    {"title": "무릎 관절 구조, 왜 이렇게 자주 다칠까", "keyword": "knee joint anatomy structure injury", "sport": "해부학", "series": "스포츠 해부학", "episode": 1},
-    {"title": "어깨 관절 360도 움직임이 가능한 이유와 약점", "keyword": "shoulder joint anatomy mobility instability", "sport": "해부학", "series": "스포츠 해부학", "episode": 2},
-    {"title": "발의 아치 구조가 달리기에 미치는 영향", "keyword": "foot arch structure running performance", "sport": "해부학", "series": "스포츠 해부학", "episode": 3},
-    {"title": "척추 디스크 구조와 압력이 가해지는 자세", "keyword": "spinal disc anatomy pressure posture", "sport": "해부학", "series": "스포츠 해부학", "episode": 4},
-    # 신체균형
-    {"title": "골반 틀어짐이 허리·무릎 통증을 만드는 연결고리", "keyword": "pelvic tilt imbalance lower back knee pain", "sport": "신체균형", "series": "체형 교정", "episode": 1},
-    {"title": "한쪽 어깨가 낮은 이유, 척추측만증 자가 체크법", "keyword": "shoulder uneven scoliosis self check", "sport": "신체균형", "series": "체형 교정", "episode": 2},
-    {"title": "평발이 운동 능력에 미치는 영향과 교정 방법", "keyword": "flat feet sports performance correction", "sport": "신체균형", "series": "체형 교정", "episode": 3},
-    {"title": "X자 다리 교정 운동, 중둔근부터 강화해야 하는 이유", "keyword": "knock knees correction gluteus medius", "sport": "신체균형", "series": "체형 교정", "episode": 4},
-    # 스포츠의학
-    {"title": "성장판 손상 없이 청소년이 안전하게 운동하는 방법", "keyword": "youth athlete growth plate safe training", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 1},
-    {"title": "열사병 위험 신호, 여름 운동 시 주의사항", "keyword": "heat stroke warning signs summer exercise", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 2},
-    {"title": "운동 중 갑자기 쥐가 나는 이유와 예방법", "keyword": "exercise cramp cause prevention electrolyte", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 3},
-    {"title": "과훈련 증후군 자가 체크, 지금 쉬어야 할 신호", "keyword": "overtraining syndrome self check recovery", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 4},
-    # 공통
-    {"title": "수면 7시간이 근육 성장과 체력에 미치는 영향", "keyword": "sleep 7 hours muscle growth performance", "sport": "공통", "series": "회복 과학", "episode": 1},
-    {"title": "나이 들수록 근육이 빠지는 이유와 막는 방법", "keyword": "sarcopenia aging muscle loss prevention", "sport": "공통", "series": "시니어 스포츠", "episode": 1},
-    {"title": "아이 운동 시작 나이, 종목별 적합한 시기", "keyword": "youth sports age appropriate training", "sport": "공통", "series": "스포츠 발달", "episode": 1},
-    {"title": "운동 초보자가 첫 달에 반드시 지켜야 할 원칙", "keyword": "beginner exercise first month principles", "sport": "공통", "series": "운동 입문", "episode": 1},
-    {"title": "체중 감량과 근육 증가를 동시에 하는 방법", "keyword": "body recomposition fat loss muscle gain", "sport": "공통", "series": "운동 입문", "episode": 2},
-    # 가동성 사슬 시리즈
-    {"title": "드리블 속도 올리는 발목 가동성이 무릎 부상을 막는 이유", "keyword": "soccer ankle mobility knee injury prevention", "sport": "축구", "series": "가동성 사슬", "episode": 1},
-    {"title": "골반 불균형이 요추 안정화 운동 효과를 반감시키는 이유", "keyword": "pelvic tilt lumbar stabilization biomechanics", "sport": "신체균형", "series": "가동성 사슬", "episode": 2},
-    {"title": "흉추 가동성 부족이 벤치프레스 시 어깨 충돌을 만드는 과정", "keyword": "thoracic mobility shoulder impingement bench press", "sport": "유연성", "series": "가동성 사슬", "episode": 3},
-    {"title": "고관절 회전 제한이 야구 투수 구속 저하를 일으키는 해부학적 경로", "keyword": "hip rotation baseball pitching velocity anatomy", "sport": "야구", "series": "가동성 사슬", "episode": 4},
-    {"title": "발 아치 무너짐이 상체 밸런스까지 무너뜨리는 상행성 사슬 원리", "keyword": "foot arch collapse upper body balance chain", "sport": "해부학", "series": "가동성 사슬", "episode": 5},
-    # 에너지 과학 시리즈
-    {"title": "크레아틴 인산 시스템과 젖산 역치의 상호작용, HIIT 훈련의 본질", "keyword": "ATP-PC system lactate threshold HIIT physiology", "sport": "생리학", "series": "에너지 과학", "episode": 1},
-    {"title": "탄수화물 로딩과 글리코겐 고갈, 경기 전 식단이 VO2max에 미치는 영향", "keyword": "carbohydrate loading glycogen VO2max performance", "sport": "영양", "series": "에너지 과학", "episode": 2},
-    {"title": "DOMS와 성장호르몬, 수면 7시간이 단백질 합성을 결정하는 법", "keyword": "DOMS growth hormone sleep muscle protein synthesis", "sport": "생리학", "series": "에너지 과학", "episode": 3},
-    {"title": "지방 연소 효율을 극대화하는 유산소 심박수 구간 설정의 과학", "keyword": "fat oxidation aerobic heart rate zone science", "sport": "체력", "series": "에너지 과학", "episode": 4},
-    {"title": "코르티솔 농도가 운동 슬럼프와 근손실에 미치는 파괴적인 영향", "keyword": "cortisol muscle loss exercise slump physiology", "sport": "생리학", "series": "에너지 과학", "episode": 5},
-    # 부상 잔혹사 시리즈
-    {"title": "왜 전력 질주 중에만 터질까, 햄스트링 편심성 수축과 달리기 역학", "keyword": "hamstring eccentric contraction running biomechanics", "sport": "재활", "series": "부상 잔혹사", "episode": 1},
-    {"title": "전방십자인대 부상을 결정하는 점프 착지 자세와 중둔근 활성화", "keyword": "ACL injury landing mechanics gluteus medius", "sport": "역학", "series": "부상 잔혹사", "episode": 2},
-    {"title": "족저근막염 아침 통증이 아킬레스건 가동성과 연결되는 해부학적 이유", "keyword": "plantar fasciitis achilles tendinopathy connection", "sport": "물리치료", "series": "부상 잔혹사", "episode": 3},
-    {"title": "테니스 엘보 치료의 핵심은 손목이 아닌 견갑골 안정화다", "keyword": "tennis elbow scapular stability physical therapy", "sport": "물리치료", "series": "부상 잔혹사", "episode": 4},
-    {"title": "허리 디스크 재활 중 절대로 피해야 할 3가지 움직임", "keyword": "lumbar disc rehabilitation avoid movements", "sport": "재활", "series": "부상 잔혹사", "episode": 5},
-    # 오피스 애슬리트 시리즈
-    {"title": "하루 8시간 거북목 습관이 투수의 회전근개 부상을 유발하는 경로", "keyword": "forward head posture rotator cuff injury pitcher", "sport": "신체균형", "series": "오피스 애슬리트", "episode": 1},
-    {"title": "복횡근이 비활성화된 직장인이 스쿼트 시 허리를 다치는 진짜 이유", "keyword": "transverse abdominis core squat back pain", "sport": "근육학", "series": "오피스 애슬리트", "episode": 2},
-    {"title": "장요근 단축이 엉덩이 근육 성장을 방해하는 상호 억제 기전", "keyword": "psoas muscle gluteal amnesia reciprocal inhibition", "sport": "근육학", "series": "오피스 애슬리트", "episode": 3},
-    {"title": "의자에 앉아 있는 시간이 햄스트링 유연성을 파괴하는 생리학적 과정", "keyword": "sitting posture hamstring flexibility physiology", "sport": "유연성", "series": "오피스 애슬리트", "episode": 4},
-    # 엘리트 마인드 시리즈
-    {"title": "압박 상황에서 집중력을 유지하는 초점 주의 훈련과 뇌파 변화", "keyword": "focus under pressure attentional focus brain waves", "sport": "심리", "series": "엘리트 마인드", "episode": 1},
-    {"title": "이미지 트레이닝이 실제 근신경계를 활성화하는 거울 뉴런의 원리", "keyword": "mental imagery mirror neurons neuromuscular activation", "sport": "심리", "series": "엘리트 마인드", "episode": 2},
-    {"title": "경기 전 긴장감을 흥분으로 전환하는 인지 재구성 방법", "keyword": "pre-game anxiety cognitive reappraisal sports", "sport": "심리", "series": "엘리트 마인드", "episode": 3},
-    {"title": "슬럼프를 탈피하는 3단계 심리학적 루틴, 통제 가능한 요소에 집중하라", "keyword": "sports slump recovery 3 steps psychology", "sport": "심리", "series": "엘리트 마인드", "episode": 4},
-    {"title": "운동 강도와 도파민 수용체의 상관관계, 오버트레이닝을 막는 멘탈 가이드", "keyword": "exercise intensity dopamine overtraining mental", "sport": "스포츠의학", "series": "엘리트 마인드", "episode": 5},
-]
-
-USED_TOPICS_FILE = "used_topics.json"
+CATEGORIES = ["스포츠이슈", "경제뉴스", "전국이슈", "연예이슈"]
 
 
-def load_used_topics():
+USED_TITLES_FILE = "used_titles2.json"
+
+def load_used_titles():
     try:
-        with open(USED_TOPICS_FILE, "r") as f:
+        with open(USED_TITLES_FILE, "r") as f:
             return json.load(f)
     except Exception:
         return []
 
-
-def save_used_topic(title):
-    used = load_used_topics()
+def save_used_title(title):
+    used = load_used_titles()
     used.append(title)
-    if len(used) > 80:
-        used = used[-80:]
+    if len(used) > 30:
+        used = used[-30:]
     try:
-        with open(USED_TOPICS_FILE, "w") as f:
-            json.dump(used, f, ensure_ascii=False)
+        with open(USED_TITLES_FILE, "w") as f:
+            import json as j
+            j.dump(used, f, ensure_ascii=False)
     except Exception as e:
         print("[중복방지] 저장 실패: " + str(e))
 
+def is_duplicate(title):
+    used = load_used_titles()
+    for t in used:
+        if title[:10] in t or t[:10] in title:
+            return True
+    return False
 
-def pick_topic():
-    used = load_used_topics()
-    available = [t for t in TOPICS if t["title"] not in used]
-    if not available:
-        print("[중복방지] 모든 주제 사용 완료, 초기화합니다.")
-        available = TOPICS
+CATEGORY_KEYWORDS = {
+    "스포츠이슈": {
+        "naver": ["스포츠 이슈 오늘", "축구 뉴스 오늘", "야구 오늘", "농구 뉴스", "스포츠 선수 이슈"],
+        "google": ["korea sports news today", "한국 스포츠 이슈"],
+        "newsapi": ["korea sports international", "korean athlete world news"]
+    },
+    "경제뉴스": {
+        "naver": ["경제 뉴스 오늘", "코스피 오늘", "부동산 뉴스", "환율 오늘", "주식 이슈"],
+        "google": ["korea economy news today", "한국 경제 이슈"],
+        "newsapi": ["korea economy global", "korean market international"]
+    },
+    "전국이슈": {
+        "naver": ["오늘 사회 이슈", "정치 뉴스 오늘", "사건사고 오늘", "핫이슈 오늘", "전국 뉴스"],
+        "google": ["korea news today", "한국 사회 이슈"],
+        "newsapi": ["korea society global reaction", "south korea world news"]
+    },
+    "연예이슈": {
+        "naver": ["연예 뉴스 오늘", "K팝 이슈", "드라마 화제", "아이돌 뉴스", "연예인 이슈"],
+        "google": ["kpop news today", "한국 연예 이슈"],
+        "newsapi": ["kpop global reaction", "korean entertainment worldwide"]
+    }
+}
+
+
+def search_naver_news(query, display=5):
+    if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
+        return []
+    try:
+        response = requests.get(
+            "https://openapi.naver.com/v1/search/news.json",
+            headers={
+                "X-Naver-Client-Id": NAVER_CLIENT_ID,
+                "X-Naver-Client-Secret": NAVER_CLIENT_SECRET
+            },
+            params={"query": query, "display": display, "sort": "date"},
+            timeout=10
+        )
+        if response.status_code == 200:
+            items = response.json().get("items", [])
+            results = []
+            for item in items:
+                title = item.get("title", "").replace("<b>", "").replace("</b>", "")
+                desc = item.get("description", "").replace("<b>", "").replace("</b>", "")
+                results.append(title + ": " + desc)
+            print("[네이버] " + str(len(results)) + "개 수집")
+            return results
+    except Exception as e:
+        print("[네이버 오류] " + str(e))
+    return []
+
+
+def test_apis():
+    import os
+    print("[API 확인] NAVER_CLIENT_ID: " + ("있음" if os.environ.get("NAVER_CLIENT_ID") else "없음"))
+    print("[API 확인] GOOGLE_SEARCH_API_KEY: " + ("있음" if os.environ.get("GOOGLE_SEARCH_API_KEY") else "없음"))
+    print("[API 확인] NEWSAPI_KEY: " + ("있음" if os.environ.get("NEWSAPI_KEY") else "없음"))
+
+    # 네이버 테스트
+    nid = os.environ.get("NAVER_CLIENT_ID", "")
+    nsec = os.environ.get("NAVER_CLIENT_SECRET", "")
+    if nid and nsec:
         try:
-            with open(USED_TOPICS_FILE, "w") as f:
-                json.dump([], f)
-        except Exception:
-            pass
-    topic = random.choice(available)
-    save_used_topic(topic["title"])
-    return topic
+            r = requests.get(
+                "https://openapi.naver.com/v1/search/news.json",
+                headers={"X-Naver-Client-Id": nid, "X-Naver-Client-Secret": nsec},
+                params={"query": "뉴스", "display": 1},
+                timeout=10
+            )
+            print("[네이버 테스트] 상태코드: " + str(r.status_code) + " / " + r.text[:100])
+        except Exception as e:
+            print("[네이버 테스트 오류] " + str(e))
+
+    # NewsAPI 테스트
+    napi = os.environ.get("NEWSAPI_KEY", "")
+    if napi:
+        try:
+            r = requests.get(
+                "https://newsapi.org/v2/top-headlines",
+                params={"country": "kr", "pageSize": 1, "apiKey": napi},
+                timeout=10
+            )
+            print("[NewsAPI 테스트] 상태코드: " + str(r.status_code) + " / " + r.text[:100])
+        except Exception as e:
+            print("[NewsAPI 테스트 오류] " + str(e))
 
 
-def get_access_token():
-    print("[인증] Google Access Token 발급 중...")
-    response = requests.post(
-        "https://oauth2.googleapis.com/token",
-        data={
-            "client_id": GOOGLE_CLIENT_ID,
-            "client_secret": GOOGLE_CLIENT_SECRET,
-            "refresh_token": GOOGLE_REFRESH_TOKEN,
-            "grant_type": "refresh_token"
-        },
-        timeout=10
-    )
-    if response.status_code != 200:
-        raise Exception("토큰 발급 실패: " + response.text)
-    print("[인증] 완료!")
-    return response.json()["access_token"]
+def search_google_news(query, num=3):
+    if not GOOGLE_SEARCH_API_KEY or not GOOGLE_SEARCH_ENGINE_ID:
+        return []
+    try:
+        response = requests.get(
+            "https://www.googleapis.com/customsearch/v1",
+            params={
+                "key": GOOGLE_SEARCH_API_KEY,
+                "cx": GOOGLE_SEARCH_ENGINE_ID,
+                "q": query + " " + TODAY_EN,
+                "num": num,
+                "dateRestrict": "d1"
+            },
+            timeout=10
+        )
+        if response.status_code == 200:
+            items = response.json().get("items", [])
+            results = []
+            for item in items:
+                results.append(item.get("title", "") + ": " + item.get("snippet", ""))
+            print("[구글] " + str(len(results)) + "개 수집")
+            return results
+    except Exception as e:
+        print("[구글 오류] " + str(e))
+    return []
 
 
-def generate_with_claude(prompt):
-    print("[AI] Claude 사용 중...")
-    response = requests.post(
-        "https://api.anthropic.com/v1/messages",
-        headers={
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json"
-        },
-        json={
-            "model": "claude-sonnet-4-20250514",
-            "max_tokens": 4000,
-            "messages": [{"role": "user", "content": prompt}]
-        },
-        timeout=300
-    )
-    if response.status_code != 200:
-        raise Exception("Claude 오류: " + str(response.status_code) + " " + response.text[:200])
-    return response.json()["content"][0]["text"]
+def search_newsapi(query, page_size=3):
+    if not NEWSAPI_KEY:
+        return []
+    try:
+        response = requests.get(
+            "https://newsapi.org/v2/everything",
+            params={
+                "q": query,
+                "sortBy": "publishedAt",
+                "pageSize": page_size,
+                "from": TODAY_EN,
+                "apiKey": NEWSAPI_KEY
+            },
+            timeout=10
+        )
+        if response.status_code == 200:
+            articles = response.json().get("articles", [])
+            results = []
+            for article in articles:
+                title = article.get("title", "") or ""
+                desc = article.get("description", "") or ""
+                results.append(title + ": " + desc)
+            print("[NewsAPI] " + str(len(results)) + "개 수집")
+            return results
+    except Exception as e:
+        print("[NewsAPI 오류] " + str(e))
+    return []
+
+
+def search_claude_web(category):
+    print("[Claude 웹검색] API 수집 실패 - 웹검색으로 전환...")
+    category_map = {
+        "스포츠이슈": "오늘 한국 스포츠 핫이슈 뉴스 축구 야구 농구",
+        "경제뉴스": "오늘 한국 경제 핫이슈 주식 부동산 금리",
+        "전국이슈": "오늘 한국 사회 핫이슈 정치 사건사고",
+        "연예이슈": "오늘 한국 연예 핫이슈 K팝 드라마 연예인"
+    }
+    query = category_map.get(category, "오늘 한국 핫이슈 뉴스")
+    payload = {
+        "model": "claude-sonnet-4-20250514",
+        "max_tokens": 1000,
+        "tools": [{"type": "web_search_20250305", "name": "web_search"}],
+        "messages": [{"role": "user", "content": (
+            "오늘(" + TODAY + ") 기준으로 다음 키워드를 검색해서 "
+            "실제 뉴스에서 확인된 핵심 팩트 5가지만 요약해줘. "
+            "루머나 추측 금지. 출처 언론사 표기 필수.\n\n검색: " + query
+        )}]
+    }
+    try:
+        response = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": ANTHROPIC_API_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            },
+            json=payload,
+            timeout=60
+        )
+        if response.status_code == 200:
+            content = response.json().get("content", [])
+            result = ""
+            for block in content:
+                if block.get("type") == "text":
+                    result += block.get("text", "")
+            print("[Claude 웹검색] 수집 완료")
+            time.sleep(30)
+            return "=== 오늘(" + TODAY + ") 웹검색 수집 뉴스 ===\n" + result
+    except Exception as e:
+        print("[Claude 웹검색 오류] " + str(e))
+    return ""
+
+
+def collect_news(category):
+    print("[뉴스 수집] 카테고리: " + category)
+    keywords = CATEGORY_KEYWORDS[category]
+
+    naver_query1 = random.choice(keywords["naver"])
+    remaining = [k for k in keywords["naver"] if k != naver_query1]
+    naver_query2 = random.choice(remaining) if remaining else naver_query1
+    google_query = random.choice(keywords["google"])
+    newsapi_query = random.choice(keywords["newsapi"])
+
+    naver_results1 = search_naver_news(naver_query1, display=5)
+    naver_results2 = search_naver_news(naver_query2, display=3)
+    google_results = search_google_news(google_query, num=3)
+    newsapi_results = search_newsapi(newsapi_query, page_size=3)
+
+    all_news = naver_results1 + naver_results2 + google_results + newsapi_results
+
+    if not all_news:
+        print("[경고] API 수집 실패 - Claude 웹검색으로 전환")
+        return search_claude_web(category)
+
+    news_context = "=== 오늘(" + TODAY + ") 수집된 뉴스 ===\n"
+    for i, news in enumerate(all_news[:14]):
+        news_context += str(i+1) + ". " + news + "\n"
+
+    print("[수집 완료] 총 " + str(len(all_news)) + "개")
+    return news_context
+
+
+def call_claude(messages, max_tokens=4000):
+    for attempt in range(3):
+        response = requests.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": ANTHROPIC_API_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            },
+            json={
+                "model": "claude-sonnet-4-20250514",
+                "max_tokens": max_tokens,
+                "messages": messages
+            },
+            timeout=300
+        )
+        if response.status_code == 200:
+            content = response.json().get("content", [])
+            result = ""
+            for block in content:
+                if block.get("type") == "text":
+                    result += block.get("text", "")
+            return result
+        elif response.status_code == 429:
+            wait = 60 * (attempt + 1)
+            print("[429] " + str(wait) + "초 대기 후 재시도...")
+            time.sleep(wait)
+        else:
+            raise Exception("Claude 오류: " + str(response.status_code))
+    raise Exception("Claude 오류: 최대 재시도 횟수 초과")
 
 
 def generate_post():
-    topic = pick_topic()
-    print("[글 생성] 주제: " + topic["title"])
+    category = random.choice(CATEGORIES)
+    print("[카테고리] " + category)
 
-    series_info = ""
-    if topic["episode"] > 1:
-        series_info = (
-            "이 글은 " + topic["series"] + " 시리즈 " + str(topic["episode"]) + "편입니다. "
-            + "이전 편보다 심화된 내용을 다루세요.\n\n"
-        )
+    news_context = collect_news(category)
 
     prompt = (
-        "당신은 스포츠 과학, 운동역학, 해부학, 근육학, 생리학, 물리치료학, 스포츠의학을 깊이 이해하는 전문 블로거입니다.\n"
-        "한국어만 사용하세요. 한자, 일본어 등 외국 문자 절대 금지.\n\n"
-        + series_info
-        + "당신은 스포츠 전문 매거진 에디터입니다.\n"
-        "정보를 나열하는 것이 아니라 독자를 끌어당기는 스토리를 씁니다.\n"
-        "말이 많아지는 게 아니라 내용이 점점 깊어져야 합니다.\n\n"
-        "반드시 아래 구조로 작성하세요:\n\n"
-        "--- 구조 시작 ---\n\n"
-        "1. 도입부 (2~3줄)\n"
-        "독자가 직접 겪는 구체적 상황을 묘사하세요. 질문형 금지. 공감과 호기심을 동시에 자극하세요.\n\n"
-        "2. 임팩트 키워드\n"
-        "##키워드## 형식으로 이 글의 핵심 개념을 한 단어나 짧은 구로 던지세요.\n"
-        "예: ##편심성 수축##, ##무혈관 지대##, ##글리코겐 역치##\n"
-        "그 아래 2~3문장으로 짧게 풀어쓰세요. 쉽고 명확하게.\n\n"
-        "3. 소제목 구조로 빌드업 (소제목 3~4개)\n"
-        "소제목: [이모지 소제목내용 이모지] 형식으로 작성하세요. 소제목 앞뒤로 반드시 이모지를 붙이세요.\n"
-        "예: [⚡ 신경근 시스템의 각성 ⚡], [🔥 폭발적 파워의 핵심 🔥], [💪 근육 성장의 비밀 💪]\n"
-        "각 소제목 아래는 원리 → 심화 → 근거 순으로 점점 깊어지게 작성하세요.\n"
-        "단락은 3~4줄 이내. 빈 줄 필수.\n"
-        "전문 용어는 괄호로 설명하세요. 예: 대퇴사두근(허벅지 앞 근육)\n"
-        "수치와 연구 출처를 포함하세요. 내용이 깊어지는 거지 말이 많아지는 게 아닙니다.\n\n"
-        "4. 추천 운동\n"
-        "훈련 표: [TABLE_START]와 [TABLE_END] 사이\n"
-        "형식: 훈련명|세트|횟수|휴식|작용 근육|효과\n"
-        "[TABLE_START]\n"
-        "훈련명|세트|횟수|휴식|작용 근육|효과\n"
-        "예시|3|12회|60초|대퇴사두근|하체 강화\n"
-        "[TABLE_END]\n"
-        "표 아래 각 운동별 핵심 포인트와 주의사항을 1~2줄로 보완 설명하세요.\n\n"
-        "5. 결론 + 조언\n"
-        "강하고 간결하게 작성하세요. 오늘 당장 실천할 수 있는 것 하나를 제시하세요.\n"
-        "결론은 반드시 존댓말로 끝내세요. '~하자', '~이다', '~한다' 절대 금지.\n"
-        "마지막 문장에 격언이나 교훈적 마무리 절대 금지.\n"
-        "전문가로서 한 마디 조언을 덧붙이세요.\n\n"
+        "당신은 20년 경력의 베테랑 시니어 기자입니다.\n"
+        "TV 뉴스 앵커처럼 명확하고 신뢰감 있으며, 독자를 끌어당기는 문장력을 갖고 있습니다.\n"
+        "한국어만 사용하세요. 외국 문자 절대 금지.\n\n"
+        "아래는 오늘(" + TODAY + ") 실제 수집된 뉴스입니다:\n"
+        + news_context + "\n\n"
+        "위 뉴스 중 가장 핫하고 독자 관심이 높을 이슈 하나를 선택해서 기사를 작성하세요.\n"
+        "국내 이슈를 중심으로 작성하되, 해외 반응이나 글로벌 관점이 있다면 비교 내용을 자연스럽게 한 섹션 추가하세요.\n"
+        "단, 해외 비교는 보조적인 내용이며 국내 상황이 항상 중심이어야 합니다.\n\n"
+        "절대 지켜야 할 원칙:\n"
+        "1. 공식 확인된 팩트만 작성하세요. 루머, 추측 절대 금지.\n"
+        "2. 명예훼손 내용 절대 금지.\n"
+        "3. 반드시 존댓말을 사용하세요. '~이다', '~한다' 반말 종결 절대 금지.\n"
+        "4. 중립적이고 객관적인 시각을 유지하세요.\n"
+        "5. 제목과 내용이 일치해야 합니다. 낚시성 제목 금지.\n\n"
+        "글 구조 (반드시 이 순서로):\n\n"
+        "1. 리드문 (2~3줄)\n"
+        "핵심 팩트를 강렬하게 전달하세요. 독자가 첫 문장에 멈추게 만드세요.\n\n"
+        "2. ##핵심키워드##\n"
+        "이 이슈의 핵심을 한 단어나 짧은 구로 크게 던지세요.\n"
+        "그 아래 2~3문장으로 쉽게 풀어쓰세요.\n\n"
+        "3. 소제목 구조 (3~4개)\n"
+        "소제목: [이모지 소제목내용 이모지] 형식. 앞뒤 이모지 필수.\n"
+        "예: [📌 사건의 전말 📌], [💬 각계 반응 💬], [🌍 해외 반응과 비교 🌍]\n"
+        "각 소제목 아래: 배경 → 팩트 → 반응 순으로 깊어지게\n"
+        "단락 3~4줄 이내. 빈 줄 필수.\n"
+        "수치, 날짜, 출처 명확히 표기.\n\n"
+        "5. 전망 + 독자 관점\n"
+        "앞으로 어떻게 될지 + 독자에게 의미하는 것\n"
+        "반드시 존댓말로 끝내세요. 격언 금지.\n\n"
         "6. 핵심 요약\n"
         "[SUMMARY_START]\n"
         "핵심1\n"
         "핵심2\n"
         "핵심3\n"
         "[SUMMARY_END]\n\n"
-        "--- 구조 끝 ---\n\n"
         "글쓰기 원칙:\n"
-        "반드시 존댓말을 사용하세요. '~하자', '~이다', '~한다', '~갈린다' 등 반말 종결 절대 금지.\n"
-        "'~합니다', '~입니다', '~하세요', '~됩니다', '~습니다' 형식으로 끝내세요.\n"
-        "각 섹션이 자연스럽게 연결되어 하나의 스토리처럼 흘러야 합니다.\n"
-        "임팩트 있는 문장 하나가 긴 설명보다 낫습니다.\n"
-        "한국어만 사용. 한자, 외국 문자 절대 금지.\n"
+        "반드시 존댓말. '~이다', '~한다' 반말 종결 절대 금지.\n"
         "AI 티 나는 나열식 표현 금지.\n"
-        "3500자에서 4500자로 작성하세요. 깊이 있는 내용을 충분히 전달하세요.\n\n"
-        "카테고리: " + topic["sport"] + "\n"
-        "주제: " + topic["title"] + "\n"
-        "제목은 궁금증을 유발하고 검색 키워드가 자연스럽게 포함되게 작성하세요.\n\n"
+        "2500자에서 3500자.\n\n"
+        "카테고리: " + category + "\n\n"
         "출력 형식:\n"
-        "제목: (훅이 있는 제목)\n"
+        "제목: (팩트 기반 강렬한 제목)\n"
         "---\n"
         "(본문)"
     )
 
-    full_text = generate_with_claude(prompt)
+    print("[AI] 기사 작성 중...")
+    full_text = call_claude([{"role": "user", "content": prompt}], max_tokens=4000)
 
     lines = full_text.strip().split("\n")
     title = ""
@@ -308,13 +380,13 @@ def generate_post():
 
     body = "\n".join(body_lines).strip()
     if not title:
-        title = topic["title"]
+        title = TODAY + " " + category + " 핫이슈"
     if not body:
         body = full_text
 
     print("[완료] 제목: " + title)
     print("[완료] 글자수: " + str(len(body)) + "자")
-    return {"title": title, "body": body, "topic": topic}
+    return {"title": title, "body": body, "category": category}
 
 
 def get_image_keyword_from_title(title, category):
@@ -491,46 +563,25 @@ def get_images(keyword, count=3, title="", category=""):
             },
             timeout=10
         )
-        data = response.json()
         images = []
-        for photo in data.get("results", []):
+        for photo in response.json().get("results", []):
             images.append({
                 "url": photo["urls"]["regular"],
                 "alt": photo.get("alt_description", keyword) or keyword,
                 "author": photo["user"]["name"],
                 "author_url": photo["user"]["links"]["html"]
             })
-        print("[이미지] " + str(len(images)) + "장 수집 완료")
+        print("[이미지] " + str(len(images)) + "장 수집")
         return images
     except Exception as e:
         print("[이미지 오류] " + str(e))
         return []
 
 
-def make_table_html(table_text):
-    rows = [r.strip() for r in table_text.strip().split("\n") if r.strip()]
-    if not rows:
-        return ""
-    html = '<div style="overflow-x:auto;margin:24px 0;">'
-    html += '<table style="width:100%;border-collapse:collapse;font-size:15px;">'
-    for i, row in enumerate(rows):
-        cols = row.split("|")
-        html += "<tr>"
-        for col in cols:
-            if i == 0:
-                html += '<th style="background:#1565c0;color:#fff;padding:10px 14px;text-align:center;border:1px solid #1565c0;">' + col.strip() + "</th>"
-            else:
-                bg = "#f5f8ff" if i % 2 == 0 else "#ffffff"
-                html += '<td style="padding:9px 14px;text-align:center;border:1px solid #dde3f0;background:' + bg + ';">' + col.strip() + "</td>"
-        html += "</tr>"
-    html += "</table></div>\n"
-    return html
-
-
 def make_summary_html(summary_text):
     lines = [l.strip() for l in summary_text.strip().split("\n") if l.strip()]
-    html = '<div style="background:#e8f4fd;border-left:5px solid #1565c0;border-radius:8px;padding:20px 24px;margin:28px 0;">'
-    html += '<p style="font-weight:700;font-size:17px;color:#1565c0;margin-bottom:12px;">📌 핵심 요약</p>'
+    html = '<div style="background:#fff8e1;border-left:5px solid #f57f17;border-radius:8px;padding:20px 24px;margin:28px 0;">'
+    html += '<p style="font-weight:700;font-size:17px;color:#f57f17;margin-bottom:12px;">📌 핵심 요약</p>'
     for line in lines:
         html += '<p style="margin:6px 0;font-size:15px;color:#333;">✅ ' + line + "</p>"
     html += "</div>\n"
@@ -545,60 +596,49 @@ def make_image_html(img, margin_top="0"):
     return html
 
 
-def body_to_html(body, images, topic):
+def body_to_html(body, images, category):
     import re
 
-    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
+    emoji = CATEGORY_EMOJI.get(category, "📰")
 
-    # 시리즈 배지
-    series_badge = ""
-    if topic.get("series"):
-        series_badge = (
-            '<div style="display:inline-block;background:#1565c0;color:#fff;'
-            'font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:20px;font-weight:600;">'
-            + sport_emoji + " " + topic["series"] + " " + str(topic["episode"]) + "편</div>\n"
-        )
+    html = (
+        '<div style="display:inline-block;background:#e65100;color:#fff;'
+        'font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:8px;font-weight:600;">'
+        + emoji + " " + category + "</div>\n"
+        '<div style="font-size:13px;color:#888;margin-bottom:20px;">📅 ' + TODAY + "</div>\n"
+    )
 
-    html = series_badge
-
-    # 상단 이미지
     if len(images) >= 1:
         html += make_image_html(images[0])
 
-    # 패턴 파싱
-    table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
+    keyword_pattern = re.compile(r'##(.+?)##')
 
-    table_match = table_pattern.search(body)
     summary_match = summary_pattern.search(body)
-
-    table_html = make_table_html(table_match.group(1)) if table_match else ""
     summary_html = make_summary_html(summary_match.group(1)) if summary_match else ""
+    clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", body)
 
-    clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
-    clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
-
-    # 목차 자동 생성
     headings = re.findall(r'\[([^\]]+)\]', clean_body)
-    headings = [h for h in headings if h not in ["TABLE_PLACEHOLDER", "SUMMARY_PLACEHOLDER"]]
+    headings = [h for h in headings if h not in ["SUMMARY_PLACEHOLDER"]]
     if headings:
-        toc = '<div style="background:#f8f9ff;border:1px solid #dde3f0;border-radius:10px;padding:20px 24px;margin:24px 0;">'
-        toc += '<p style="font-weight:700;font-size:15px;color:#1565c0;margin-bottom:12px;">📋 목차</p>'
+        toc = '<div style="background:#f8f9ff;border:1px solid #e0e0e0;border-radius:10px;padding:20px 24px;margin:24px 0;">'
+        toc += '<p style="font-weight:700;font-size:15px;color:#e65100;margin-bottom:12px;">📋 목차</p>'
         toc += '<ol style="margin:0;padding-left:20px;">'
         for h in headings:
             clean_h = re.sub(r'^[^\w가-힣]+', '', h).strip()
-            toc += '<li style="margin:6px 0;font-size:15px;color:#444;line-height:1.6;">' + clean_h + '</li>'
+            clean_h = re.sub(r'[^\w가-힣\s]+$', '', clean_h).strip()
+            if clean_h:
+                toc += '<li style="margin:6px 0;font-size:15px;color:#444;line-height:1.6;">' + clean_h + '</li>'
         toc += '</ol></div>\n'
         html += toc
 
-    # 키워드 강조 처리
-    keyword_pattern = re.compile(r'##(.+?)##')
     def replace_keyword(m):
         return (
-            '<span style="display:inline-block;font-size:28px;font-weight:900;'
-            'color:#1565c0;letter-spacing:-0.5px;margin:20px 0 8px 0;'
-            'border-bottom:3px solid #1565c0;padding-bottom:4px;">'
-            + m.group(1) + '</span>'
+            '<div style="margin:28px 0 12px 0;">'
+            '<span style="display:inline-block;font-size:30px;font-weight:900;'
+            'color:#e65100;letter-spacing:-0.5px;'
+            'border-bottom:3px solid #e65100;padding-bottom:4px;">'
+            + m.group(1) + '</span></div>\n'
         )
 
     paragraphs = clean_body.split("\n")
@@ -611,139 +651,118 @@ def body_to_html(body, images, topic):
             html += '<div style="margin:10px 0;"></div>\n'
             continue
 
-        if para.strip() == "[TABLE_PLACEHOLDER]":
-            html += table_html
-            continue
-
         if para.strip() == "[SUMMARY_PLACEHOLDER]":
             html += summary_html
             continue
 
-        # 소제목
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
             html += (
-                '<h2 style="margin-top:48px;margin-bottom:16px;font-size:22px;font-weight:700;'
-                'background:linear-gradient(90deg,#1565c0,#1976d2);'
+                '<h2 style="margin-top:48px;margin-bottom:16px;font-size:21px;font-weight:700;'
+                'background:linear-gradient(90deg,#e65100,#ef6c00);'
                 'color:#fff;padding:12px 20px;border-radius:8px;">'
                 + heading + "</h2>\n"
             )
             continue
 
-        # 번호 리스트
         if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
             html += (
                 '<div style="display:flex;align-items:flex-start;margin:10px 0;padding:12px 16px;'
-                'background:#f5f8ff;border-radius:8px;">'
-                '<span style="color:#1565c0;font-weight:700;margin-right:12px;font-size:16px;">'
+                'background:#fff3e0;border-radius:8px;">'
+                '<span style="color:#e65100;font-weight:700;margin-right:12px;font-size:16px;">'
                 + para.strip()[0] + '.</span>'
                 '<span style="color:#333;font-size:16px;line-height:1.8;">'
                 + para.strip()[2:].strip() + '</span></div>\n'
             )
             continue
 
-        # 일반 단락
         para_count += 1
         processed = keyword_pattern.sub(replace_keyword, para.strip())
 
-        # 키워드 강조가 있는 단락
         if processed != para.strip():
-            html += '<div style="margin:28px 0 12px 0;">' + processed + '</div>\n'
-
-        # 4단락마다 핵심 문장 강조 박스
+            html += processed
         elif para_count % 4 == 0 and len(para.strip()) > 30:
             html += (
-                '<div style="border-left:4px solid #1565c0;padding:14px 20px;margin:20px 0;'
-                'background:#f0f4ff;border-radius:0 8px 8px 0;">'
-                '<p style="margin:0;font-size:16px;line-height:1.9;color:#1a1a2e;font-weight:500;">'
+                '<div style="border-left:4px solid #e65100;padding:14px 20px;margin:20px 0;'
+                'background:#fff3e0;border-radius:0 8px 8px 0;">'
+                '<p style="margin:0;font-size:16px;line-height:1.9;color:#1a1a1a;font-weight:500;">'
                 + para.strip() + '</p></div>\n'
             )
-
-        # 일반 단락
         else:
             html += (
                 '<p style="margin:14px 0;line-height:1.9;font-size:16px;color:#333;">'
                 + para.strip() + '</p>\n'
             )
 
-        # 중간 이미지
         if i >= mid and not image2_inserted and len(images) >= 2:
             html += make_image_html(images[1], margin_top="20px")
             image2_inserted = True
 
-    # 하단 이미지
     if len(images) >= 3:
         html += make_image_html(images[2], margin_top="20px")
 
     return html
 
 
-def send_telegram(title, post_url, topic):
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        print("[텔레그램] 설정값 없음 - 건너뜀")
-        return
-    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
-    message = (
-        sport_emoji + " 새 포스팅\n\n"
-        + "📌 " + title + "\n\n"
-        + "🔗 " + post_url
+def get_access_token():
+    response = requests.post(
+        "https://oauth2.googleapis.com/token",
+        data={
+            "client_id": GOOGLE_CLIENT_ID,
+            "client_secret": GOOGLE_CLIENT_SECRET,
+            "refresh_token": GOOGLE_REFRESH_TOKEN,
+            "grant_type": "refresh_token"
+        },
+        timeout=10
     )
+    if response.status_code != 200:
+        raise Exception("토큰 발급 실패: " + response.text)
+    return response.json()["access_token"]
+
+
+def send_telegram(title, post_url, category):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        return
+    emoji = CATEGORY_EMOJI.get(category, "📰")
+    message = emoji + " 새 포스팅\n\n📌 " + title + "\n\n🔗 " + post_url
     try:
-        response = requests.post(
+        requests.post(
             "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
             json={"chat_id": TELEGRAM_CHAT_ID, "text": message},
             timeout=10
         )
-        if response.status_code == 200:
-            print("[텔레그램] 공유 성공!")
-        else:
-            print("[텔레그램] 실패: " + response.text[:200])
+        print("[텔레그램] 공유 성공!")
     except Exception as e:
         print("[텔레그램 오류] " + str(e))
 
 
-def send_facebook(title, post_url, topic):
+def send_facebook(title, post_url, category):
     if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
-        print("[페이스북] 설정값 없음 - 건너뜀")
         return
-    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
-    message = (
-        sport_emoji + " 새 포스팅\n\n"
-        + title + "\n\n"
-        + "자세히 읽기 👉 " + post_url
-    )
+    emoji = CATEGORY_EMOJI.get(category, "📰")
+    message = emoji + " 새 포스팅\n\n" + title + "\n\n자세히 읽기 👉 " + post_url
     try:
-        response = requests.post(
+        requests.post(
             "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
-            data={
-                "message": message,
-                "link": post_url,
-                "access_token": FACEBOOK_ACCESS_TOKEN
-            },
+            data={"message": message, "link": post_url, "access_token": FACEBOOK_ACCESS_TOKEN},
             timeout=10
         )
-        if response.status_code == 200:
-            print("[페이스북] 공유 성공!")
-        else:
-            print("[페이스북] 실패: " + response.text[:200])
+        print("[페이스북] 공유 성공!")
     except Exception as e:
         print("[페이스북 오류] " + str(e))
 
 
 def post_to_blogger(post_data, images, retry=2):
-    print("\n[Blogger] 포스팅 시작...")
-    topic = post_data["topic"]
-    labels = [topic["sport"], topic["series"]]
+    print("\n[Blogger] insaplayer 포스팅 시작...")
+    category = post_data["category"]
+    labels = [category, TODAY]
 
     for attempt in range(1, retry + 2):
         try:
             access_token = get_access_token()
-            body_html = body_to_html(post_data["body"], images, topic)
+            body_html = body_to_html(post_data["body"], images, category)
             url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
-            headers = {
-                "Authorization": "Bearer " + access_token,
-                "Content-Type": "application/json"
-            }
+            headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
             payload = {
                 "kind": "blogger#post",
                 "title": post_data["title"],
@@ -751,36 +770,40 @@ def post_to_blogger(post_data, images, retry=2):
                 "labels": labels,
                 "status": "LIVE"
             }
-            print("[시도 " + str(attempt) + "] 제목: " + post_data["title"])
+            print("[시도 " + str(attempt) + "] " + post_data["title"])
             response = requests.post(url, headers=headers, json=payload, timeout=30)
-            print("[응답] 상태코드: " + str(response.status_code))
             if response.status_code == 200:
-                result = response.json()
-                post_url = result.get("url", "")
-                print("\n발행 완료!")
-                print("   링크: " + post_url)
-                send_telegram(post_data["title"], post_url, topic)
-                send_facebook(post_data["title"], post_url, topic)
+                post_url = response.json().get("url", "")
+                print("발행 완료! " + post_url)
+                send_telegram(post_data["title"], post_url, category)
+                send_facebook(post_data["title"], post_url, category)
                 return True
             else:
-                print("실패: " + response.text[:300])
+                print("실패: " + response.text[:200])
                 if attempt <= retry:
-                    print("[재시도] " + str(attempt) + "번째 재시도 중...")
+                    time.sleep(10)
         except Exception as e:
             print("[오류] " + str(e))
             if attempt <= retry:
-                print("[재시도] " + str(attempt) + "번째 재시도 중...")
+                time.sleep(10)
     return False
 
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("AutoBlog Sports Publisher - Claude Edition")
+    print("insaplayer - 실시간 뉴스 블로그 v4")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
+    test_apis()
     try:
         post = generate_post()
-        images = get_images(post["topic"]["keyword"], count=3, title=post["title"], category=post["topic"]["sport"])
+        keyword_map = {
+            "스포츠이슈": "sports athlete action",
+            "경제뉴스": "business finance economy",
+            "전국이슈": "city korea urban street",
+            "연예이슈": "stage performance music concert"
+        }
+        images = get_images("", count=3, title=post["title"], category=post["category"])
         post_to_blogger(post, images)
         print("\n모든 작업 완료!")
     except Exception as e:
