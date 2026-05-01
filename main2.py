@@ -13,9 +13,15 @@ TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID", "")
 FACEBOOK_PAGE_ID = os.environ.get("FACEBOOK_PAGE_ID", "")
 FACEBOOK_ACCESS_TOKEN = os.environ.get("FACEBOOK_ACCESS_TOKEN", "")
+NAVER_CLIENT_ID = os.environ.get("NAVER_CLIENT_ID", "")
+NAVER_CLIENT_SECRET = os.environ.get("NAVER_CLIENT_SECRET", "")
+GOOGLE_SEARCH_API_KEY = os.environ.get("GOOGLE_SEARCH_API_KEY", "")
+GOOGLE_SEARCH_ENGINE_ID = os.environ.get("GOOGLE_SEARCH_ENGINE_ID", "")
+NEWSAPI_KEY = os.environ.get("NEWSAPI_KEY", "")
 BLOG_ID = "8468892944117983817"
 
 TODAY = datetime.now().strftime("%Y년 %m월 %d일")
+TODAY_EN = datetime.now().strftime("%Y-%m-%d")
 
 CATEGORY_EMOJI = {
     "스포츠이슈": "⚽",
@@ -26,17 +32,144 @@ CATEGORY_EMOJI = {
 
 CATEGORIES = ["스포츠이슈", "경제뉴스", "전국이슈", "연예이슈"]
 
+CATEGORY_KEYWORDS = {
+    "스포츠이슈": {
+        "naver": ["스포츠 이슈 오늘", "축구 뉴스 오늘", "야구 오늘", "농구 뉴스", "스포츠 선수 이슈"],
+        "google": ["korea sports news today", "한국 스포츠 이슈"],
+        "newsapi": ["korea sports international", "korean athlete world news"]
+    },
+    "경제뉴스": {
+        "naver": ["경제 뉴스 오늘", "코스피 오늘", "부동산 뉴스", "환율 오늘", "주식 이슈"],
+        "google": ["korea economy news today", "한국 경제 이슈"],
+        "newsapi": ["korea economy global", "korean market international"]
+    },
+    "전국이슈": {
+        "naver": ["오늘 사회 이슈", "정치 뉴스 오늘", "사건사고 오늘", "핫이슈 오늘", "전국 뉴스"],
+        "google": ["korea news today", "한국 사회 이슈"],
+        "newsapi": ["korea society global reaction", "south korea world news"]
+    },
+    "연예이슈": {
+        "naver": ["연예 뉴스 오늘", "K팝 이슈", "드라마 화제", "아이돌 뉴스", "연예인 이슈"],
+        "google": ["kpop news today", "한국 연예 이슈"],
+        "newsapi": ["kpop global reaction", "korean entertainment worldwide"]
+    }
+}
 
-def call_claude(messages, max_tokens=4000, use_search=False):
+
+def search_naver_news(query, display=5):
+    if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
+        return []
+    try:
+        response = requests.get(
+            "https://openapi.naver.com/v1/search/news.json",
+            headers={
+                "X-Naver-Client-Id": NAVER_CLIENT_ID,
+                "X-Naver-Client-Secret": NAVER_CLIENT_SECRET
+            },
+            params={"query": query, "display": display, "sort": "date"},
+            timeout=10
+        )
+        if response.status_code == 200:
+            items = response.json().get("items", [])
+            results = []
+            for item in items:
+                title = item.get("title", "").replace("<b>", "").replace("</b>", "")
+                desc = item.get("description", "").replace("<b>", "").replace("</b>", "")
+                results.append(title + ": " + desc)
+            print("[네이버] " + str(len(results)) + "개 수집")
+            return results
+    except Exception as e:
+        print("[네이버 오류] " + str(e))
+    return []
+
+
+def search_google_news(query, num=3):
+    if not GOOGLE_SEARCH_API_KEY or not GOOGLE_SEARCH_ENGINE_ID:
+        return []
+    try:
+        response = requests.get(
+            "https://www.googleapis.com/customsearch/v1",
+            params={
+                "key": GOOGLE_SEARCH_API_KEY,
+                "cx": GOOGLE_SEARCH_ENGINE_ID,
+                "q": query + " " + TODAY_EN,
+                "num": num,
+                "dateRestrict": "d1"
+            },
+            timeout=10
+        )
+        if response.status_code == 200:
+            items = response.json().get("items", [])
+            results = []
+            for item in items:
+                results.append(item.get("title", "") + ": " + item.get("snippet", ""))
+            print("[구글] " + str(len(results)) + "개 수집")
+            return results
+    except Exception as e:
+        print("[구글 오류] " + str(e))
+    return []
+
+
+def search_newsapi(query, page_size=3):
+    if not NEWSAPI_KEY:
+        return []
+    try:
+        response = requests.get(
+            "https://newsapi.org/v2/everything",
+            params={
+                "q": query,
+                "sortBy": "publishedAt",
+                "pageSize": page_size,
+                "from": TODAY_EN,
+                "apiKey": NEWSAPI_KEY
+            },
+            timeout=10
+        )
+        if response.status_code == 200:
+            articles = response.json().get("articles", [])
+            results = []
+            for article in articles:
+                title = article.get("title", "") or ""
+                desc = article.get("description", "") or ""
+                results.append(title + ": " + desc)
+            print("[NewsAPI] " + str(len(results)) + "개 수집")
+            return results
+    except Exception as e:
+        print("[NewsAPI 오류] " + str(e))
+    return []
+
+
+def collect_news(category):
+    print("[뉴스 수집] 카테고리: " + category)
+    keywords = CATEGORY_KEYWORDS[category]
+
+    naver_query1 = random.choice(keywords["naver"])
+    remaining = [k for k in keywords["naver"] if k != naver_query1]
+    naver_query2 = random.choice(remaining) if remaining else naver_query1
+    google_query = random.choice(keywords["google"])
+    newsapi_query = random.choice(keywords["newsapi"])
+
+    naver_results1 = search_naver_news(naver_query1, display=5)
+    naver_results2 = search_naver_news(naver_query2, display=3)
+    google_results = search_google_news(google_query, num=3)
+    newsapi_results = search_newsapi(newsapi_query, page_size=3)
+
+    all_news = naver_results1 + naver_results2 + google_results + newsapi_results
+
+    if not all_news:
+        print("[경고] 수집된 뉴스 없음")
+        return "오늘 " + category + " 분야 최신 뉴스"
+
+    news_context = "=== 오늘(" + TODAY + ") 수집된 뉴스 ===\n"
+    for i, news in enumerate(all_news[:14]):
+        news_context += str(i+1) + ". " + news + "\n"
+
+    print("[수집 완료] 총 " + str(len(all_news)) + "개")
+    return news_context
+
+
+def call_claude(messages, max_tokens=4000):
     for attempt in range(3):
-        payload = {
-            "model": "claude-sonnet-4-20250514",
-            "max_tokens": max_tokens,
-            "messages": messages
-        }
-        if use_search:
-            payload["tools"] = [{"type": "web_search_20250305", "name": "web_search"}]
-
         response = requests.post(
             "https://api.anthropic.com/v1/messages",
             headers={
@@ -44,8 +177,12 @@ def call_claude(messages, max_tokens=4000, use_search=False):
                 "anthropic-version": "2023-06-01",
                 "content-type": "application/json"
             },
-            json=payload,
-            timeout=120
+            json={
+                "model": "claude-sonnet-4-20250514",
+                "max_tokens": max_tokens,
+                "messages": messages
+            },
+            timeout=300
         )
         if response.status_code == 200:
             content = response.json().get("content", [])
@@ -63,55 +200,25 @@ def call_claude(messages, max_tokens=4000, use_search=False):
     raise Exception("Claude 오류: 최대 재시도 횟수 초과")
 
 
-def get_hot_topic(category):
-    print("[핫이슈 탐색] 카테고리: " + category)
-
-    category_map = {
-        "스포츠이슈": "스포츠 (축구, 농구, 야구, 선수 이슈, 구단 뉴스)",
-        "경제뉴스": "경제 (주식, 부동산, 금리, 환율, 기업 뉴스)",
-        "전국이슈": "사회 (정치, 사건사고, 정책, 사회 이슈)",
-        "연예이슈": "연예 (드라마, 영화, K팝, 연예인 공식 발표)"
-    }
-
-    prompt = (
-        "오늘(" + TODAY + ") 한국에서 가장 뜨거운 " + category_map[category] + " 분야 핫이슈를 웹에서 검색해줘.\n\n"
-        "반드시 아래 형식으로만 출력해:\n"
-        "주제: (오늘 가장 핫한 이슈 제목)\n"
-        "키워드: (검색 키워드 영문)\n"
-        "핵심팩트: (확인된 팩트 3줄 이내)\n\n"
-        "조건:\n"
-        "- 공식 확인된 뉴스만\n"
-        "- 루머나 추측 금지\n"
-        "- 오늘 날짜 기준 가장 화제인 것\n"
-        "- 명예훼손 내용 금지"
-    )
-
-    result = call_claude(
-        [{"role": "user", "content": prompt}],
-        max_tokens=500,
-        use_search=True
-    )
-    print("[핫이슈] " + result[:100])
-    return result
-
-
 def generate_post():
     category = random.choice(CATEGORIES)
     print("[카테고리] " + category)
 
-    hot_topic = get_hot_topic(category)
-    time.sleep(5)
+    news_context = collect_news(category)
 
     prompt = (
         "당신은 20년 경력의 베테랑 시니어 기자입니다.\n"
         "TV 뉴스 앵커처럼 명확하고 신뢰감 있으며, 독자를 끌어당기는 문장력을 갖고 있습니다.\n"
         "한국어만 사용하세요. 외국 문자 절대 금지.\n\n"
-        "오늘(" + TODAY + ") 가장 핫한 이슈:\n"
-        + hot_topic + "\n\n"
+        "아래는 오늘(" + TODAY + ") 실제 수집된 뉴스입니다:\n"
+        + news_context + "\n\n"
+        "위 뉴스 중 가장 핫하고 독자 관심이 높을 이슈 하나를 선택해서 기사를 작성하세요.\n"
+        "국내 이슈를 중심으로 작성하되, 해외 반응이나 글로벌 관점이 있다면 비교 내용을 자연스럽게 한 섹션 추가하세요.\n"
+        "단, 해외 비교는 보조적인 내용이며 국내 상황이 항상 중심이어야 합니다.\n\n"
         "절대 지켜야 할 원칙:\n"
         "1. 공식 확인된 팩트만 작성하세요. 루머, 추측 절대 금지.\n"
         "2. 명예훼손 내용 절대 금지.\n"
-        "3. 반드시 존댓말을 사용하세요.\n"
+        "3. 반드시 존댓말을 사용하세요. '~이다', '~한다' 반말 종결 절대 금지.\n"
         "4. 중립적이고 객관적인 시각을 유지하세요.\n"
         "5. 제목과 내용이 일치해야 합니다. 낚시성 제목 금지.\n\n"
         "글 구조 (반드시 이 순서로):\n\n"
@@ -122,11 +229,10 @@ def generate_post():
         "그 아래 2~3문장으로 쉽게 풀어쓰세요.\n\n"
         "3. 소제목 구조 (3~4개)\n"
         "소제목: [이모지 소제목내용 이모지] 형식. 앞뒤 이모지 필수.\n"
-        "예: [📌 사건의 전말 📌], [💬 각계 반응 💬]\n"
+        "예: [📌 사건의 전말 📌], [💬 각계 반응 💬], [🌍 해외 반응과 비교 🌍]\n"
         "각 소제목 아래: 배경 → 팩트 → 반응 순으로 깊어지게\n"
         "단락 3~4줄 이내. 빈 줄 필수.\n"
         "수치, 날짜, 출처 명확히 표기.\n\n"
-        "4. 추천 운동 표 없음 (뉴스 기사이므로 생략)\n\n"
         "5. 전망 + 독자 관점\n"
         "앞으로 어떻게 될지 + 독자에게 의미하는 것\n"
         "반드시 존댓말로 끝내세요. 격언 금지.\n\n"
@@ -148,11 +254,7 @@ def generate_post():
     )
 
     print("[AI] 기사 작성 중...")
-    full_text = call_claude(
-        [{"role": "user", "content": prompt}],
-        max_tokens=4000,
-        use_search=False
-    )
+    full_text = call_claude([{"role": "user", "content": prompt}], max_tokens=4000)
 
     lines = full_text.strip().split("\n")
     title = ""
@@ -230,7 +332,6 @@ def body_to_html(body, images, category):
 
     emoji = CATEGORY_EMOJI.get(category, "📰")
 
-    # 배지 + 날짜
     html = (
         '<div style="display:inline-block;background:#e65100;color:#fff;'
         'font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:8px;font-weight:600;">'
@@ -238,11 +339,9 @@ def body_to_html(body, images, category):
         '<div style="font-size:13px;color:#888;margin-bottom:20px;">📅 ' + TODAY + "</div>\n"
     )
 
-    # 상단 이미지
     if len(images) >= 1:
         html += make_image_html(images[0])
 
-    # 목차 자동 생성
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
     keyword_pattern = re.compile(r'##(.+?)##')
 
@@ -287,7 +386,6 @@ def body_to_html(body, images, category):
             html += summary_html
             continue
 
-        # 소제목
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
             html += (
@@ -298,7 +396,6 @@ def body_to_html(body, images, category):
             )
             continue
 
-        # 번호 리스트
         if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
             html += (
                 '<div style="display:flex;align-items:flex-start;margin:10px 0;padding:12px 16px;'
@@ -310,7 +407,6 @@ def body_to_html(body, images, category):
             )
             continue
 
-        # 키워드 처리
         para_count += 1
         processed = keyword_pattern.sub(replace_keyword, para.strip())
 
@@ -426,12 +522,11 @@ def post_to_blogger(post_data, images, retry=2):
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("insaplayer - 오늘의 핫이슈 블로그")
+    print("insaplayer - 실시간 뉴스 블로그 v4")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
     try:
         post = generate_post()
-        # 카테고리별 안전한 이미지 키워드 (Unsplash 검색용)
         keyword_map = {
             "스포츠이슈": "sports athlete action",
             "경제뉴스": "business finance economy",
