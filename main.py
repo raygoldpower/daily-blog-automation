@@ -3,9 +3,7 @@ import requests
 import random
 from datetime import datetime
 import json
-import re
 
-# [원본 유지] API 설정 및 환경 변수
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
@@ -24,8 +22,8 @@ SPORT_EMOJI = {
     "역학": "⚙️", "해부학": "🦴", "신체균형": "⚖️", "스포츠의학": "🩻",
 }
 
-# [원본 유지] 주제 리스트 (길이 관계상 생략, 기존 데이터 그대로 사용하시면 됩니다)
 TOPICS = [
+    # 축구
     {"title": "드리블 속도 올리는 발목 가동성 훈련 3가지", "keyword": "soccer dribbling ankle mobility", "sport": "축구", "series": "드리블 마스터", "episode": 1},
     {"title": "축구 순간 스피드 높이는 가속 훈련법", "keyword": "soccer acceleration sprint training", "sport": "축구", "series": "스피드 혁명", "episode": 1},
     {"title": "축구 슈팅력을 높이는 고관절 회전 훈련", "keyword": "soccer shooting hip rotation power", "sport": "축구", "series": "슈팅 마스터", "episode": 1},
@@ -88,7 +86,7 @@ TOPICS = [
     {"title": "테니스 엘보 치료, 집에서 할 수 있는 운동", "keyword": "tennis elbow treatment home exercise", "sport": "물리치료", "series": "물리치료 가이드", "episode": 3},
     {"title": "족저근막염 아침 통증 줄이는 스트레칭 루틴", "keyword": "plantar fasciitis morning stretching routine", "sport": "물리치료", "series": "물리치료 가이드", "episode": 4},
     {"title": "거북목 교정 운동, 하루 5분으로 효과 보기", "keyword": "forward head posture correction exercise", "sport": "물리치료", "series": "물리치료 가이드", "episode": 5},
-    # 역학 (스포츠 역학)
+    # 역학
     {"title": "달리기 자세 분석, 무릎에 가해지는 충격 줄이기", "keyword": "running biomechanics knee impact reduction", "sport": "역학", "series": "스포츠 역학", "episode": 1},
     {"title": "스쿼트할 때 무릎이 안쪽으로 무너지는 원인", "keyword": "squat knee valgus cause biomechanics", "sport": "역학", "series": "스포츠 역학", "episode": 2},
     {"title": "데드리프트 허리 부상 막는 척추 중립 자세", "keyword": "deadlift spine neutral position injury prevention", "sport": "역학", "series": "스포츠 역학", "episode": 3},
@@ -114,43 +112,39 @@ TOPICS = [
     {"title": "아이 운동 시작 나이, 종목별 적합한 시기", "keyword": "youth sports age appropriate training", "sport": "공통", "series": "스포츠 발달", "episode": 1},
     {"title": "운동 초보자가 첫 달에 반드시 지켜야 할 원칙", "keyword": "beginner exercise first month principles", "sport": "공통", "series": "운동 입문", "episode": 1},
     {"title": "체중 감량과 근육 증가를 동시에 하는 방법", "keyword": "body recomposition fat loss muscle gain", "sport": "공통", "series": "운동 입문", "episode": 2},
-    # 1. [가동성 사슬 시리즈] 신체 연결성의 역학적 분석
+    # 가동성 사슬 시리즈
     {"title": "드리블 속도 올리는 발목 가동성이 무릎 부상을 막는 이유", "keyword": "soccer ankle mobility knee injury prevention", "sport": "축구", "series": "가동성 사슬", "episode": 1},
-    {"title": "골반 불균형이 요추 안정화 운동 효과를 반감시키는 기구학적 이유", "keyword": "pelvic tilt lumbar stabilization biomechanics", "sport": "신체균형", "series": "가동성 사슬", "episode": 2},
+    {"title": "골반 불균형이 요추 안정화 운동 효과를 반감시키는 이유", "keyword": "pelvic tilt lumbar stabilization biomechanics", "sport": "신체균형", "series": "가동성 사슬", "episode": 2},
     {"title": "흉추 가동성 부족이 벤치프레스 시 어깨 충돌을 만드는 과정", "keyword": "thoracic mobility shoulder impingement bench press", "sport": "유연성", "series": "가동성 사슬", "episode": 3},
-    {"title": "고관절 회전 제한이 야구 투수의 구속 저하를 일으키는 해부학적 경로", "keyword": "hip rotation baseball pitching velocity anatomy", "sport": "야구", "series": "가동성 사슬", "episode": 4},
-    {"title": "발 아치의 무너짐이 상체 밸런스까지 무너뜨리는 상행성 사슬의 원리", "keyword": "foot arch collapse upper body balance chain", "sport": "해부학", "series": "가동성 사슬", "episode": 5},
-
-    # 2. [에너지 시스템 시리즈] 지치지 않는 90분의 생리학
-    {"title": "크레아틴 인산 시스템과 젖산 역치의 상호작용: HIIT 훈련의 본질", "keyword": "ATP-PC system lactate threshold HIIT physiology", "sport": "생리학", "series": "에너지 과학", "episode": 1},
-    {"title": "탄수화물 로딩과 글리코겐 고갈: 경기 1시간 전 식단이 VO2max에 미치는 영향", "keyword": "carbohydrate loading glycogen VO2max performance", "sport": "영양", "series": "에너지 과학", "episode": 2},
-    {"title": "운동 후 통증(DOMS)과 성장호르몬: 수면 7시간이 단백질 합성을 결정하는 법", "keyword": "DOMS growth hormone sleep muscle protein synthesis", "sport": "생리학", "series": "에너지 과학", "episode": 3},
+    {"title": "고관절 회전 제한이 야구 투수 구속 저하를 일으키는 해부학적 경로", "keyword": "hip rotation baseball pitching velocity anatomy", "sport": "야구", "series": "가동성 사슬", "episode": 4},
+    {"title": "발 아치 무너짐이 상체 밸런스까지 무너뜨리는 상행성 사슬 원리", "keyword": "foot arch collapse upper body balance chain", "sport": "해부학", "series": "가동성 사슬", "episode": 5},
+    # 에너지 과학 시리즈
+    {"title": "크레아틴 인산 시스템과 젖산 역치의 상호작용, HIIT 훈련의 본질", "keyword": "ATP-PC system lactate threshold HIIT physiology", "sport": "생리학", "series": "에너지 과학", "episode": 1},
+    {"title": "탄수화물 로딩과 글리코겐 고갈, 경기 전 식단이 VO2max에 미치는 영향", "keyword": "carbohydrate loading glycogen VO2max performance", "sport": "영양", "series": "에너지 과학", "episode": 2},
+    {"title": "DOMS와 성장호르몬, 수면 7시간이 단백질 합성을 결정하는 법", "keyword": "DOMS growth hormone sleep muscle protein synthesis", "sport": "생리학", "series": "에너지 과학", "episode": 3},
     {"title": "지방 연소 효율을 극대화하는 유산소 심박수 구간 설정의 과학", "keyword": "fat oxidation aerobic heart rate zone science", "sport": "체력", "series": "에너지 과학", "episode": 4},
     {"title": "코르티솔 농도가 운동 슬럼프와 근손실에 미치는 파괴적인 영향", "keyword": "cortisol muscle loss exercise slump physiology", "sport": "생리학", "series": "에너지 과학", "episode": 5},
-
-    # 3. [부상 잔혹사 시리즈] 재활 로직의 정교한 재구성
-    {"title": "왜 전력 질주 중에만 터질까? 햄스트링 편심성 수축과 달리기 역학", "keyword": "hamstring eccentric contraction running biomechanics", "sport": "재활", "series": "부상 잔혹사", "episode": 1},
-    {"title": "전방십자인대 부상을 결정하는 점프 착지 자세: 중둔근 활성화의 중요성", "keyword": "ACL injury landing mechanics gluteus medius", "sport": "역학", "series": "부상 잔혹사", "episode": 2},
+    # 부상 잔혹사 시리즈
+    {"title": "왜 전력 질주 중에만 터질까, 햄스트링 편심성 수축과 달리기 역학", "keyword": "hamstring eccentric contraction running biomechanics", "sport": "재활", "series": "부상 잔혹사", "episode": 1},
+    {"title": "전방십자인대 부상을 결정하는 점프 착지 자세와 중둔근 활성화", "keyword": "ACL injury landing mechanics gluteus medius", "sport": "역학", "series": "부상 잔혹사", "episode": 2},
     {"title": "족저근막염 아침 통증이 아킬레스건 가동성과 연결되는 해부학적 이유", "keyword": "plantar fasciitis achilles tendinopathy connection", "sport": "물리치료", "series": "부상 잔혹사", "episode": 3},
-    {"title": "테니스 엘보 치료의 핵심: 손목 신전근이 아닌 견갑골 안정화에 집중하라", "keyword": "tennis elbow scapular stability physical therapy", "sport": "물리치료", "series": "부상 잔혹사", "episode": 4},
-    {"title": "허리 디스크 재활 중 절대로 피해야 할 3가지 움직임과 생리학적 근거", "keyword": "lumbar disc rehabilitation avoid movements", "sport": "재활", "series": "부상 잔혹사", "episode": 5},
-
-    # 4. [오피스 애슬리트 시리즈] 일상이 퍼포먼스를 결정한다
+    {"title": "테니스 엘보 치료의 핵심은 손목이 아닌 견갑골 안정화다", "keyword": "tennis elbow scapular stability physical therapy", "sport": "물리치료", "series": "부상 잔혹사", "episode": 4},
+    {"title": "허리 디스크 재활 중 절대로 피해야 할 3가지 움직임", "keyword": "lumbar disc rehabilitation avoid movements", "sport": "재활", "series": "부상 잔혹사", "episode": 5},
+    # 오피스 애슬리트 시리즈
     {"title": "하루 8시간 거북목 습관이 투수의 회전근개 부상을 유발하는 경로", "keyword": "forward head posture rotator cuff injury pitcher", "sport": "신체균형", "series": "오피스 애슬리트", "episode": 1},
-    {"title": "복횡근 활성화가 안 되는 직장인이 스쿼트 시 허리를 다치는 진짜 이유", "keyword": "transverse abdominis core squat back pain", "sport": "근육학", "series": "오피스 애슬리트", "episode": 2},
-    {"title": "장요근 단축이 엉덩이 근육 성장을 방해하는 '상호 억제' 기전 분석", "keyword": "psoas muscle gluteal amnesia reciprocal inhibition", "sport": "근육학", "series": "오피스 애슬리트", "episode": 3},
+    {"title": "복횡근이 비활성화된 직장인이 스쿼트 시 허리를 다치는 진짜 이유", "keyword": "transverse abdominis core squat back pain", "sport": "근육학", "series": "오피스 애슬리트", "episode": 2},
+    {"title": "장요근 단축이 엉덩이 근육 성장을 방해하는 상호 억제 기전", "keyword": "psoas muscle gluteal amnesia reciprocal inhibition", "sport": "근육학", "series": "오피스 애슬리트", "episode": 3},
     {"title": "의자에 앉아 있는 시간이 햄스트링 유연성을 파괴하는 생리학적 과정", "keyword": "sitting posture hamstring flexibility physiology", "sport": "유연성", "series": "오피스 애슬리트", "episode": 4},
-    {"title": "데스크테리어와 멘탈 헬스: 이끼 테라리움이 스포츠 심리에 미치는 영향", "keyword": "deskterior moss terrarium sports psychology", "sport": "심리", "series": "오피스 애슬리트", "episode": 5},
-
-    # 5. [엘리트 마인드 시리즈] 승리를 부르는 뇌 과학
-    {"title": "압박 상황에서 집중력을 유지하는 '초점 주의' 훈련과 뇌파 변화", "keyword": "focus under pressure attentional focus brain waves", "sport": "심리", "series": "엘리트 마인드", "episode": 1},
-    {"title": "이미지 트레이닝이 실제 근신경계 활성화를 유도하는 거울 뉴런의 원리", "keyword": "mental imagery mirror neurons neuromuscular activation", "sport": "심리", "series": "엘리트 마인드", "episode": 2},
-    {"title": "경기 전 긴장감을 투쟁-도피 반응에서 흥분으로 전환하는 인지 재구성", "keyword": "pre-game anxiety cognitive reappraisal sports", "sport": "심리", "series": "엘리트 마인드", "episode": 3},
-    {"title": "슬럼프를 탈피하는 3단계 심리학적 루틴: 통제 가능한 요소에 집중하라", "keyword": "sports slump recovery 3 steps psychology", "sport": "심리", "series": "엘리트 마인드", "episode": 4},
-    {"title": "운동 강도와 도파민 수용체의 상관관계: 오버트레이닝을 막는 멘탈 가이드", "keyword": "exercise intensity dopamine overtraining mental", "sport": "스포츠의학", "series": "엘리트 마인드", "episode": 5},    
+    # 엘리트 마인드 시리즈
+    {"title": "압박 상황에서 집중력을 유지하는 초점 주의 훈련과 뇌파 변화", "keyword": "focus under pressure attentional focus brain waves", "sport": "심리", "series": "엘리트 마인드", "episode": 1},
+    {"title": "이미지 트레이닝이 실제 근신경계를 활성화하는 거울 뉴런의 원리", "keyword": "mental imagery mirror neurons neuromuscular activation", "sport": "심리", "series": "엘리트 마인드", "episode": 2},
+    {"title": "경기 전 긴장감을 흥분으로 전환하는 인지 재구성 방법", "keyword": "pre-game anxiety cognitive reappraisal sports", "sport": "심리", "series": "엘리트 마인드", "episode": 3},
+    {"title": "슬럼프를 탈피하는 3단계 심리학적 루틴, 통제 가능한 요소에 집중하라", "keyword": "sports slump recovery 3 steps psychology", "sport": "심리", "series": "엘리트 마인드", "episode": 4},
+    {"title": "운동 강도와 도파민 수용체의 상관관계, 오버트레이닝을 막는 멘탈 가이드", "keyword": "exercise intensity dopamine overtraining mental", "sport": "스포츠의학", "series": "엘리트 마인드", "episode": 5},
 ]
 
 USED_TOPICS_FILE = "used_topics.json"
+
 
 def load_used_topics():
     try:
@@ -158,6 +152,7 @@ def load_used_topics():
             return json.load(f)
     except Exception:
         return []
+
 
 def save_used_topic(title):
     used = load_used_topics()
@@ -170,10 +165,12 @@ def save_used_topic(title):
     except Exception as e:
         print("[중복방지] 저장 실패: " + str(e))
 
+
 def pick_topic():
     used = load_used_topics()
     available = [t for t in TOPICS if t["title"] not in used]
     if not available:
+        print("[중복방지] 모든 주제 사용 완료, 초기화합니다.")
         available = TOPICS
         try:
             with open(USED_TOPICS_FILE, "w") as f:
@@ -184,7 +181,9 @@ def pick_topic():
     save_used_topic(topic["title"])
     return topic
 
+
 def get_access_token():
+    print("[인증] Google Access Token 발급 중...")
     response = requests.post(
         "https://oauth2.googleapis.com/token",
         data={
@@ -197,10 +196,12 @@ def get_access_token():
     )
     if response.status_code != 200:
         raise Exception("토큰 발급 실패: " + response.text)
+    print("[인증] 완료!")
     return response.json()["access_token"]
 
+
 def generate_with_claude(prompt):
-    # [원본 모델 유지]
+    print("[AI] Claude 사용 중...")
     response = requests.post(
         "https://api.anthropic.com/v1/messages",
         headers={
@@ -219,6 +220,7 @@ def generate_with_claude(prompt):
         raise Exception("Claude 오류: " + str(response.status_code) + " " + response.text[:200])
     return response.json()["content"][0]["text"]
 
+
 def generate_post():
     topic = pick_topic()
     print("[글 생성] 주제: " + topic["title"])
@@ -230,38 +232,56 @@ def generate_post():
             + "이전 편보다 심화된 내용을 다루세요.\n\n"
         )
 
-    # [매거진 요구사항 반영 프롬프트]
     prompt = (
-        "당신은 스포츠 과학 전문 매거진의 수석 에디터입니다.\n"
+        "당신은 스포츠 과학, 운동역학, 해부학, 근육학, 생리학, 물리치료학, 스포츠의학을 깊이 이해하는 전문 블로거입니다.\n"
         "한국어만 사용하세요. 한자, 일본어 등 외국 문자 절대 금지.\n\n"
         + series_info
-        + "매거진 레이아웃 지침:\n"
-        "1. 제목: 독자의 궁금증을 유발하는 강력한 훅(Hook)을 제목에 자연스럽게 포함하세요.\n"
-        "2. 첫 글: 독자가 겪는 상황에 깊이 공감하는 1~2줄의 짧고 강한 문장으로 시작하세요.\n"
-        "3. 임팩트 키워드: 본문의 핵심 주제를 관통하는 단어 하나를 [KEYWORD]단어[/KEYWORD] 형식으로 크게 제시하세요.\n"
-        "4. 키워드 설명: 해당 키워드가 왜 중요한지 보통 크기로 짧고 굵게 설명하세요.\n\n"
-        "독자가 글의 주인공입니다. 독자가 직접 변화하고 성장하는 느낌을 줘야 합니다.\n"
-        "전문 블로그답게 깊이 있게 쓰세요. 기초 설명에 그치지 말고 메커니즘과 원리까지 파고드세요.\n"        
-        "첫 문장은 독자가 겪는 구체적 상황을 직접 묘사하세요. 질문형 금지.\n"
-        "연구 결과나 수치를 인용할 때는 출처와 함께 구체적으로 제시하세요.\n"      
-        "마무리는 오늘 당장 할 수 있는 행동 한 가지로 끝내세요. 격언 금지.\n"
-        "AI가 쓴 티 나는 나열식 표현 금지. 자연스럽게 쓰세요.\n\n"
-        "본문 집필 원칙 (원본 유지):\n"
-        "독자가 글의 주인공입니다. 기초 설명에 그치지 말고 메커니즘과 원리까지 파고드세요.\n"
-        "전문 용어는 반드시 괄호 안에 쉬운 설명을 추가하세요.\n"
-        "연구 결과나 수치를 인용할 때는 출처와 함께 구체적으로 제시하세요.\n"
-        "한 단락은 3~4줄 이내. 단락 사이 빈 줄 필수.\n"
-        "[소제목1] 원리 설명, [소제목2] 심화 분석, [소제목3] 전문 근거 순으로 내용의 깊이를 점점 더하세요,소제목앞에 이모지로 가독성 증가.\n"
-        "2500자에서 3500자로 작성하세요.\n\n"
-        "실전 및 마무리:\n"
-        "훈련/실천 표: [TABLE_START]와 [TABLE_END] 사이에 '훈련명|세트|횟수|휴식|작용 근육|효과' 형식으로 작성하세요.\n"
-        "운동 보완 설명: 각 운동별 핵심 팁을 짧게 덧붙이세요.\n"
-        "결론 및 조언: 오늘 당장 할 수 있는 행동 하나를 강하고 간결하게 조언하며 끝내세요.\n"
-        "핵심 요약: 반드시 [SUMMARY_START]로 시작하고 [SUMMARY_END]로 닫으세요.\n\n"
+        + "당신은 스포츠 전문 매거진 에디터입니다.\n"
+        "정보를 나열하는 것이 아니라 독자를 끌어당기는 스토리를 씁니다.\n"
+        "말이 많아지는 게 아니라 내용이 점점 깊어져야 합니다.\n\n"
+        "반드시 아래 구조로 작성하세요:\n\n"
+        "--- 구조 시작 ---\n\n"
+        "1. 도입부 (2~3줄)\n"
+        "독자가 겪는 상황을 짧고 강렬하게 묘사. 질문형 금지. 공감과 호기심을 동시에 자극.\n\n"
+        "2. 임팩트 키워드\n"
+        "##키워드## 형식으로 이 글의 핵심 개념을 한 단어나 짧은 구로 던져라.\n"
+        "예: ##편심성 수축##, ##무혈관 지대##, ##글리코겐 역치##\n"
+        "그 아래 2~3문장으로 짧게 풀어쓰기. 쉽고 명확하게.\n\n"
+        "3. 소제목 구조로 빌드업 (소제목 2~3개)\n"
+        "소제목: [소제목] 형식, 이모지 필수\n"
+        "각 소제목 아래는 원리 → 심화 → 근거 순으로 점점 깊어지게\n"
+        "단락은 3~4줄 이내. 빈 줄 필수.\n"
+        "전문 용어는 괄호로 설명. 예: 대퇴사두근(허벅지 앞 근육)\n"
+        "수치와 연구 출처 포함. 내용이 깊어지는 거지 말이 많아지는 게 아님.\n\n"
+        "4. 추천 운동\n"
+        "훈련 표: [TABLE_START]와 [TABLE_END] 사이\n"
+        "형식: 훈련명|세트|횟수|휴식|작용 근육|효과\n"
+        "[TABLE_START]\n"
+        "훈련명|세트|횟수|휴식|작용 근육|효과\n"
+        "예시|3|12회|60초|대퇴사두근|하체 강화\n"
+        "[TABLE_END]\n"
+        "표 아래 각 운동별 핵심 포인트와 주의사항을 1~2줄로 보완 설명.\n\n"
+        "5. 결론 + 조언\n"
+        "강하고 간결하게. 오늘 당장 실천할 수 있는 것 하나. 격언 금지.\n"
+        "전문가로서 한 마디 조언을 더해라.\n\n"
+        "6. 핵심 요약\n"
+        "[SUMMARY_START]\n"
+        "핵심1\n"
+        "핵심2\n"
+        "핵심3\n"
+        "[SUMMARY_END]\n\n"
+        "--- 구조 끝 ---\n\n"
+        "글쓰기 원칙:\n"
+        "각 섹션이 자연스럽게 연결되어 하나의 스토리처럼 흘러야 합니다.\n"
+        "임팩트 있는 문장 하나가 긴 설명보다 낫습니다.\n"
+        "한국어만 사용. 한자, 외국 문자 절대 금지.\n"
+        "AI 티 나는 나열식 표현 금지.\n"
+        "2500자에서 3500자.\n\n"
         "카테고리: " + topic["sport"] + "\n"
-        "주제: " + topic["title"] + "\n\n"
+        "주제: " + topic["title"] + "\n"
+        "제목은 궁금증을 유발하고 검색 키워드가 자연스럽게 포함되게.\n\n"
         "출력 형식:\n"
-        "제목: (제목)\n"
+        "제목: (훅이 있는 제목)\n"
         "---\n"
         "(본문)"
     )
@@ -288,7 +308,9 @@ def generate_post():
         body = full_text
 
     print("[완료] 제목: " + title)
+    print("[완료] 글자수: " + str(len(body)) + "자")
     return {"title": title, "body": body, "topic": topic}
+
 
 def get_images(keyword, count=3):
     if not UNSPLASH_ACCESS_KEY:
@@ -297,7 +319,10 @@ def get_images(keyword, count=3):
         response = requests.get(
             "https://api.unsplash.com/search/photos",
             params={
-                "query": keyword, "per_page": count, "orientation": "landscape", "client_id": UNSPLASH_ACCESS_KEY
+                "query": keyword,
+                "per_page": count,
+                "orientation": "landscape",
+                "client_id": UNSPLASH_ACCESS_KEY
             },
             timeout=10
         )
@@ -310,73 +335,72 @@ def get_images(keyword, count=3):
                 "author": photo["user"]["name"],
                 "author_url": photo["user"]["links"]["html"]
             })
+        print("[이미지] " + str(len(images)) + "장 수집 완료")
         return images
-    except Exception:
+    except Exception as e:
+        print("[이미지 오류] " + str(e))
         return []
+
 
 def make_table_html(table_text):
     rows = [r.strip() for r in table_text.strip().split("\n") if r.strip()]
-    if not rows: return ""
-    html = '<div style="overflow-x:auto;margin:24px 0;"><table style="width:100%;border-collapse:collapse;font-size:15px;">'
+    if not rows:
+        return ""
+    html = '<div style="overflow-x:auto;margin:24px 0;">'
+    html += '<table style="width:100%;border-collapse:collapse;font-size:15px;">'
     for i, row in enumerate(rows):
         cols = row.split("|")
         html += "<tr>"
         for col in cols:
             if i == 0:
-                html += f'<th style="background:#1565c0;color:#fff;padding:10px 14px;text-align:center;border:1px solid #1565c0;">{col.strip()}</th>'
+                html += '<th style="background:#1565c0;color:#fff;padding:10px 14px;text-align:center;border:1px solid #1565c0;">' + col.strip() + "</th>"
             else:
                 bg = "#f5f8ff" if i % 2 == 0 else "#ffffff"
-                html += f'<td style="padding:9px 14px;text-align:center;border:1px solid #dde3f0;background:{bg};">{col.strip()}</td>'
+                html += '<td style="padding:9px 14px;text-align:center;border:1px solid #dde3f0;background:' + bg + ';">' + col.strip() + "</td>"
         html += "</tr>"
-    html += "</table></div>"
+    html += "</table></div>\n"
     return html
+
 
 def make_summary_html(summary_text):
     lines = [l.strip() for l in summary_text.strip().split("\n") if l.strip()]
     html = '<div style="background:#e8f4fd;border-left:5px solid #1565c0;border-radius:8px;padding:20px 24px;margin:28px 0;">'
     html += '<p style="font-weight:700;font-size:17px;color:#1565c0;margin-bottom:12px;">📌 핵심 요약</p>'
     for line in lines:
-        html += f'<p style="margin:6px 0;font-size:15px;color:#333;">✅ {line}</p>'
-    html += "</div>"
+        html += '<p style="margin:6px 0;font-size:15px;color:#333;">✅ ' + line + "</p>"
+    html += "</div>\n"
     return html
 
+
 def make_image_html(img, margin_top="0"):
-    return (
-        f'<div style="text-align:center;margin:30px 0;margin-top:{margin_top};">'
-        f'<img src="{img["url"]}" alt="{img["alt"]}" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);"/>'
-        f'<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="{img["author_url"]}">{img["author"]}</a> on Unsplash</p></div>'
-    )
+    html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
+    html += '<img src="' + img["url"] + '" alt="' + img["alt"] + '" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);"/>'
+    html += '<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="' + img["author_url"] + '" style="color:#999;">' + img["author"] + '</a> on Unsplash</p>'
+    html += "</div>\n"
+    return html
+
 
 def body_to_html(body, images, topic):
     import re
+
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
 
-    # 1. 임팩트 키워드 스타일링 (Blogger에서 깨지지 않도록 완전한 div 태그 사용)
-    def style_keyword(match):
-        word = match.group(1).strip()
-        return (
-            f'</div><div style="text-align:center; margin:50px 0;">'
-            f'<p style="font-size:14px; color:#666; margin-bottom:10px;">Focus Keyword</p>'
-            f'<span style="font-size:42px; font-weight:900; color:#1565c0; letter-spacing:-1px; border-bottom:6px solid #1565c0; padding-bottom:5px;">{word}</span>'
-            f'</div><div style="margin:14px 0;">'
-        )
-    body = re.sub(r'\[KEYWORD\](.*?)\[/KEYWORD\]', style_keyword, body)
-
-    # 2. 레이아웃 시작
+    # 시리즈 배지
     series_badge = ""
     if topic.get("series"):
         series_badge = (
-            f'<div style="display:inline-block;background:#1565c0;color:#fff;font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:20px;font-weight:600;">'
-            f'{sport_emoji} {topic["series"]} {topic["episode"]}편</div>'
+            '<div style="display:inline-block;background:#1565c0;color:#fff;'
+            'font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:20px;font-weight:600;">'
+            + sport_emoji + " " + topic["series"] + " " + str(topic["episode"]) + "편</div>\n"
         )
 
-    # 전체 문서를 감싸는 컨테이너 시작
-    html = f'<div style="font-family:sans-serif; line-height:1.9; color:#333; font-size:16px;">{series_badge}'
+    html = series_badge
 
+    # 상단 이미지
     if len(images) >= 1:
         html += make_image_html(images[0])
 
-    # 3. 특수 요소 파싱 (표, 요약)
+    # 패턴 파싱
     table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
 
@@ -389,98 +413,213 @@ def body_to_html(body, images, topic):
     clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
 
-    # 4. 문단별 렌더링
+    # 목차 자동 생성
+    headings = re.findall(r'\[([^\]]+)\]', clean_body)
+    headings = [h for h in headings if h not in ["TABLE_PLACEHOLDER", "SUMMARY_PLACEHOLDER"]]
+    if headings:
+        toc = '<div style="background:#f8f9ff;border:1px solid #dde3f0;border-radius:10px;padding:20px 24px;margin:24px 0;">'
+        toc += '<p style="font-weight:700;font-size:15px;color:#1565c0;margin-bottom:12px;">📋 목차</p>'
+        toc += '<ol style="margin:0;padding-left:20px;">'
+        for h in headings:
+            clean_h = re.sub(r'^[^\w가-힣]+', '', h).strip()
+            toc += '<li style="margin:6px 0;font-size:15px;color:#444;line-height:1.6;">' + clean_h + '</li>'
+        toc += '</ol></div>\n'
+        html += toc
+
+    # 키워드 강조 처리
+    keyword_pattern = re.compile(r'##(.+?)##')
+    def replace_keyword(m):
+        return (
+            '<span style="display:inline-block;font-size:28px;font-weight:900;'
+            'color:#1565c0;letter-spacing:-0.5px;margin:20px 0 8px 0;'
+            'border-bottom:3px solid #1565c0;padding-bottom:4px;">'
+            + m.group(1) + '</span>'
+        )
+
     paragraphs = clean_body.split("\n")
     mid = len(paragraphs) // 2
     image2_inserted = False
     para_count = 0
 
     for i, para in enumerate(paragraphs):
-        text = para.strip()
-        if not text: continue
+        if not para.strip():
+            html += '<div style="margin:10px 0;"></div>\n'
+            continue
 
-        if text == "[TABLE_PLACEHOLDER]":
+        if para.strip() == "[TABLE_PLACEHOLDER]":
             html += table_html
-        elif text == "[SUMMARY_PLACEHOLDER]":
-            html += summary_html
-        if text.startswith("[") and "]" in text:
-            heading = text.strip("[]")
-            html += (
-                f'<h2 style="margin-top:50px; margin-bottom:20px; font-size:26px; font-weight:800; '
-                f'background:linear-gradient(90deg,#1565c0,#003c8f); color:#fff; '
-                f'padding:15px 25px; border-radius:10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); '
-                f'display:block; letter-spacing:-0.5px;">{heading}</h2>'
-            )
-        elif len(text) > 2 and text[0].isdigit() and text[1] in [".", ")"]: # 번호 리스트
-            html += (
-                f'<div style="display:flex; align-items:flex-start; margin:10px 0; padding:12px 16px; background:#f5f8ff; border-radius:8px;">'
-                f'<span style="color:#1565c0; font-weight:700; margin-right:12px; font-size:16px;">{text[0]}.</span>'
-                f'<span>{text[2:].strip()}</span></div>'
-            )
-        else: # 일반 단락
-            para_count += 1
-            if para_count % 4 == 0 and para_count > 1 and len(text) > 30:
-                html += (
-                    f'<div style="border-left:4px solid #1565c0; padding:14px 20px; margin:20px 0; background:#f0f4ff; border-radius:0 8px 8px 0;">'
-                    f'<p style="margin:0; font-weight:500;">{text}</p></div>'
-                )
-            else:
-                html += f'<p style="margin:14px 0;">{text}</p>'
+            continue
 
+        if para.strip() == "[SUMMARY_PLACEHOLDER]":
+            html += summary_html
+            continue
+
+        # 소제목
+        if para.startswith("[") and "]" in para:
+            heading = para.strip("[]").strip()
+            html += (
+                '<h2 style="margin-top:48px;margin-bottom:16px;font-size:22px;font-weight:700;'
+                'background:linear-gradient(90deg,#1565c0,#1976d2);'
+                'color:#fff;padding:12px 20px;border-radius:8px;">'
+                + heading + "</h2>\n"
+            )
+            continue
+
+        # 번호 리스트
+        if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
+            html += (
+                '<div style="display:flex;align-items:flex-start;margin:10px 0;padding:12px 16px;'
+                'background:#f5f8ff;border-radius:8px;">'
+                '<span style="color:#1565c0;font-weight:700;margin-right:12px;font-size:16px;">'
+                + para.strip()[0] + '.</span>'
+                '<span style="color:#333;font-size:16px;line-height:1.8;">'
+                + para.strip()[2:].strip() + '</span></div>\n'
+            )
+            continue
+
+        # 일반 단락
+        para_count += 1
+        processed = keyword_pattern.sub(replace_keyword, para.strip())
+
+        # 키워드 강조가 있는 단락
+        if processed != para.strip():
+            html += '<div style="margin:28px 0 12px 0;">' + processed + '</div>\n'
+
+        # 4단락마다 핵심 문장 강조 박스
+        elif para_count % 4 == 0 and len(para.strip()) > 30:
+            html += (
+                '<div style="border-left:4px solid #1565c0;padding:14px 20px;margin:20px 0;'
+                'background:#f0f4ff;border-radius:0 8px 8px 0;">'
+                '<p style="margin:0;font-size:16px;line-height:1.9;color:#1a1a2e;font-weight:500;">'
+                + para.strip() + '</p></div>\n'
+            )
+
+        # 일반 단락
+        else:
+            html += (
+                '<p style="margin:14px 0;line-height:1.9;font-size:16px;color:#333;">'
+                + para.strip() + '</p>\n'
+            )
+
+        # 중간 이미지
         if i >= mid and not image2_inserted and len(images) >= 2:
             html += make_image_html(images[1], margin_top="20px")
             image2_inserted = True
 
+    # 하단 이미지
     if len(images) >= 3:
         html += make_image_html(images[2], margin_top="20px")
 
-    return html + "</div>"
+    return html
+
 
 def send_telegram(title, post_url, topic):
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID: return
-    msg = f"{SPORT_EMOJI.get(topic['sport'], '🏆')} 새 포스팅\n\n📌 {title}\n🔗 {post_url}"
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print("[텔레그램] 설정값 없음 - 건너뜀")
+        return
+    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
+    message = (
+        sport_emoji + " 새 포스팅\n\n"
+        + "📌 " + title + "\n\n"
+        + "🔗 " + post_url
+    )
     try:
-        requests.post(f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage", json={"chat_id": TELEGRAM_CHAT_ID, "text": msg}, timeout=10)
-    except Exception: pass
+        response = requests.post(
+            "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": message},
+            timeout=10
+        )
+        if response.status_code == 200:
+            print("[텔레그램] 공유 성공!")
+        else:
+            print("[텔레그램] 실패: " + response.text[:200])
+    except Exception as e:
+        print("[텔레그램 오류] " + str(e))
+
 
 def send_facebook(title, post_url, topic):
-    if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN: return
-    msg = f"{SPORT_EMOJI.get(topic['sport'], '🏆')} 새 포스팅\n\n{title}\n자세히 읽기 👉 {post_url}"
+    if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
+        print("[페이스북] 설정값 없음 - 건너뜀")
+        return
+    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
+    message = (
+        sport_emoji + " 새 포스팅\n\n"
+        + title + "\n\n"
+        + "자세히 읽기 👉 " + post_url
+    )
     try:
-        requests.post(f"https://graph.facebook.com/v19.0/{FACEBOOK_PAGE_ID}/feed", data={"message": msg, "link": post_url, "access_token": FACEBOOK_ACCESS_TOKEN}, timeout=10)
-    except Exception: pass
-
-def post_to_blogger(post_data, images):
-    try:
-        access_token = get_access_token()
-        body_html = body_to_html(post_data["body"], images, post_data["topic"])
-        url = f"https://www.googleapis.com/blogger/v3/blogs/{BLOG_ID}/posts"
-        headers = {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json"}
-        payload = {
-            "kind": "blogger#post",
-            "title": post_data["title"],
-            "content": body_html,
-            "labels": [post_data["topic"]["sport"], post_data["topic"]["series"]],
-            "status": "LIVE"
-        }
-        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response = requests.post(
+            "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
+            data={
+                "message": message,
+                "link": post_url,
+                "access_token": FACEBOOK_ACCESS_TOKEN
+            },
+            timeout=10
+        )
         if response.status_code == 200:
-            post_url = response.json().get("url", "")
-            print(f"\n발행 완료! 링크: {post_url}")
-            send_telegram(post_data["title"], post_url, post_data["topic"])
-            send_facebook(post_data["title"], post_url, post_data["topic"])
-            return True
+            print("[페이스북] 공유 성공!")
         else:
-            print(f"발행 실패: {response.text}")
+            print("[페이스북] 실패: " + response.text[:200])
     except Exception as e:
-        print(f"오류: {e}")
+        print("[페이스북 오류] " + str(e))
+
+
+def post_to_blogger(post_data, images, retry=2):
+    print("\n[Blogger] 포스팅 시작...")
+    topic = post_data["topic"]
+    labels = [topic["sport"], topic["series"]]
+
+    for attempt in range(1, retry + 2):
+        try:
+            access_token = get_access_token()
+            body_html = body_to_html(post_data["body"], images, topic)
+            url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
+            headers = {
+                "Authorization": "Bearer " + access_token,
+                "Content-Type": "application/json"
+            }
+            payload = {
+                "kind": "blogger#post",
+                "title": post_data["title"],
+                "content": body_html,
+                "labels": labels,
+                "status": "LIVE"
+            }
+            print("[시도 " + str(attempt) + "] 제목: " + post_data["title"])
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
+            print("[응답] 상태코드: " + str(response.status_code))
+            if response.status_code == 200:
+                result = response.json()
+                post_url = result.get("url", "")
+                print("\n발행 완료!")
+                print("   링크: " + post_url)
+                send_telegram(post_data["title"], post_url, topic)
+                send_facebook(post_data["title"], post_url, topic)
+                return True
+            else:
+                print("실패: " + response.text[:300])
+                if attempt <= retry:
+                    print("[재시도] " + str(attempt) + "번째 재시도 중...")
+        except Exception as e:
+            print("[오류] " + str(e))
+            if attempt <= retry:
+                print("[재시도] " + str(attempt) + "번째 재시도 중...")
     return False
 
+
 if __name__ == "__main__":
-    print(f"AutoBlog 시작: {datetime.now()}")
+    print("=" * 50)
+    print("AutoBlog Sports Publisher - Claude Edition")
+    print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    print("=" * 50)
     try:
         post = generate_post()
         images = get_images(post["topic"]["keyword"], count=3)
         post_to_blogger(post, images)
+        print("\n모든 작업 완료!")
     except Exception as e:
-        print(f"최종 오류: {e}")
+        print("\n오류 발생: " + str(e))
+        import traceback
+        traceback.print_exc()
+        exit(1)
