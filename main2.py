@@ -2,6 +2,7 @@ import os
 import requests
 import random
 from datetime import datetime
+import time
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
@@ -23,118 +24,19 @@ CATEGORY_EMOJI = {
     "연예이슈": "🎭"
 }
 
-# 카테고리별 검색 쿼리
-SEARCH_TOPICS = [
-    # 스포츠 이슈
-    {
-        "category": "스포츠이슈",
-        "keyword": "sports news korea",
-        "queries": [
-            "오늘 스포츠 뉴스 이슈 " + datetime.now().strftime("%Y년 %m월 %d일"),
-            "축구 농구 야구 오늘 핫이슈",
-            "스포츠 선수 공식 발표 오늘",
-            "스포츠조선 오늘 뉴스",
-            "해외 스포츠 이슈 오늘 한국",
-        ]
-    },
-    # 경제 뉴스
-    {
-        "category": "경제뉴스",
-        "keyword": "economy finance korea",
-        "queries": [
-            "오늘 경제 뉴스 핫이슈 " + datetime.now().strftime("%Y년 %m월 %d일"),
-            "코스피 코스닥 오늘 시장 동향",
-            "부동산 금리 환율 오늘 뉴스",
-            "주식 투자 오늘 핫종목 이슈",
-            "경제 정책 기업 오늘 발표",
-        ]
-    },
-    # 전국 이슈
-    {
-        "category": "전국이슈",
-        "keyword": "korea news issue today",
-        "queries": [
-            "오늘 전국 사회 핫이슈 " + datetime.now().strftime("%Y년 %m월 %d일"),
-            "오늘 사건사고 뉴스 한국",
-            "정치 사회 오늘 핫이슈",
-            "오늘 화제 뉴스 한국 실시간",
-            "오늘 논란 이슈 사회 뉴스",
-        ]
-    },
-    # 연예 이슈
-    {
-        "category": "연예이슈",
-        "keyword": "kpop entertainment news",
-        "queries": [
-            "오늘 연예 뉴스 핫이슈 " + datetime.now().strftime("%Y년 %m월 %d일"),
-            "오늘 드라마 영화 음악 화제",
-            "연예인 공식 발표 오늘 뉴스",
-            "K팝 아이돌 오늘 이슈",
-            "오늘 연예계 논란 공식 발표",
-        ]
-    },
-]
+CATEGORIES = ["스포츠이슈", "경제뉴스", "전국이슈", "연예이슈"]
 
 
-def get_access_token():
-    print("[인증] Google Access Token 발급 중...")
-    response = requests.post(
-        "https://oauth2.googleapis.com/token",
-        data={
-            "client_id": GOOGLE_CLIENT_ID,
-            "client_secret": GOOGLE_CLIENT_SECRET,
-            "refresh_token": GOOGLE_REFRESH_TOKEN,
-            "grant_type": "refresh_token"
-        },
-        timeout=10
-    )
-    if response.status_code != 200:
-        raise Exception("토큰 발급 실패: " + response.text)
-    print("[인증] 완료!")
-    return response.json()["access_token"]
-
-
-def search_news(query):
-    print("[웹검색] 검색 중: " + query)
-    response = requests.post(
-        "https://api.anthropic.com/v1/messages",
-        headers={
-            "x-api-key": ANTHROPIC_API_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json"
-        },
-        json={
-            "model": "claude-sonnet-4-20250514",
-            "max_tokens": 2000,
-            "tools": [{"type": "web_search_20250305", "name": "web_search"}],
-            "messages": [{
-                "role": "user",
-                "content": (
-                    "오늘(" + TODAY + ") 기준으로 다음 키워드를 검색해서 "
-                    "실제 뉴스 기사에서 확인된 핵심 팩트만 3~5가지 요약해줘. "
-                    "루머나 추측은 절대 포함하지 마. "
-                    "각 팩트에 출처 언론사명을 표기해줘.\n\n"
-                    "검색 키워드: " + query
-                )
-            }]
-        },
-        timeout=60
-    )
-    if response.status_code != 200:
-        print("[웹검색 실패] " + str(response.status_code))
-        return ""
-    content = response.json().get("content", [])
-    result = ""
-    for block in content:
-        if block.get("type") == "text":
-            result += block.get("text", "")
-    return result
-
-
-def generate_with_claude(prompt):
-    import time
-    print("[AI] Claude 글 생성 중...")
+def call_claude(messages, max_tokens=4000, use_search=False):
     for attempt in range(3):
+        payload = {
+            "model": "claude-sonnet-4-20250514",
+            "max_tokens": max_tokens,
+            "messages": messages
+        }
+        if use_search:
+            payload["tools"] = [{"type": "web_search_20250305", "name": "web_search"}]
+
         response = requests.post(
             "https://api.anthropic.com/v1/messages",
             headers={
@@ -142,75 +44,115 @@ def generate_with_claude(prompt):
                 "anthropic-version": "2023-06-01",
                 "content-type": "application/json"
             },
-            json={
-                "model": "claude-sonnet-4-20250514",
-                "max_tokens": 4000,
-                "messages": [{"role": "user", "content": prompt}]
-            },
-            timeout=300
+            json=payload,
+            timeout=120
         )
         if response.status_code == 200:
-            return response.json()["content"][0]["text"]
+            content = response.json().get("content", [])
+            result = ""
+            for block in content:
+                if block.get("type") == "text":
+                    result += block.get("text", "")
+            return result
         elif response.status_code == 429:
             wait = 60 * (attempt + 1)
-            print("[429] 속도 제한 - " + str(wait) + "초 대기 후 재시도...")
+            print("[429] " + str(wait) + "초 대기 후 재시도...")
             time.sleep(wait)
         else:
             raise Exception("Claude 오류: " + str(response.status_code))
     raise Exception("Claude 오류: 최대 재시도 횟수 초과")
 
 
+def get_hot_topic(category):
+    print("[핫이슈 탐색] 카테고리: " + category)
+
+    category_map = {
+        "스포츠이슈": "스포츠 (축구, 농구, 야구, 선수 이슈, 구단 뉴스)",
+        "경제뉴스": "경제 (주식, 부동산, 금리, 환율, 기업 뉴스)",
+        "전국이슈": "사회 (정치, 사건사고, 정책, 사회 이슈)",
+        "연예이슈": "연예 (드라마, 영화, K팝, 연예인 공식 발표)"
+    }
+
+    prompt = (
+        "오늘(" + TODAY + ") 한국에서 가장 뜨거운 " + category_map[category] + " 분야 핫이슈를 웹에서 검색해줘.\n\n"
+        "반드시 아래 형식으로만 출력해:\n"
+        "주제: (오늘 가장 핫한 이슈 제목)\n"
+        "키워드: (검색 키워드 영문)\n"
+        "핵심팩트: (확인된 팩트 3줄 이내)\n\n"
+        "조건:\n"
+        "- 공식 확인된 뉴스만\n"
+        "- 루머나 추측 금지\n"
+        "- 오늘 날짜 기준 가장 화제인 것\n"
+        "- 명예훼손 내용 금지"
+    )
+
+    result = call_claude(
+        [{"role": "user", "content": prompt}],
+        max_tokens=500,
+        use_search=True
+    )
+    print("[핫이슈] " + result[:100])
+    return result
+
+
 def generate_post():
-    topic = random.choice(SEARCH_TOPICS)
-    query = random.choice(topic["queries"])
+    category = random.choice(CATEGORIES)
+    print("[카테고리] " + category)
 
-    print("[카테고리] " + topic["category"])
-    print("[검색어] " + query)
-
-    news_context = search_news(query)
-
-    if not news_context or len(news_context) < 100:
-        print("[경고] 검색 결과 부족, 다른 쿼리로 재시도")
-        query = random.choice(topic["queries"])
-        news_context = search_news(query)
+    hot_topic = get_hot_topic(category)
+    time.sleep(5)
 
     prompt = (
         "당신은 20년 경력의 베테랑 시니어 기자입니다.\n"
         "TV 뉴스 앵커처럼 명확하고 신뢰감 있으며, 독자를 끌어당기는 문장력을 갖고 있습니다.\n"
-        "한자, 일본어, 중국어 등 한국어가 아닌 문자는 절대 사용하지 마세요.\n\n"
-        "오늘(" + TODAY + ") 수집한 뉴스 정보:\n"
-        + news_context + "\n\n"
+        "한국어만 사용하세요. 외국 문자 절대 금지.\n\n"
+        "오늘(" + TODAY + ") 가장 핫한 이슈:\n"
+        + hot_topic + "\n\n"
         "절대 지켜야 할 원칙:\n"
-        "1. 공식 확인된 팩트만 작성하세요. 루머, 찌라시, 추측 절대 금지.\n"
-        "2. 명예훼손이 될 수 있는 내용 절대 금지.\n"
-        "3. 확인되지 않은 사생활 침해 내용 절대 금지.\n"
-        "4. 법원 판결, 공식 발표, 공식 보도된 내용만 다루세요.\n"
-        "5. 반드시 존댓말을 사용하세요.\n"
-        "6. 중립적이고 객관적인 시각을 유지하세요.\n"
-        "7. 수치, 날짜, 출처를 명확히 표기하세요.\n"
-        "8. 제목과 내용이 일치해야 합니다. 낚시성 제목 금지.\n\n"
-        "글쓰기 스타일:\n"
-        "첫 문장부터 핵심 팩트를 강렬하게 전달하세요.\n"
-        "독자가 이 글 하나로 이슈의 전말을 완전히 이해할 수 있게 작성하세요.\n"
-        "전문 용어는 괄호 안에 쉬운 설명을 추가하세요.\n"
-        "소제목은 [소제목] 형식으로 표시하고 이모지를 붙이세요.\n\n"
-        "반드시 아래 구조로 작성하세요:\n"
-        "1. 리드문: 핵심 팩트를 2~3줄로 강렬하게 전달\n"
-        "2. 배경 설명: 이 이슈가 왜 중요한지\n"
-        "3. 팩트 분석: 확인된 사실만 수치/날짜와 함께\n"
-        "4. 현장/전문가 시각: 업계 반응\n"
-        "5. 독자 관점: 이 이슈의 의미\n"
-        "6. 전망: 앞으로 어떻게 될 것인가\n\n"
-        "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3가지 핵심만 작성\n\n"
-        "카테고리: " + topic["category"] + "\n"
-        "목표 분량: 2500자에서 4000자\n\n"
-        "반드시 아래 형식으로 출력하세요:\n"
-        "제목: (팩트 기반의 강렬하고 정확한 제목)\n"
+        "1. 공식 확인된 팩트만 작성하세요. 루머, 추측 절대 금지.\n"
+        "2. 명예훼손 내용 절대 금지.\n"
+        "3. 반드시 존댓말을 사용하세요.\n"
+        "4. 중립적이고 객관적인 시각을 유지하세요.\n"
+        "5. 제목과 내용이 일치해야 합니다. 낚시성 제목 금지.\n\n"
+        "글 구조 (반드시 이 순서로):\n\n"
+        "1. 리드문 (2~3줄)\n"
+        "핵심 팩트를 강렬하게 전달하세요. 독자가 첫 문장에 멈추게 만드세요.\n\n"
+        "2. ##핵심키워드##\n"
+        "이 이슈의 핵심을 한 단어나 짧은 구로 크게 던지세요.\n"
+        "그 아래 2~3문장으로 쉽게 풀어쓰세요.\n\n"
+        "3. 소제목 구조 (3~4개)\n"
+        "소제목: [이모지 소제목내용 이모지] 형식. 앞뒤 이모지 필수.\n"
+        "예: [📌 사건의 전말 📌], [💬 각계 반응 💬]\n"
+        "각 소제목 아래: 배경 → 팩트 → 반응 순으로 깊어지게\n"
+        "단락 3~4줄 이내. 빈 줄 필수.\n"
+        "수치, 날짜, 출처 명확히 표기.\n\n"
+        "4. 추천 운동 표 없음 (뉴스 기사이므로 생략)\n\n"
+        "5. 전망 + 독자 관점\n"
+        "앞으로 어떻게 될지 + 독자에게 의미하는 것\n"
+        "반드시 존댓말로 끝내세요. 격언 금지.\n\n"
+        "6. 핵심 요약\n"
+        "[SUMMARY_START]\n"
+        "핵심1\n"
+        "핵심2\n"
+        "핵심3\n"
+        "[SUMMARY_END]\n\n"
+        "글쓰기 원칙:\n"
+        "반드시 존댓말. '~이다', '~한다' 반말 종결 절대 금지.\n"
+        "AI 티 나는 나열식 표현 금지.\n"
+        "2500자에서 3500자.\n\n"
+        "카테고리: " + category + "\n\n"
+        "출력 형식:\n"
+        "제목: (팩트 기반 강렬한 제목)\n"
         "---\n"
-        "(본문 내용)"
+        "(본문)"
     )
 
-    full_text = generate_with_claude(prompt)
+    print("[AI] 기사 작성 중...")
+    full_text = call_claude(
+        [{"role": "user", "content": prompt}],
+        max_tokens=4000,
+        use_search=False
+    )
 
     lines = full_text.strip().split("\n")
     title = ""
@@ -227,13 +169,13 @@ def generate_post():
 
     body = "\n".join(body_lines).strip()
     if not title:
-        title = TODAY + " " + topic["category"] + " 핫이슈"
+        title = TODAY + " " + category + " 핫이슈"
     if not body:
         body = full_text
 
     print("[완료] 제목: " + title)
     print("[완료] 글자수: " + str(len(body)) + "자")
-    return {"title": title, "body": body, "topic": topic}
+    return {"title": title, "body": body, "category": category}
 
 
 def get_images(keyword, count=3):
@@ -258,7 +200,7 @@ def get_images(keyword, count=3):
                 "author": photo["user"]["name"],
                 "author_url": photo["user"]["links"]["html"]
             })
-        print("[이미지] " + str(len(images)) + "장 수집 완료")
+        print("[이미지] " + str(len(images)) + "장 수집")
         return images
     except Exception as e:
         print("[이미지 오류] " + str(e))
@@ -283,50 +225,109 @@ def make_image_html(img, margin_top="0"):
     return html
 
 
-def body_to_html(body, images, topic):
+def body_to_html(body, images, category):
     import re
 
-    category = topic.get("category", "이슈")
     emoji = CATEGORY_EMOJI.get(category, "📰")
 
-    category_badge = (
+    # 배지 + 날짜
+    html = (
         '<div style="display:inline-block;background:#e65100;color:#fff;'
-        'font-size:13px;padding:4px 12px;border-radius:20px;margin-bottom:8px;">'
+        'font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:8px;font-weight:600;">'
         + emoji + " " + category + "</div>\n"
-    )
-    date_badge = (
-        '<div style="font-size:13px;color:#888;margin-bottom:16px;">'
-        + TODAY + "</div>\n"
+        '<div style="font-size:13px;color:#888;margin-bottom:20px;">📅 ' + TODAY + "</div>\n"
     )
 
-    html = category_badge + date_badge
-
+    # 상단 이미지
     if len(images) >= 1:
         html += make_image_html(images[0])
 
+    # 목차 자동 생성
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
+    keyword_pattern = re.compile(r'##(.+?)##')
+
     summary_match = summary_pattern.search(body)
     summary_html = make_summary_html(summary_match.group(1)) if summary_match else ""
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", body)
 
+    headings = re.findall(r'\[([^\]]+)\]', clean_body)
+    headings = [h for h in headings if h not in ["SUMMARY_PLACEHOLDER"]]
+    if headings:
+        toc = '<div style="background:#f8f9ff;border:1px solid #e0e0e0;border-radius:10px;padding:20px 24px;margin:24px 0;">'
+        toc += '<p style="font-weight:700;font-size:15px;color:#e65100;margin-bottom:12px;">📋 목차</p>'
+        toc += '<ol style="margin:0;padding-left:20px;">'
+        for h in headings:
+            clean_h = re.sub(r'^[^\w가-힣]+', '', h).strip()
+            clean_h = re.sub(r'[^\w가-힣\s]+$', '', clean_h).strip()
+            if clean_h:
+                toc += '<li style="margin:6px 0;font-size:15px;color:#444;line-height:1.6;">' + clean_h + '</li>'
+        toc += '</ol></div>\n'
+        html += toc
+
+    def replace_keyword(m):
+        return (
+            '<div style="margin:28px 0 12px 0;">'
+            '<span style="display:inline-block;font-size:30px;font-weight:900;'
+            'color:#e65100;letter-spacing:-0.5px;'
+            'border-bottom:3px solid #e65100;padding-bottom:4px;">'
+            + m.group(1) + '</span></div>\n'
+        )
+
     paragraphs = clean_body.split("\n")
     mid = len(paragraphs) // 2
     image2_inserted = False
+    para_count = 0
 
     for i, para in enumerate(paragraphs):
         if not para.strip():
-            html += '<p style="margin:14px 0;">&nbsp;</p>\n'
+            html += '<div style="margin:10px 0;"></div>\n'
             continue
+
         if para.strip() == "[SUMMARY_PLACEHOLDER]":
             html += summary_html
             continue
+
+        # 소제목
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
-            html += '<h2 style="margin-top:40px;margin-bottom:14px;font-size:22px;border-left:4px solid #e65100;padding-left:14px;color:#1a1a1a;">' + heading + "</h2>\n"
-        elif len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
-            html += '<p style="margin:8px 0 8px 24px;line-height:2.0;color:#333;">' + para + "</p>\n"
+            html += (
+                '<h2 style="margin-top:48px;margin-bottom:16px;font-size:21px;font-weight:700;'
+                'background:linear-gradient(90deg,#e65100,#ef6c00);'
+                'color:#fff;padding:12px 20px;border-radius:8px;">'
+                + heading + "</h2>\n"
+            )
+            continue
+
+        # 번호 리스트
+        if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
+            html += (
+                '<div style="display:flex;align-items:flex-start;margin:10px 0;padding:12px 16px;'
+                'background:#fff3e0;border-radius:8px;">'
+                '<span style="color:#e65100;font-weight:700;margin-right:12px;font-size:16px;">'
+                + para.strip()[0] + '.</span>'
+                '<span style="color:#333;font-size:16px;line-height:1.8;">'
+                + para.strip()[2:].strip() + '</span></div>\n'
+            )
+            continue
+
+        # 키워드 처리
+        para_count += 1
+        processed = keyword_pattern.sub(replace_keyword, para.strip())
+
+        if processed != para.strip():
+            html += processed
+        elif para_count % 4 == 0 and len(para.strip()) > 30:
+            html += (
+                '<div style="border-left:4px solid #e65100;padding:14px 20px;margin:20px 0;'
+                'background:#fff3e0;border-radius:0 8px 8px 0;">'
+                '<p style="margin:0;font-size:16px;line-height:1.9;color:#1a1a1a;font-weight:500;">'
+                + para.strip() + '</p></div>\n'
+            )
         else:
-            html += '<p style="margin:12px 0;line-height:2.0;font-size:16px;color:#222;">' + para + "</p>\n"
+            html += (
+                '<p style="margin:14px 0;line-height:1.9;font-size:16px;color:#333;">'
+                + para.strip() + '</p>\n'
+            )
 
         if i >= mid and not image2_inserted and len(images) >= 2:
             html += make_image_html(images[1], margin_top="20px")
@@ -338,99 +339,105 @@ def body_to_html(body, images, topic):
     return html
 
 
-def send_telegram(title, post_url, topic):
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        print("[텔레그램] 설정값 없음 - 건너뜀")
-        return
-    category = topic.get("category", "이슈")
-    emoji = CATEGORY_EMOJI.get(category, "📰")
-    message = (
-        emoji + " 새 포스팅\n\n"
-        + "📌 " + title + "\n\n"
-        + "🔗 " + post_url
+def get_access_token():
+    response = requests.post(
+        "https://oauth2.googleapis.com/token",
+        data={
+            "client_id": GOOGLE_CLIENT_ID,
+            "client_secret": GOOGLE_CLIENT_SECRET,
+            "refresh_token": GOOGLE_REFRESH_TOKEN,
+            "grant_type": "refresh_token"
+        },
+        timeout=10
     )
+    if response.status_code != 200:
+        raise Exception("토큰 발급 실패: " + response.text)
+    return response.json()["access_token"]
+
+
+def send_telegram(title, post_url, category):
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        return
+    emoji = CATEGORY_EMOJI.get(category, "📰")
+    message = emoji + " 새 포스팅\n\n📌 " + title + "\n\n🔗 " + post_url
     try:
-        response = requests.post(
+        requests.post(
             "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
             json={"chat_id": TELEGRAM_CHAT_ID, "text": message},
             timeout=10
         )
-        if response.status_code == 200:
-            print("[텔레그램] 공유 성공!")
-        else:
-            print("[텔레그램] 실패: " + response.text[:200])
+        print("[텔레그램] 공유 성공!")
     except Exception as e:
         print("[텔레그램 오류] " + str(e))
 
 
-def send_facebook(title, post_url, topic):
+def send_facebook(title, post_url, category):
     if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
-        print("[페이스북] 설정값 없음 - 건너뜀")
         return
-    category = topic.get("category", "이슈")
     emoji = CATEGORY_EMOJI.get(category, "📰")
-    message = (
-        emoji + " 새 포스팅\n\n"
-        + title + "\n\n"
-        + "자세히 읽기 👉 " + post_url
-    )
+    message = emoji + " 새 포스팅\n\n" + title + "\n\n자세히 읽기 👉 " + post_url
     try:
-        response = requests.post(
+        requests.post(
             "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
-            data={
-                "message": message,
-                "link": post_url,
-                "access_token": FACEBOOK_ACCESS_TOKEN
-            },
+            data={"message": message, "link": post_url, "access_token": FACEBOOK_ACCESS_TOKEN},
             timeout=10
         )
-        if response.status_code == 200:
-            print("[페이스북] 공유 성공!")
-        else:
-            print("[페이스북] 실패: " + response.text[:200])
+        print("[페이스북] 공유 성공!")
     except Exception as e:
         print("[페이스북 오류] " + str(e))
 
 
-def post_to_blogger(post_data, images):
+def post_to_blogger(post_data, images, retry=2):
     print("\n[Blogger] insaplayer 포스팅 시작...")
-    access_token = get_access_token()
-    body_html = body_to_html(post_data["body"], images, post_data["topic"])
-    url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
-    headers = {
-        "Authorization": "Bearer " + access_token,
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "kind": "blogger#post",
-        "title": post_data["title"],
-        "content": body_html,
-        "status": "LIVE"
-    }
-    print("[제목] " + post_data["title"])
-    response = requests.post(url, headers=headers, json=payload, timeout=30)
-    print("[응답] 상태코드: " + str(response.status_code))
-    if response.status_code == 200:
-        result = response.json()
-        post_url = result.get("url", "")
-        print("\n발행 완료!")
-        print("   링크: " + post_url)
-        send_telegram(post_data["title"], post_url, post_data["topic"])
-        send_facebook(post_data["title"], post_url, post_data["topic"])
-        return True
-    else:
-        print("실패: " + response.text[:300])
-        return False
+    category = post_data["category"]
+    labels = [category, TODAY]
+
+    for attempt in range(1, retry + 2):
+        try:
+            access_token = get_access_token()
+            body_html = body_to_html(post_data["body"], images, category)
+            url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
+            headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
+            payload = {
+                "kind": "blogger#post",
+                "title": post_data["title"],
+                "content": body_html,
+                "labels": labels,
+                "status": "LIVE"
+            }
+            print("[시도 " + str(attempt) + "] " + post_data["title"])
+            response = requests.post(url, headers=headers, json=payload, timeout=30)
+            if response.status_code == 200:
+                post_url = response.json().get("url", "")
+                print("발행 완료! " + post_url)
+                send_telegram(post_data["title"], post_url, category)
+                send_facebook(post_data["title"], post_url, category)
+                return True
+            else:
+                print("실패: " + response.text[:200])
+                if attempt <= retry:
+                    time.sleep(10)
+        except Exception as e:
+            print("[오류] " + str(e))
+            if attempt <= retry:
+                time.sleep(10)
+    return False
 
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("insaplayer - 실시간 이슈 블로그 - Claude Edition")
+    print("insaplayer - 오늘의 핫이슈 블로그")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
     try:
         post = generate_post()
-        images = get_images(post["topic"]["keyword"], count=3)
+        keyword_map = {
+            "스포츠이슈": "sports korea news",
+            "경제뉴스": "economy finance korea",
+            "전국이슈": "korea news society",
+            "연예이슈": "kpop entertainment korea"
+        }
+        images = get_images(keyword_map.get(post["category"], "news korea"), count=3)
         post_to_blogger(post, images)
         print("\n모든 작업 완료!")
     except Exception as e:
