@@ -461,20 +461,30 @@ def get_images_pixabay(keyword, count=3):
     return []
 
 
-def get_images(keyword, count=3, title="", category=""):
-    print("[이미지 검색] 키워드: " + keyword)
+def get_image_keyword(keyword):
+    """긴 키워드에서 이미지 검색용 핵심 단어만 추출"""
+    # 첫 번째 단어 1~2개만 사용
+    words = keyword.strip().split()
+    if len(words) >= 2:
+        return words[0] + " " + words[1]
+    return words[0] if words else "fitness"
 
-    images = get_images_unsplash(keyword, count)
+
+def get_images(keyword, count=3, title="", category=""):
+    img_keyword = get_image_keyword(keyword)
+    print("[이미지 검색] 키워드: " + img_keyword)
+
+    images = get_images_unsplash(img_keyword, count)
     if images:
         print("[이미지] Unsplash " + str(len(images)) + "장")
         return images
 
-    images = get_images_pexels(keyword, count)
+    images = get_images_pexels(img_keyword, count)
     if images:
         print("[이미지] Pexels " + str(len(images)) + "장")
         return images
 
-    images = get_images_pixabay(keyword, count)
+    images = get_images_pixabay(img_keyword, count)
     if images:
         print("[이미지] Pixabay " + str(len(images)) + "장")
         return images
