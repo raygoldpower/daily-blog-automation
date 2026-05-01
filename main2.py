@@ -83,6 +83,41 @@ def search_naver_news(query, display=5):
     return []
 
 
+def test_apis():
+    import os
+    print("[API 확인] NAVER_CLIENT_ID: " + ("있음" if os.environ.get("NAVER_CLIENT_ID") else "없음"))
+    print("[API 확인] GOOGLE_SEARCH_API_KEY: " + ("있음" if os.environ.get("GOOGLE_SEARCH_API_KEY") else "없음"))
+    print("[API 확인] NEWSAPI_KEY: " + ("있음" if os.environ.get("NEWSAPI_KEY") else "없음"))
+
+    # 네이버 테스트
+    nid = os.environ.get("NAVER_CLIENT_ID", "")
+    nsec = os.environ.get("NAVER_CLIENT_SECRET", "")
+    if nid and nsec:
+        try:
+            r = requests.get(
+                "https://openapi.naver.com/v1/search/news.json",
+                headers={"X-Naver-Client-Id": nid, "X-Naver-Client-Secret": nsec},
+                params={"query": "뉴스", "display": 1},
+                timeout=10
+            )
+            print("[네이버 테스트] 상태코드: " + str(r.status_code) + " / " + r.text[:100])
+        except Exception as e:
+            print("[네이버 테스트 오류] " + str(e))
+
+    # NewsAPI 테스트
+    napi = os.environ.get("NEWSAPI_KEY", "")
+    if napi:
+        try:
+            r = requests.get(
+                "https://newsapi.org/v2/top-headlines",
+                params={"country": "kr", "pageSize": 1, "apiKey": napi},
+                timeout=10
+            )
+            print("[NewsAPI 테스트] 상태코드: " + str(r.status_code) + " / " + r.text[:100])
+        except Exception as e:
+            print("[NewsAPI 테스트 오류] " + str(e))
+
+
 def search_google_news(query, num=3):
     if not GOOGLE_SEARCH_API_KEY or not GOOGLE_SEARCH_ENGINE_ID:
         return []
@@ -525,6 +560,7 @@ if __name__ == "__main__":
     print("insaplayer - 실시간 뉴스 블로그 v4")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
+    test_apis()
     try:
         post = generate_post()
         keyword_map = {
