@@ -431,13 +431,15 @@ if __name__ == "__main__":
     print("=" * 50)
     try:
         post = generate_post()
+        # 카테고리별 안전한 이미지 키워드 (Unsplash 검색용)
         keyword_map = {
-            "스포츠이슈": "sports korea news",
-            "경제뉴스": "economy finance korea",
-            "전국이슈": "korea news society",
-            "연예이슈": "kpop entertainment korea"
+            "스포츠이슈": "sports athlete action",
+            "경제뉴스": "business finance economy",
+            "전국이슈": "city korea urban street",
+            "연예이슈": "stage performance music concert"
         }
-        images = get_images(keyword_map.get(post["category"], "news korea"), count=3)
+        img_keyword = keyword_map.get(post["category"], "news")
+        images = get_images(img_keyword, count=3)
         post_to_blogger(post, images)
         print("\n모든 작업 완료!")
     except Exception as e:
