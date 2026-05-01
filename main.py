@@ -462,8 +462,6 @@ def get_images_pixabay(keyword, count=3):
 
 
 def get_images(keyword, count=3, title="", category=""):
-    if title or category:
-        keyword = get_image_keyword_from_title(title, category)
     print("[이미지 검색] 키워드: " + keyword)
 
     images = get_images_unsplash(keyword, count)
@@ -784,7 +782,7 @@ if __name__ == "__main__":
     print("=" * 50)
     try:
         post = generate_post()
-        images = get_images(post["topic"]["keyword"], count=3, title=post["title"], category=post["topic"]["sport"])
+        images = get_images(post["topic"]["keyword"], count=3)
         post_to_blogger(post, images)
         print("\n모든 작업 완료!")
     except Exception as e:
