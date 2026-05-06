@@ -282,73 +282,13 @@ def generate_post():
 
     body = "\n".join(body_lines).strip()
     if not title:
-        title = TODAY + " " + category + " 핫이슈"
+        title = topic["title"]
     if not body:
         body = full_text
 
-    if is_duplicate(title):
-        print("[중복 감지] 제목 중복 — 발행 건너뜀: " + title)
-        return None
-
-    save_used_title(title)
     print("[완료] 제목: " + title)
     print("[완료] 글자수: " + str(len(body)) + "자")
     return {"title": title, "body": body, "topic": topic}
-
-
-def get_image_keyword_from_title(title, category):
-    """제목에서 이미지 검색 키워드 추출"""
-    keyword_map = {
-        "축구": "soccer football player",
-        "야구": "baseball player",
-        "농구": "basketball player",
-        "손흥민": "soccer player football",
-        "류현진": "baseball pitcher",
-        "코스피": "stock market chart",
-        "부동산": "real estate building",
-        "금리": "finance money banking",
-        "환율": "currency exchange money",
-        "드라마": "korean drama tv",
-        "아이돌": "kpop concert music",
-        "연예": "entertainment stage performance",
-        "사건": "police investigation",
-        "정치": "government politics",
-        "경제": "business finance economy",
-        "스포츠이슈": "sports athlete action",
-        "경제뉴스": "business finance economy",
-        "전국이슈": "city korea urban",
-        "연예이슈": "stage performance music",
-        "근육": "muscle fitness gym",
-        "재활": "physical therapy rehabilitation",
-        "축구": "soccer training",
-        "농구": "basketball court",
-    }
-    for kor, eng in keyword_map.items():
-        if kor in title or kor in category:
-            return eng
-    category_defaults = {
-        "스포츠이슈": "sports athlete action",
-        "경제뉴스": "business finance economy",
-        "전국이슈": "city korea urban street",
-        "연예이슈": "stage performance music concert",
-        "축구": "soccer football",
-        "농구": "basketball",
-        "야구": "baseball",
-        "근육학": "fitness muscle gym",
-        "재활": "physical therapy",
-        "영양": "nutrition healthy food",
-        "심리": "mental health mindset",
-        "체력": "endurance running fitness",
-        "유연성": "stretching yoga flexibility",
-        "생리학": "human body science",
-        "물리치료": "physical therapy clinic",
-        "역학": "biomechanics movement",
-        "해부학": "anatomy body",
-        "신체균형": "balance posture body",
-        "스포츠의학": "sports medicine doctor",
-        "공통": "fitness sports health",
-    }
-    return category_defaults.get(category, "sports fitness health")
 
 
 def get_images_unsplash(keyword, count=3):
@@ -436,7 +376,7 @@ def get_images_pixabay(keyword, count=3):
     return []
 
 
-def get_images(keyword, count=3, title="", category=""):
+def get_images(keyword, count=3):
     print("[이미지 검색] 키워드: " + keyword)
 
     images = get_images_unsplash(keyword, count)
@@ -457,7 +397,6 @@ def get_images(keyword, count=3, title="", category=""):
     print("[이미지] 모든 소스 실패")
     return []
 
-    
 
 def make_table_html(table_text):
     rows = [r.strip() for r in table_text.strip().split("\n") if r.strip()]
@@ -489,6 +428,7 @@ def make_summary_html(summary_text):
     return html
 
 
+# [수정1] 이미지 출처 source 동적 처리
 def make_image_html(img, margin_top="0"):
     source = img.get("source", "Unsplash")
     html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
@@ -503,7 +443,6 @@ def body_to_html(body, images, topic):
 
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
 
-    # 시리즈 배지
     series_badge = ""
     if topic.get("series"):
         series_badge = (
@@ -514,11 +453,9 @@ def body_to_html(body, images, topic):
 
     html = series_badge
 
-    # 상단 이미지
     if len(images) >= 1:
         html += make_image_html(images[0])
 
-    # 패턴 파싱
     table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
 
@@ -531,7 +468,6 @@ def body_to_html(body, images, topic):
     clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
 
-    # 목차 자동 생성
     headings = re.findall(r'\[([^\]]+)\]', clean_body)
     headings = [h for h in headings if h not in ["TABLE_PLACEHOLDER", "SUMMARY_PLACEHOLDER"]]
     if headings:
@@ -544,7 +480,6 @@ def body_to_html(body, images, topic):
         toc += '</ol></div>\n'
         html += toc
 
-    # 키워드 강조 처리
     keyword_pattern = re.compile(r'##(.+?)##')
     def replace_keyword(m):
         return (
@@ -572,7 +507,6 @@ def body_to_html(body, images, topic):
             html += summary_html
             continue
 
-        # 소제목
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
             html += (
@@ -583,7 +517,6 @@ def body_to_html(body, images, topic):
             )
             continue
 
-        # 번호 리스트
         if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
             html += (
                 '<div style="display:flex;align-items:flex-start;margin:10px 0;padding:12px 16px;'
@@ -595,15 +528,11 @@ def body_to_html(body, images, topic):
             )
             continue
 
-        # 일반 단락
         para_count += 1
         processed = keyword_pattern.sub(replace_keyword, para.strip())
 
-        # 키워드 강조가 있는 단락
         if processed != para.strip():
             html += '<div style="margin:28px 0 12px 0;">' + processed + '</div>\n'
-
-        # 4단락마다 핵심 문장 강조 박스
         elif para_count % 4 == 0 and len(para.strip()) > 30:
             html += (
                 '<div style="border-left:4px solid #1565c0;padding:14px 20px;margin:20px 0;'
@@ -611,20 +540,16 @@ def body_to_html(body, images, topic):
                 '<p style="margin:0;font-size:16px;line-height:1.9;color:#1a1a2e;font-weight:500;">'
                 + para.strip() + '</p></div>\n'
             )
-
-        # 일반 단락
         else:
             html += (
                 '<p style="margin:14px 0;line-height:1.9;font-size:16px;color:#333;">'
                 + para.strip() + '</p>\n'
             )
 
-        # 중간 이미지
         if i >= mid and not image2_inserted and len(images) >= 2:
             html += make_image_html(images[1], margin_top="20px")
             image2_inserted = True
 
-    # 하단 이미지
     if len(images) >= 3:
         html += make_image_html(images[2], margin_top="20px")
 
@@ -733,10 +658,7 @@ if __name__ == "__main__":
     print("=" * 50)
     try:
         post = generate_post()
-        if post is None:
-            print("[종료] 중복 감지로 발행 건너뜀")
-            exit(0)
-        images = get_images("", count=3, title=post["title"], category=post["category"])
+        images = get_images(post["topic"].get("img_keyword", post["topic"]["keyword"]), count=3)
         post_to_blogger(post, images)
         print("\n모든 작업 완료!")
     except Exception as e:
