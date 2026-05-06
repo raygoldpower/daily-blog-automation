@@ -282,10 +282,15 @@ def generate_post():
 
     body = "\n".join(body_lines).strip()
     if not title:
-        title = topic["title"]
+        title = TODAY + " " + category + " 핫이슈"
     if not body:
         body = full_text
 
+    if is_duplicate(title):
+        print("[중복 감지] 제목 중복 — 발행 건너뜀: " + title)
+        return None
+
+    save_used_title(title)
     print("[완료] 제목: " + title)
     print("[완료] 글자수: " + str(len(body)) + "자")
     return {"title": title, "body": body, "topic": topic}
@@ -452,32 +457,7 @@ def get_images(keyword, count=3, title="", category=""):
     print("[이미지] 모든 소스 실패")
     return []
 
-    try:
-        response = requests.get(
-            "https://api.unsplash.com/search/photos",
-            params={
-                "query": keyword,
-                "per_page": count,
-                "orientation": "landscape",
-                "client_id": UNSPLASH_ACCESS_KEY
-            },
-            timeout=10
-        )
-        data = response.json()
-        images = []
-        for photo in data.get("results", []):
-            images.append({
-                "url": photo["urls"]["regular"],
-                "alt": photo.get("alt_description", keyword) or keyword,
-                "author": photo["user"]["name"],
-                "author_url": photo["user"]["links"]["html"]
-            })
-        print("[이미지] " + str(len(images)) + "장 수집 완료")
-        return images
-    except Exception as e:
-        print("[이미지 오류] " + str(e))
-        return []
-
+    
 
 def make_table_html(table_text):
     rows = [r.strip() for r in table_text.strip().split("\n") if r.strip()]
@@ -510,9 +490,10 @@ def make_summary_html(summary_text):
 
 
 def make_image_html(img, margin_top="0"):
+    source = img.get("source", "Unsplash")
     html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
     html += '<img src="' + img["url"] + '" alt="' + img["alt"] + '" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);"/>'
-    html += '<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="' + img["author_url"] + '" style="color:#999;">' + img["author"] + '</a> on Unsplash</p>'
+    html += '<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="' + img["author_url"] + '" style="color:#999;">' + img["author"] + '</a> on ' + source + '</p>'
     html += "</div>\n"
     return html
 
@@ -752,7 +733,10 @@ if __name__ == "__main__":
     print("=" * 50)
     try:
         post = generate_post()
-        images = get_images(post["topic"].get("img_keyword", post["topic"]["keyword"]), count=3)
+        if post is None:
+            print("[종료] 중복 감지로 발행 건너뜀")
+            exit(0)
+        images = get_images("", count=3, title=post["title"], category=post["category"])
         post_to_blogger(post, images)
         print("\n모든 작업 완료!")
     except Exception as e:
