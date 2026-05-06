@@ -1,42 +1,28 @@
 name: Daily Blog Automation
-
 on:
   schedule:
-    - cron: '0 0 * * *'
-    - cron: '0 1 * * *'
-    - cron: '0 2 * * *'
-    - cron: '0 3 * * *'
-    - cron: '0 5 * * *'
-    - cron: '0 6 * * *'
-    - cron: '0 7 * * *'
-    - cron: '0 9 * * *'
-    - cron: '0 10 * * *'
-    - cron: '0 11 * * *'
+    - cron: '0 0 * * *'    # 한국시간 오전 9시
+    - cron: '0 4 * * *'    # 한국시간 오후 1시
+    - cron: '0 11 * * *'   # 한국시간 오후 8시
   workflow_dispatch:
-
 jobs:
   post-blog:
     runs-on: ubuntu-latest
-
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
         with:
           ref: main
-
       - name: Python 설치
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
       - name: 패키지 설치
         run: pip install requests
-
       - name: 현재 코드 확인
         run: |
           git log --oneline -3
           head -10 main.py
-
       - name: 블로그 자동 발행
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
