@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 import json
 
-ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
@@ -115,38 +115,6 @@ def search_naver_news(query, display=5):
     return []
 
 
-def test_apis():
-    print("[API 확인] NAVER_CLIENT_ID: " + ("있음" if os.environ.get("NAVER_CLIENT_ID") else "없음"))
-    print("[API 확인] GOOGLE_SEARCH_API_KEY: " + ("있음" if os.environ.get("GOOGLE_SEARCH_API_KEY") else "없음"))
-    print("[API 확인] NEWSAPI_KEY: " + ("있음" if os.environ.get("NEWSAPI_KEY") else "없음"))
-
-    nid = os.environ.get("NAVER_CLIENT_ID", "")
-    nsec = os.environ.get("NAVER_CLIENT_SECRET", "")
-    if nid and nsec:
-        try:
-            r = requests.get(
-                "https://openapi.naver.com/v1/search/news.json",
-                headers={"X-Naver-Client-Id": nid, "X-Naver-Client-Secret": nsec},
-                params={"query": "뉴스", "display": 1},
-                timeout=10
-            )
-            print("[네이버 테스트] 상태코드: " + str(r.status_code) + " / " + r.text[:100])
-        except Exception as e:
-            print("[네이버 테스트 오류] " + str(e))
-
-    napi = os.environ.get("NEWSAPI_KEY", "")
-    if napi:
-        try:
-            r = requests.get(
-                "https://newsapi.org/v2/top-headlines",
-                params={"country": "kr", "pageSize": 1, "apiKey": napi},
-                timeout=10
-            )
-            print("[NewsAPI 테스트] 상태코드: " + str(r.status_code) + " / " + r.text[:100])
-        except Exception as e:
-            print("[NewsAPI 테스트 오류] " + str(e))
-
-
 def search_google_news(query, num=3):
     if not GOOGLE_SEARCH_API_KEY or not GOOGLE_SEARCH_ENGINE_ID:
         return []
@@ -203,50 +171,6 @@ def search_newsapi(query, page_size=3):
     return []
 
 
-def search_claude_web(category):
-    print("[Claude 웹검색] API 수집 실패 - 웹검색으로 전환...")
-    category_map = {
-        "스포츠이슈": "오늘 한국 스포츠 핫이슈 뉴스 축구 야구 농구",
-        "경제뉴스": "오늘 한국 경제 핫이슈 주식 부동산 금리",
-        "전국이슈": "오늘 한국 사회 핫이슈 정치 사건사고",
-        "연예이슈": "오늘 한국 연예 핫이슈 K팝 드라마 연예인"
-    }
-    query = category_map.get(category, "오늘 한국 핫이슈 뉴스")
-    payload = {
-        "model": "claude-sonnet-4-20250514",
-        "max_tokens": 1000,
-        "tools": [{"type": "web_search_20250305", "name": "web_search"}],
-        "messages": [{"role": "user", "content": (
-            "오늘(" + TODAY + ") 기준으로 다음 키워드를 검색해서 "
-            "실제 뉴스에서 확인된 핵심 팩트 5가지만 요약해줘. "
-            "루머나 추측 금지. 출처 언론사 표기 필수.\n\n검색: " + query
-        )}]
-    }
-    try:
-        response = requests.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": ANTHROPIC_API_KEY,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json"
-            },
-            json=payload,
-            timeout=60
-        )
-        if response.status_code == 200:
-            content = response.json().get("content", [])
-            result = ""
-            for block in content:
-                if block.get("type") == "text":
-                    result += block.get("text", "")
-            print("[Claude 웹검색] 수집 완료")
-            time.sleep(30)
-            return "=== 오늘(" + TODAY + ") 웹검색 수집 뉴스 ===\n" + result
-    except Exception as e:
-        print("[Claude 웹검색 오류] " + str(e))
-    return ""
-
-
 def collect_news(category):
     print("[뉴스 수집] 카테고리: " + category)
     keywords = CATEGORY_KEYWORDS[category]
@@ -265,47 +189,93 @@ def collect_news(category):
     all_news = naver_results1 + naver_results2 + google_results + newsapi_results
 
     if not all_news:
-        print("[경고] API 수집 실패 - Claude 웹검색으로 전환")
-        return search_claude_web(category)
+        print("[경고] 뉴스 수집 실패 - 기본 뉴스 컨텍스트로 진행")
+        return "=== 오늘(" + TODAY + ") 뉴스 수집 실패 - 최신 이슈로 작성 요청 ==="
 
     news_context = "=== 오늘(" + TODAY + ") 수집된 뉴스 ===\n"
     for i, news in enumerate(all_news[:5]):
-        news_context += str(i+1) + ". " + news + "\n"
+        news_context += str(i + 1) + ". " + news + "\n"
 
     print("[수집 완료] 총 " + str(len(all_news)) + "개")
     return news_context
 
 
-def call_claude(messages, max_tokens=4000):
+def call_gemini(prompt, max_tokens=4000):
+    """Gemini 2.0 Flash API 호출"""
+    if not GEMINI_API_KEY:
+        raise Exception("GEMINI_API_KEY 없음")
+
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        "gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY
+    )
+
+    payload = {
+        "contents": [
+            {
+                "parts": [{"text": prompt}]
+            }
+        ],
+        "generationConfig": {
+            "maxOutputTokens": max_tokens,
+            "temperature": 0.8,
+            "topP": 0.95,
+        }
+    }
+
     for attempt in range(3):
-        response = requests.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": ANTHROPIC_API_KEY,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json"
-            },
-            json={
-                "model": "claude-sonnet-4-20250514",
-                "max_tokens": max_tokens,
-                "messages": messages
-            },
-            timeout=300
-        )
-        if response.status_code == 200:
-            content = response.json().get("content", [])
-            result = ""
-            for block in content:
-                if block.get("type") == "text":
-                    result += block.get("text", "")
-            return result
-        elif response.status_code == 429:
-            wait = 60 * (attempt + 1)
-            print("[429] " + str(wait) + "초 대기 후 재시도...")
-            time.sleep(wait)
-        else:
-            raise Exception("Claude 오류: " + str(response.status_code))
-    raise Exception("Claude 오류: 최대 재시도 횟수 초과")
+        try:
+            response = requests.post(url, json=payload, timeout=120)
+            print("[Gemini] 응답 상태코드: " + str(response.status_code))
+
+            if response.status_code == 200:
+                data = response.json()
+                candidates = data.get("candidates", [])
+                if candidates:
+                    parts = candidates[0].get("content", {}).get("parts", [])
+                    result = ""
+                    for part in parts:
+                        result += part.get("text", "")
+                    return result
+                else:
+                    raise Exception("Gemini 응답에 candidates 없음: " + str(data))
+
+            elif response.status_code == 429:
+                wait = 60 * (attempt + 1)
+                print("[429] " + str(wait) + "초 대기 후 재시도...")
+                time.sleep(wait)
+
+            elif response.status_code == 503:
+                wait = 30 * (attempt + 1)
+                print("[503] " + str(wait) + "초 대기 후 재시도...")
+                time.sleep(wait)
+
+            else:
+                raise Exception("Gemini 오류: " + str(response.status_code) + " " + response.text[:200])
+
+        except Exception as e:
+            print("[Gemini 오류] attempt " + str(attempt + 1) + ": " + str(e))
+            if attempt < 2:
+                time.sleep(20)
+            else:
+                raise
+
+    raise Exception("Gemini 오류: 최대 재시도 횟수 초과")
+
+
+def test_apis():
+    print("[API 확인] GEMINI_API_KEY: " + ("있음" if GEMINI_API_KEY else "없음"))
+    print("[API 확인] NAVER_CLIENT_ID: " + ("있음" if os.environ.get("NAVER_CLIENT_ID") else "없음"))
+    print("[API 확인] GOOGLE_SEARCH_API_KEY: " + ("있음" if os.environ.get("GOOGLE_SEARCH_API_KEY") else "없음"))
+    print("[API 확인] NEWSAPI_KEY: " + ("있음" if os.environ.get("NEWSAPI_KEY") else "없음"))
+
+    # Gemini 연결 테스트
+    if GEMINI_API_KEY:
+        try:
+            result = call_gemini("안녕하세요. 테스트입니다. 한 문장으로 응답해주세요.", max_tokens=50)
+            print("[Gemini 테스트] 성공: " + result[:50])
+        except Exception as e:
+            print("[Gemini 테스트 오류] " + str(e))
 
 
 def generate_post():
@@ -341,10 +311,10 @@ def generate_post():
         "각 소제목 아래: 배경 → 팩트 → 반응 순으로 깊어지게\n"
         "단락 3~4줄 이내. 빈 줄 필수.\n"
         "수치, 날짜, 출처 명확히 표기.\n\n"
-        "5. 전망 + 독자 관점\n"
+        "4. 전망 + 독자 관점\n"
         "앞으로 어떻게 될지 + 독자에게 의미하는 것\n"
         "반드시 존댓말로 끝내세요. 격언 금지.\n\n"
-        "6. 핵심 요약\n"
+        "5. 핵심 요약\n"
         "[SUMMARY_START]\n"
         "핵심1\n"
         "핵심2\n"
@@ -361,8 +331,8 @@ def generate_post():
         "(본문)"
     )
 
-    print("[AI] 기사 작성 중...")
-    full_text = call_claude([{"role": "user", "content": prompt}], max_tokens=4000)
+    print("[AI] Gemini 2.0 Flash 기사 작성 중...")
+    full_text = call_gemini(prompt, max_tokens=4000)
 
     lines = full_text.strip().split("\n")
     title = ""
@@ -383,7 +353,7 @@ def generate_post():
     if not body:
         body = full_text
 
-    # [수정3] is_duplicate() 실제 연결 — 중복 감지 시 None 반환
+    # 중복 감지
     if is_duplicate(title):
         print("[중복 감지] 제목 중복 — 발행 건너뜀: " + title)
         return None
@@ -392,6 +362,36 @@ def generate_post():
     print("[완료] 제목: " + title)
     print("[완료] 글자수: " + str(len(body)) + "자")
     return {"title": title, "body": body, "category": category}
+
+
+def get_image_keyword_from_title(title, category):
+    keyword_map = {
+        "축구": "soccer football player",
+        "야구": "baseball player",
+        "농구": "basketball player",
+        "손흥민": "soccer player football",
+        "류현진": "baseball pitcher",
+        "코스피": "stock market chart",
+        "부동산": "real estate building",
+        "금리": "finance money banking",
+        "환율": "currency exchange money",
+        "드라마": "korean drama tv",
+        "아이돌": "kpop concert music",
+        "연예": "entertainment stage performance",
+        "사건": "police investigation",
+        "정치": "government politics",
+        "경제": "business finance economy",
+    }
+    for kor, eng in keyword_map.items():
+        if kor in title:
+            return eng
+    category_defaults = {
+        "스포츠이슈": "sports athlete action",
+        "경제뉴스": "business finance economy",
+        "전국이슈": "city korea urban street",
+        "연예이슈": "stage performance music concert",
+    }
+    return category_defaults.get(category, "news media")
 
 
 def get_images_unsplash(keyword, count=3):
@@ -503,37 +503,6 @@ def get_images(keyword, count=3, title="", category=""):
     return []
 
 
-def get_image_keyword_from_title(title, category):
-    keyword_map = {
-        "축구": "soccer football player",
-        "야구": "baseball player",
-        "농구": "basketball player",
-        "손흥민": "soccer player football",
-        "류현진": "baseball pitcher",
-        "코스피": "stock market chart",
-        "부동산": "real estate building",
-        "금리": "finance money banking",
-        "환율": "currency exchange money",
-        "드라마": "korean drama tv",
-        "아이돌": "kpop concert music",
-        "연예": "entertainment stage performance",
-        "사건": "police investigation",
-        "정치": "government politics",
-        "경제": "business finance economy",
-    }
-    for kor, eng in keyword_map.items():
-        if kor in title:
-            return eng
-    category_defaults = {
-        "스포츠이슈": "sports athlete action",
-        "경제뉴스": "business finance economy",
-        "전국이슈": "city korea urban street",
-        "연예이슈": "stage performance music concert",
-    }
-    return category_defaults.get(category, "news media")
-
-
-# [수정1] 이미지 출처 source 동적 처리
 def make_summary_html(summary_text):
     lines = [l.strip() for l in summary_text.strip().split("\n") if l.strip()]
     html = '<div style="background:#fff8e1;border-left:5px solid #f57f17;border-radius:8px;padding:20px 24px;margin:28px 0;">'
@@ -748,13 +717,12 @@ def post_to_blogger(post_data, images, retry=2):
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("insaplayer - 실시간 뉴스 블로그 v4")
+    print("insaplayer - 실시간 뉴스 블로그 v5 (Gemini 2.0 Flash)")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
     test_apis()
     try:
         post = generate_post()
-        # [수정3] 중복 감지 시 None 처리
         if post is None:
             print("[종료] 중복 감지로 발행 건너뜀")
             exit(0)
