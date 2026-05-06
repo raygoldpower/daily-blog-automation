@@ -33,8 +33,8 @@ CATEGORY_EMOJI = {
 
 CATEGORIES = ["스포츠이슈", "경제뉴스", "전국이슈", "연예이슈"]
 
-
 USED_TITLES_FILE = "used_titles2.json"
+
 
 def load_used_titles():
     try:
@@ -43,6 +43,7 @@ def load_used_titles():
     except Exception:
         return []
 
+
 def save_used_title(title):
     used = load_used_titles()
     used.append(title)
@@ -50,10 +51,10 @@ def save_used_title(title):
         used = used[-30:]
     try:
         with open(USED_TITLES_FILE, "w") as f:
-            import json as j
-            j.dump(used, f, ensure_ascii=False)
+            json.dump(used, f, ensure_ascii=False)
     except Exception as e:
         print("[중복방지] 저장 실패: " + str(e))
+
 
 def is_duplicate(title):
     used = load_used_titles()
@@ -61,6 +62,7 @@ def is_duplicate(title):
         if title[:10] in t or t[:10] in title:
             return True
     return False
+
 
 CATEGORY_KEYWORDS = {
     "스포츠이슈": {
@@ -114,12 +116,10 @@ def search_naver_news(query, display=5):
 
 
 def test_apis():
-    import os
     print("[API 확인] NAVER_CLIENT_ID: " + ("있음" if os.environ.get("NAVER_CLIENT_ID") else "없음"))
     print("[API 확인] GOOGLE_SEARCH_API_KEY: " + ("있음" if os.environ.get("GOOGLE_SEARCH_API_KEY") else "없음"))
     print("[API 확인] NEWSAPI_KEY: " + ("있음" if os.environ.get("NEWSAPI_KEY") else "없음"))
 
-    # 네이버 테스트
     nid = os.environ.get("NAVER_CLIENT_ID", "")
     nsec = os.environ.get("NAVER_CLIENT_SECRET", "")
     if nid and nsec:
@@ -134,7 +134,6 @@ def test_apis():
         except Exception as e:
             print("[네이버 테스트 오류] " + str(e))
 
-    # NewsAPI 테스트
     napi = os.environ.get("NEWSAPI_KEY", "")
     if napi:
         try:
@@ -384,64 +383,15 @@ def generate_post():
     if not body:
         body = full_text
 
+    # [수정3] is_duplicate() 실제 연결 — 중복 감지 시 None 반환
+    if is_duplicate(title):
+        print("[중복 감지] 제목 중복 — 발행 건너뜀: " + title)
+        return None
+
+    save_used_title(title)
     print("[완료] 제목: " + title)
     print("[완료] 글자수: " + str(len(body)) + "자")
     return {"title": title, "body": body, "category": category}
-
-
-def get_image_keyword_from_title(title, category):
-    """제목에서 이미지 검색 키워드 추출"""
-    keyword_map = {
-        "축구": "soccer football player",
-        "야구": "baseball player",
-        "농구": "basketball player",
-        "손흥민": "soccer player football",
-        "류현진": "baseball pitcher",
-        "코스피": "stock market chart",
-        "부동산": "real estate building",
-        "금리": "finance money banking",
-        "환율": "currency exchange money",
-        "드라마": "korean drama tv",
-        "아이돌": "kpop concert music",
-        "연예": "entertainment stage performance",
-        "사건": "police investigation",
-        "정치": "government politics",
-        "경제": "business finance economy",
-        "스포츠이슈": "sports athlete action",
-        "경제뉴스": "business finance economy",
-        "전국이슈": "city korea urban",
-        "연예이슈": "stage performance music",
-        "근육": "muscle fitness gym",
-        "재활": "physical therapy rehabilitation",
-        "축구": "soccer training",
-        "농구": "basketball court",
-    }
-    for kor, eng in keyword_map.items():
-        if kor in title or kor in category:
-            return eng
-    category_defaults = {
-        "스포츠이슈": "sports athlete action",
-        "경제뉴스": "business finance economy",
-        "전국이슈": "city korea urban street",
-        "연예이슈": "stage performance music concert",
-        "축구": "soccer football",
-        "농구": "basketball",
-        "야구": "baseball",
-        "근육학": "fitness muscle gym",
-        "재활": "physical therapy",
-        "영양": "nutrition healthy food",
-        "심리": "mental health mindset",
-        "체력": "endurance running fitness",
-        "유연성": "stretching yoga flexibility",
-        "생리학": "human body science",
-        "물리치료": "physical therapy clinic",
-        "역학": "biomechanics movement",
-        "해부학": "anatomy body",
-        "신체균형": "balance posture body",
-        "스포츠의학": "sports medicine doctor",
-        "공통": "fitness sports health",
-    }
-    return category_defaults.get(category, "sports fitness health")
 
 
 def get_images_unsplash(keyword, count=3):
@@ -552,32 +502,38 @@ def get_images(keyword, count=3, title="", category=""):
     print("[이미지] 모든 소스 실패")
     return []
 
-    try:
-        response = requests.get(
-            "https://api.unsplash.com/search/photos",
-            params={
-                "query": keyword,
-                "per_page": count,
-                "orientation": "landscape",
-                "client_id": UNSPLASH_ACCESS_KEY
-            },
-            timeout=10
-        )
-        images = []
-        for photo in response.json().get("results", []):
-            images.append({
-                "url": photo["urls"]["regular"],
-                "alt": photo.get("alt_description", keyword) or keyword,
-                "author": photo["user"]["name"],
-                "author_url": photo["user"]["links"]["html"]
-            })
-        print("[이미지] " + str(len(images)) + "장 수집")
-        return images
-    except Exception as e:
-        print("[이미지 오류] " + str(e))
-        return []
+
+def get_image_keyword_from_title(title, category):
+    keyword_map = {
+        "축구": "soccer football player",
+        "야구": "baseball player",
+        "농구": "basketball player",
+        "손흥민": "soccer player football",
+        "류현진": "baseball pitcher",
+        "코스피": "stock market chart",
+        "부동산": "real estate building",
+        "금리": "finance money banking",
+        "환율": "currency exchange money",
+        "드라마": "korean drama tv",
+        "아이돌": "kpop concert music",
+        "연예": "entertainment stage performance",
+        "사건": "police investigation",
+        "정치": "government politics",
+        "경제": "business finance economy",
+    }
+    for kor, eng in keyword_map.items():
+        if kor in title:
+            return eng
+    category_defaults = {
+        "스포츠이슈": "sports athlete action",
+        "경제뉴스": "business finance economy",
+        "전국이슈": "city korea urban street",
+        "연예이슈": "stage performance music concert",
+    }
+    return category_defaults.get(category, "news media")
 
 
+# [수정1] 이미지 출처 source 동적 처리
 def make_summary_html(summary_text):
     lines = [l.strip() for l in summary_text.strip().split("\n") if l.strip()]
     html = '<div style="background:#fff8e1;border-left:5px solid #f57f17;border-radius:8px;padding:20px 24px;margin:28px 0;">'
@@ -589,9 +545,10 @@ def make_summary_html(summary_text):
 
 
 def make_image_html(img, margin_top="0"):
+    source = img.get("source", "Unsplash")
     html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
     html += '<img src="' + img["url"] + '" alt="' + img["alt"] + '" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);"/>'
-    html += '<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="' + img["author_url"] + '" style="color:#999;">' + img["author"] + '</a> on Unsplash</p>'
+    html += '<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="' + img["author_url"] + '" style="color:#999;">' + img["author"] + '</a> on ' + source + '</p>'
     html += "</div>\n"
     return html
 
@@ -797,12 +754,10 @@ if __name__ == "__main__":
     test_apis()
     try:
         post = generate_post()
-        keyword_map = {
-            "스포츠이슈": "sports athlete action",
-            "경제뉴스": "business finance economy",
-            "전국이슈": "city korea urban street",
-            "연예이슈": "stage performance music concert"
-        }
+        # [수정3] 중복 감지 시 None 처리
+        if post is None:
+            print("[종료] 중복 감지로 발행 건너뜀")
+            exit(0)
         images = get_images("", count=3, title=post["title"], category=post["category"])
         post_to_blogger(post, images)
         print("\n모든 작업 완료!")
