@@ -8,6 +8,7 @@ on:
 jobs:
   post-blog:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
