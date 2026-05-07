@@ -395,9 +395,27 @@ def get_images_unsplash(keyword, count=3):
     try:
         response = requests.get(
             "https://api.unsplash.com/search/photos",
-            params={"query": keyword, "per_page": count, "orientation": "landscape", "client_id": UNSPLASH_ACCESS_KEY},
+            params={
+                "query": keyword,
+                "per_page": 10,                      # 10장 가져와서
+                "page": random.randint(1, 3),        # 랜덤 페이지
+                "orientation": "landscape",
+                "client_id": UNSPLASH_ACCESS_KEY
+            },
             timeout=10
         )
+        if response.status_code == 200:
+            images = []
+            for photo in response.json().get("results", []):
+                images.append({
+                    "url": photo["urls"]["regular"],
+                    "alt": photo.get("alt_description", keyword) or keyword,
+                    "author": photo["user"]["name"],
+                    "author_url": photo["user"]["links"]["html"],
+                    "source": "Unsplash"
+                })
+            random.shuffle(images)      # 결과 섞기
+            return images[:count]       # 그 중 count장 반환
         if response.status_code == 200:
             images = []
             for photo in response.json().get("results", []):
