@@ -207,7 +207,7 @@ def call_gemini(prompt, max_tokens=4000):
 
     url = (
         "https://generativelanguage.googleapis.com/v1beta/models/"
-        "gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY
+        "gemini-2.5-flash-preview-05-20:generateContent?key=" + GEMINI_API_KEY
     )
 
     payload = {
@@ -264,18 +264,13 @@ def call_gemini(prompt, max_tokens=4000):
 
 
 def test_apis():
+    # API 키 존재 여부만 확인 (실제 호출 금지 - 한도 낭비 방지)
     print("[API 확인] GEMINI_API_KEY: " + ("있음" if GEMINI_API_KEY else "없음"))
     print("[API 확인] NAVER_CLIENT_ID: " + ("있음" if os.environ.get("NAVER_CLIENT_ID") else "없음"))
     print("[API 확인] GOOGLE_SEARCH_API_KEY: " + ("있음" if os.environ.get("GOOGLE_SEARCH_API_KEY") else "없음"))
     print("[API 확인] NEWSAPI_KEY: " + ("있음" if os.environ.get("NEWSAPI_KEY") else "없음"))
-
-    # Gemini 연결 테스트
-    if GEMINI_API_KEY:
-        try:
-            result = call_gemini("안녕하세요. 테스트입니다. 한 문장으로 응답해주세요.", max_tokens=50)
-            print("[Gemini 테스트] 성공: " + result[:50])
-        except Exception as e:
-            print("[Gemini 테스트 오류] " + str(e))
+    if not GEMINI_API_KEY:
+        raise Exception("GEMINI_API_KEY 없음 — GitHub Secrets 및 yml 확인 필요")
 
 
 def generate_post():
