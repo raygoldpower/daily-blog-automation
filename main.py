@@ -144,6 +144,83 @@ TOPICS = [
 ]
 
 USED_TOPICS_FILE = "used_topics.json"
+SERIES_LINKS_FILE = "series_links.json"
+
+
+def load_series_links():
+    """발행된 글의 시리즈 링크 정보 로드"""
+    try:
+        with open(SERIES_LINKS_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def save_series_link(series, episode, title, url):
+    """발행 완료된 글의 시리즈 링크 저장"""
+    links = load_series_links()
+    if series not in links:
+        links[series] = {}
+    links[series][str(episode)] = {"title": title, "url": url}
+    try:
+        with open(SERIES_LINKS_FILE, "w") as f:
+            json.dump(links, f, ensure_ascii=False)
+        print("[시리즈링크] 저장 완료: " + series + " " + str(episode) + "편")
+    except Exception as e:
+        print("[시리즈링크] 저장 실패: " + str(e))
+
+
+def get_series_nav_html(topic):
+    """이전편/다음편 내부 링크 HTML 생성"""
+    series = topic.get("series", "")
+    episode = topic.get("episode", 1)
+    if not series:
+        return ""
+
+    links = load_series_links()
+    series_data = links.get(series, {})
+
+    prev_html = ""
+    next_html = ""
+
+    # 이전 편
+    prev_ep = str(episode - 1)
+    if prev_ep in series_data:
+        prev = series_data[prev_ep]
+        prev_html = (
+            '<a href="' + prev["url"] + '" style="display:flex;align-items:center;'
+            'text-decoration:none;color:#1565c0;font-size:14px;font-weight:600;">'
+            '◀ 이전편: ' + prev["title"] + '</a>'
+        )
+
+    # 다음 편
+    next_ep = str(episode + 1)
+    if next_ep in series_data:
+        nxt = series_data[next_ep]
+        next_html = (
+            '<a href="' + nxt["url"] + '" style="display:flex;align-items:center;'
+            'text-decoration:none;color:#1565c0;font-size:14px;font-weight:600;">'
+            '다음편: ' + nxt["title"] + ' ▶</a>'
+        )
+
+    if not prev_html and not next_html:
+        return ""
+
+    html = (
+        '<div style="background:#f0f4ff;border:2px solid #1565c0;border-radius:12px;'
+        'padding:20px 24px;margin:40px 0;">'
+        '<p style="font-weight:700;font-size:15px;color:#1565c0;margin-bottom:14px;">'
+        '📚 ' + series + ' 시리즈 더 보기</p>'
+        '<div style="display:flex;flex-direction:column;gap:10px;">'
+    )
+    if prev_html:
+        html += '<div>' + prev_html + '</div>'
+    if next_html:
+        html += '<div>' + next_html + '</div>'
+    html += '</div></div>\n'
+    return html
+
+
 
 
 def load_used_topics():
@@ -553,6 +630,9 @@ def body_to_html(body, images, topic):
     if len(images) >= 3:
         html += make_image_html(images[2], margin_top="20px")
 
+    # 시리즈 내부 링크 네비게이션
+    html += get_series_nav_html(topic)
+
     return html
 
 
@@ -637,6 +717,13 @@ def post_to_blogger(post_data, images, retry=2):
                 post_url = result.get("url", "")
                 print("\n발행 완료!")
                 print("   링크: " + post_url)
+                # 시리즈 링크 저장 (내부 링크 자동 연결용)
+                save_series_link(
+                    topic.get("series", ""),
+                    topic.get("episode", 1),
+                    post_data["title"],
+                    post_url
+                )
                 send_telegram(post_data["title"], post_url, topic)
                 send_facebook(post_data["title"], post_url, topic)
                 return True
