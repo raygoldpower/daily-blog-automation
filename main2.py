@@ -281,53 +281,53 @@ def generate_post():
 
     prompt = (
         "당신은 20년 경력의 베테랑 시니어 기자입니다.\n"
-        "TV 뉴스 앵커처럼 명확하고 신뢰감 있으며, 독자를 끌어당기는 문장력을 갖고 있습니다.\n"
+        "독자가 끝까지 읽고 싶은 글, 공유하고 싶은 글을 씁니다.\n"
         "한국어만 사용하세요. 외국 문자 절대 금지.\n\n"
         "아래는 오늘(" + TODAY + ") 실제 수집된 뉴스입니다:\n"
         + news_context + "\n\n"
-        "위 뉴스 중 가장 핫하고 독자 관심이 높을 이슈 하나를 선택해서 기사를 작성하세요.\n"
-        "국내 이슈를 중심으로 작성하되, 해외 반응이나 글로벌 관점이 있다면 비교 내용을 자연스럽게 한 섹션 추가하세요.\n"
-        "단, 해외 비교는 보조적인 내용이며 국내 상황이 항상 중심이어야 합니다.\n\n"
+        "위 뉴스 중 가장 핫하고 독자 관심이 높을 이슈 하나를 선택해서 깊이 있는 기사를 작성하세요.\n"
+        "단순 사실 나열이 아니라 배경, 맥락, 의미까지 풀어내야 합니다.\n"
+        "국내 이슈 중심으로 쓰되, 해외 반응이나 비교가 있으면 한 섹션 자연스럽게 추가하세요.\n\n"
         "절대 지켜야 할 원칙:\n"
-        "1. 공식 확인된 팩트만 작성하세요. 루머, 추측 절대 금지.\n"
-        "2. 명예훼손 내용 절대 금지.\n"
-        "3. 반드시 존댓말을 사용하세요. '~이다', '~한다' 반말 종결 절대 금지.\n"
-        "4. 중립적이고 객관적인 시각을 유지하세요.\n"
-        "5. 제목과 내용이 일치해야 합니다. 낚시성 제목 금지.\n\n"
-        "글 구조 (반드시 이 순서로):\n\n"
-        "1. 리드문 (2~3줄)\n"
-        "핵심 팩트를 강렬하게 전달하세요. 독자가 첫 문장에 멈추게 만드세요.\n\n"
+        "1. 공식 확인된 팩트만 작성. 루머, 추측 절대 금지.\n"
+        "2. 명예훼손 절대 금지.\n"
+        "3. 반드시 존댓말. '~이다', '~한다' 반말 종결 절대 금지.\n"
+        "4. 중립적이고 객관적인 시각 유지.\n"
+        "5. 제목과 내용 일치. 낚시성 제목 금지.\n"
+        "6. 각 소제목 아래 내용은 최소 5문장 이상 충분히 작성할 것.\n"
+        "7. 절대로 글을 중간에 끊거나 생략하지 말 것. 반드시 완성된 글을 출력할 것.\n\n"
+        "글 구조 (반드시 이 순서로, 각 섹션 충분히 작성):\n\n"
+        "1. 리드문 (3~4줄)\n"
+        "핵심 팩트를 강렬하게 전달. 독자가 첫 문장에 멈추게 만드세요.\n"
+        "왜 이 뉴스가 지금 중요한지 한 문장으로 설명하세요.\n\n"
         "2. ##핵심키워드##\n"
-        "이 이슈의 핵심을 한 단어나 짧은 구로 크게 던지세요.\n"
-        "그 아래 2~3문장으로 쉽게 풀어쓰세요.\n\n"
-        "3. 소제목 구조 (3~4개)\n"
+        "이슈의 핵심을 한 단어나 짧은 구로 던지세요.\n"
+        "그 아래 3~4문장으로 충분히 풀어쓰세요.\n\n"
+        "3. 소제목 구조 (4개 필수)\n"
         "소제목: [이모지 소제목내용 이모지] 형식. 앞뒤 이모지 필수.\n"
-        "예: [📌 사건의 전말 📌], [💬 각계 반응 💬], [🌍 해외 반응과 비교 🌍]\n"
-        "각 소제목 아래: 배경 → 팩트 → 반응 순으로 깊어지게\n"
-        "단락 3~4줄 이내. 빈 줄 필수.\n"
-        "수치, 날짜, 출처 명확히 표기.\n\n"
-        "4. 전망 + 독자 관점\n"
-        "앞으로 어떻게 될지 + 독자에게 의미하는 것\n"
-        "반드시 존댓말로 끝내세요. 격언 금지.\n\n"
+        "예: [📌 사건의 전말 📌], [💬 각계 반응 💬], [🔍 배경과 맥락 🔍], [🌍 해외 반응 🌍]\n"
+        "각 소제목 아래: 최소 5문장 이상. 배경→팩트→반응→의미 순으로.\n"
+        "수치, 날짜, 출처 반드시 표기. 빈 줄로 단락 구분.\n\n"
+        "4. 전망 + 독자 관점 (3~4줄)\n"
+        "앞으로 어떻게 될지 + 독자에게 무엇을 의미하는지\n"
+        "반드시 존댓말로 끝내세요.\n\n"
         "5. 핵심 요약\n"
         "[SUMMARY_START]\n"
-        "핵심1\n"
-        "핵심2\n"
-        "핵심3\n"
+        "핵심1 (구체적 수치나 팩트 포함)\n"
+        "핵심2 (배경이나 맥락)\n"
+        "핵심3 (앞으로의 전망)\n"
         "[SUMMARY_END]\n\n"
-        "글쓰기 원칙:\n"
-        "반드시 존댓말. '~이다', '~한다' 반말 종결 절대 금지.\n"
-        "AI 티 나는 나열식 표현 금지.\n"
-        "2500자에서 3500자.\n\n"
+        "분량 필수: 반드시 3500자 이상 4500자 이하로 작성하세요.\n"
+        "AI 티 나는 나열식 표현 금지. 존댓말 필수.\n\n"
         "카테고리: " + category + "\n\n"
         "출력 형식:\n"
-        "제목: (팩트 기반 강렬한 제목)\n"
+        "제목: (팩트 기반 강렬하고 구체적인 제목 — 날짜나 카테고리명 절대 포함 금지)\n"
         "---\n"
-        "(본문)"
+        "(본문 — 반드시 완성된 전체 글 출력)"
     )
 
     print("[AI] Gemini 2.0 Flash 기사 작성 중...")
-    full_text = call_gemini(prompt, max_tokens=4000)
+    full_text = call_gemini(prompt, max_tokens=6000)
 
     lines = full_text.strip().split("\n")
     title = ""
@@ -395,13 +395,7 @@ def get_images_unsplash(keyword, count=3):
     try:
         response = requests.get(
             "https://api.unsplash.com/search/photos",
-            params={
-                "query": keyword,
-                "per_page": 10,                      # 10장 가져와서
-                "page": random.randint(1, 3),        # 랜덤 페이지
-                "orientation": "landscape",
-                "client_id": UNSPLASH_ACCESS_KEY
-            },
+            params={"query": keyword, "per_page": 10, "page": random.randint(1, 3), "orientation": "landscape", "client_id": UNSPLASH_ACCESS_KEY},
             timeout=10
         )
         if response.status_code == 200:
@@ -414,19 +408,8 @@ def get_images_unsplash(keyword, count=3):
                     "author_url": photo["user"]["links"]["html"],
                     "source": "Unsplash"
                 })
-            random.shuffle(images)      # 결과 섞기
-            return images[:count]       # 그 중 count장 반환
-        if response.status_code == 200:
-            images = []
-            for photo in response.json().get("results", []):
-                images.append({
-                    "url": photo["urls"]["regular"],
-                    "alt": photo.get("alt_description", keyword) or keyword,
-                    "author": photo["user"]["name"],
-                    "author_url": photo["user"]["links"]["html"],
-                    "source": "Unsplash"
-                })
-            return images
+            random.shuffle(images)
+            return images[:count]
     except Exception as e:
         print("[Unsplash 오류] " + str(e))
     return []
@@ -547,6 +530,7 @@ def body_to_html(body, images, category):
         '<div style="font-size:13px;color:#888;margin-bottom:20px;">📅 ' + TODAY + "</div>\n"
     )
 
+    # 이미지는 상단 1장만 (본문 중간 끊김 방지)
     if len(images) >= 1:
         html += make_image_html(images[0])
 
@@ -582,7 +566,6 @@ def body_to_html(body, images, category):
 
     paragraphs = clean_body.split("\n")
     mid = len(paragraphs) // 2
-    image2_inserted = False
     para_count = 0
 
     for i, para in enumerate(paragraphs):
@@ -633,12 +616,9 @@ def body_to_html(body, images, category):
                 + para.strip() + '</p>\n'
             )
 
-        if i >= mid and not image2_inserted and len(images) >= 2:
-            html += make_image_html(images[1], margin_top="20px")
-            image2_inserted = True
-
-    if len(images) >= 3:
-        html += make_image_html(images[2], margin_top="20px")
+    # 하단 이미지 1장 추가 (요약 박스 아래)
+    if len(images) >= 2:
+        html += make_image_html(images[1], margin_top="20px")
 
     return html
 
