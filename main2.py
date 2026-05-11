@@ -335,16 +335,33 @@ def generate_post():
     separator_found = False
 
     for line in lines:
-        if line.startswith("제목:"):
-            title = line.replace("제목:", "").strip()
-        elif line.strip() == "---":
-            separator_found = True
-        elif separator_found:
-            body_lines.append(line)
+    if line.startswith("제목:"):
+        title = line.replace("제목:", "").strip()
+    elif not title and ("제목" in line and ":" in line):
+        # 제목: 형식이 약간 달라도 포착
+        title = line.split(":", 1)[-1].strip()
+    elif line.strip() == "---":
+        separator_found = True
+    elif separator_found:
+        body_lines.append(line)
 
-    body = "\n".join(body_lines).strip()
-    if not title:
-        title = TODAY + " " + category + " 핫이슈"
+body = "\n".join(body_lines).strip()
+
+# 제목 파싱 실패 시 본문 첫 줄에서 추출 시도
+if not title and body_lines:
+    for bl in body_lines[:5]:
+        if bl.strip() and len(bl.strip()) > 5 and not bl.startswith("["):
+            title = bl.strip()[:60]
+            break
+
+# 그래도 없으면 Gemini에 제목만 재요청
+if not title:
+    print("[경고] 제목 파싱 실패 — 재추출 시도")
+    title_prompt = "다음 글에서 제목만 한 줄로 추출하세요. 날짜나 카테고리명 포함 금지:\n\n" + full_text[:500]
+    try:
+        title = call_gemini(title_prompt, max_tokens=100).strip().split("\n")[0]
+    except:
+        title = category + " 핫이슈 " + datetime.now().strftime("%H%M")
     if not body:
         body = full_text
 
