@@ -201,7 +201,7 @@ def collect_news(category):
 
 
 def call_gemini(prompt, max_tokens=4000):
-    """Gemini 2.0 Flash API 호출"""
+    """Gemini 2.5 Flash API 호출"""
     if not GEMINI_API_KEY:
         raise Exception("GEMINI_API_KEY 없음")
 
@@ -264,7 +264,6 @@ def call_gemini(prompt, max_tokens=4000):
 
 
 def test_apis():
-    # API 키 존재 여부만 확인 (실제 호출 금지 - 한도 낭비 방지)
     print("[API 확인] GEMINI_API_KEY: " + ("있음" if GEMINI_API_KEY else "없음"))
     print("[API 확인] NAVER_CLIENT_ID: " + ("있음" if os.environ.get("NAVER_CLIENT_ID") else "없음"))
     print("[API 확인] GOOGLE_SEARCH_API_KEY: " + ("있음" if os.environ.get("GOOGLE_SEARCH_API_KEY") else "없음"))
@@ -281,7 +280,10 @@ def generate_post():
 
     prompt = (
         "당신은 20년 경력의 베테랑 시니어 기자입니다.\n"
-        "독자가 끝까지 읽고 싶은 글, 공유하고 싶은 글을 씁니다.\n"
+        "독자가 첫 문장에 멈추고, 끝까지 읽고, 공유하게 만드는 글을 씁니다.\n"
+        "글쓰기 원칙: 사실은 구체적 수치로, 감정은 독자 공감으로, 배경은 스토리로 풀어냅니다.\n"
+        "절대 금지: '~알아보겠습니다', '~살펴보겠습니다', '~중요합니다' 같은 AI 나열 표현.\n"
+        "문장은 짧고 강하게. 단락은 호흡감 있게. 독자가 다음 줄로 넘어가게 만드세요.\n"
         "한국어만 사용하세요. 외국 문자 절대 금지.\n\n"
         "아래는 오늘(" + TODAY + ") 실제 수집된 뉴스입니다:\n"
         + news_context + "\n\n"
@@ -321,12 +323,13 @@ def generate_post():
         "AI 티 나는 나열식 표현 금지. 존댓말 필수.\n\n"
         "카테고리: " + category + "\n\n"
         "출력 형식:\n"
-        "제목: (팩트 기반 강렬하고 구체적인 제목 — 날짜나 카테고리명 절대 포함 금지)\n"
+        "제목: (반드시 첫 줄에 '제목: '으로 시작. 실제 이슈명과 핵심 팩트 포함. "
+        "날짜·카테고리명·'핫이슈' 같은 일반어 절대 금지. 예: '손흥민, 시즌 20호골 폭발…토트넘 4강 진출')\n"
         "---\n"
-        "(본문 — 반드시 완성된 전체 글 출력)"
+        "(본문 시작 — 리드문부터 바로 작성. 반드시 완성된 전체 글 출력)"
     )
 
-    print("[AI] Gemini 2.0 Flash 기사 작성 중...")
+    print("[AI] Gemini 2.5 Flash 기사 작성 중...")
     full_text = call_gemini(prompt, max_tokens=6000)
 
     lines = full_text.strip().split("\n")
@@ -334,34 +337,40 @@ def generate_post():
     body_lines = []
     separator_found = False
 
+    # ✅ 수정: 제목 파싱 강화 (3단계 보완)
     for line in lines:
-    if line.startswith("제목:"):
-        title = line.replace("제목:", "").strip()
-    elif not title and ("제목" in line and ":" in line):
-        # 제목: 형식이 약간 달라도 포착
-        title = line.split(":", 1)[-1].strip()
-    elif line.strip() == "---":
-        separator_found = True
-    elif separator_found:
-        body_lines.append(line)
+        if line.startswith("제목:"):
+            title = line.replace("제목:", "").strip()
+        elif not title and "제목" in line and ":" in line:
+            # 제목: 형식이 약간 달라도 포착
+            title = line.split(":", 1)[-1].strip()
+        elif line.strip() == "---":
+            separator_found = True
+        elif separator_found:
+            body_lines.append(line)
 
-body = "\n".join(body_lines).strip()
+    body = "\n".join(body_lines).strip()
 
-# 제목 파싱 실패 시 본문 첫 줄에서 추출 시도
-if not title and body_lines:
-    for bl in body_lines[:5]:
-        if bl.strip() and len(bl.strip()) > 5 and not bl.startswith("["):
-            title = bl.strip()[:60]
-            break
+    # ✅ 2단계: 제목 파싱 실패 시 본문 첫 줄에서 추출
+    if not title and body_lines:
+        for bl in body_lines[:5]:
+            if bl.strip() and len(bl.strip()) > 5 and not bl.startswith("["):
+                title = bl.strip()[:60]
+                break
 
-# 그래도 없으면 Gemini에 제목만 재요청
-if not title:
-    print("[경고] 제목 파싱 실패 — 재추출 시도")
-    title_prompt = "다음 글에서 제목만 한 줄로 추출하세요. 날짜나 카테고리명 포함 금지:\n\n" + full_text[:500]
-    try:
-        title = call_gemini(title_prompt, max_tokens=100).strip().split("\n")[0]
-    except:
-        title = category + " 핫이슈 " + datetime.now().strftime("%H%M")
+    # ✅ 3단계: 그래도 없으면 Gemini에 제목만 재요청
+    if not title:
+        print("[경고] 제목 파싱 실패 — 재추출 시도")
+        title_prompt = (
+            "다음 글에서 제목만 한 줄로 추출하세요. "
+            "날짜나 카테고리명 포함 금지:\n\n" + full_text[:500]
+        )
+        try:
+            title = call_gemini(title_prompt, max_tokens=100).strip().split("\n")[0]
+            title = title.replace("제목:", "").strip()
+        except Exception:
+            title = category + " 핫이슈 " + datetime.now().strftime("%H%M")
+
     if not body:
         body = full_text
 
@@ -412,7 +421,13 @@ def get_images_unsplash(keyword, count=3):
     try:
         response = requests.get(
             "https://api.unsplash.com/search/photos",
-            params={"query": keyword, "per_page": 10, "page": random.randint(1, 3), "orientation": "landscape", "client_id": UNSPLASH_ACCESS_KEY},
+            params={
+                "query": keyword,
+                "per_page": 10,
+                "page": random.randint(1, 3),
+                "orientation": "landscape",
+                "client_id": UNSPLASH_ACCESS_KEY
+            },
             timeout=10
         )
         if response.status_code == 200:
@@ -547,7 +562,6 @@ def body_to_html(body, images, category):
         '<div style="font-size:13px;color:#888;margin-bottom:20px;">📅 ' + TODAY + "</div>\n"
     )
 
-    # 이미지는 상단 1장만 (본문 중간 끊김 방지)
     if len(images) >= 1:
         html += make_image_html(images[0])
 
@@ -582,7 +596,6 @@ def body_to_html(body, images, category):
         )
 
     paragraphs = clean_body.split("\n")
-    mid = len(paragraphs) // 2
     para_count = 0
 
     for i, para in enumerate(paragraphs):
@@ -633,7 +646,6 @@ def body_to_html(body, images, category):
                 + para.strip() + '</p>\n'
             )
 
-    # 하단 이미지 1장 추가 (요약 박스 아래)
     if len(images) >= 2:
         html += make_image_html(images[1], margin_top="20px")
 
@@ -727,7 +739,7 @@ def post_to_blogger(post_data, images, retry=2):
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("insaplayer - 실시간 뉴스 블로그 v5 (Gemini 2.0 Flash)")
+    print("insaplayer - 실시간 뉴스 블로그 v5 (Gemini 2.5 Flash)")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
     test_apis()
