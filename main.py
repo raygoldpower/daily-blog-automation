@@ -15,6 +15,9 @@ FACEBOOK_PAGE_ID = os.environ.get("FACEBOOK_PAGE_ID", "")
 FACEBOOK_ACCESS_TOKEN = os.environ.get("FACEBOOK_ACCESS_TOKEN", "")
 BLOG_ID = "4393162034375416055"
 
+# ✅ 쿠팡 파트너스 간편링크
+COUPANG_LINK = "https://www.coupang.com/np/goldbox"
+
 SPORT_EMOJI = {
     "축구": "⚽", "농구": "🏀", "야구": "⚾", "공통": "🏆",
     "근육학": "💪", "재활": "🩺", "영양": "🥗", "심리": "🧠",
@@ -148,7 +151,6 @@ SERIES_LINKS_FILE = "series_links.json"
 
 
 def load_series_links():
-    """발행된 글의 시리즈 링크 정보 로드"""
     try:
         with open(SERIES_LINKS_FILE, "r") as f:
             return json.load(f)
@@ -157,7 +159,6 @@ def load_series_links():
 
 
 def save_series_link(series, episode, title, url):
-    """발행 완료된 글의 시리즈 링크 저장"""
     links = load_series_links()
     if series not in links:
         links[series] = {}
@@ -171,7 +172,6 @@ def save_series_link(series, episode, title, url):
 
 
 def get_series_nav_html(topic):
-    """이전편/다음편 내부 링크 HTML 생성"""
     series = topic.get("series", "")
     episode = topic.get("episode", 1)
     if not series:
@@ -183,7 +183,6 @@ def get_series_nav_html(topic):
     prev_html = ""
     next_html = ""
 
-    # 이전 편
     prev_ep = str(episode - 1)
     if prev_ep in series_data:
         prev = series_data[prev_ep]
@@ -193,7 +192,6 @@ def get_series_nav_html(topic):
             '◀ 이전편: ' + prev["title"] + '</a>'
         )
 
-    # 다음 편
     next_ep = str(episode + 1)
     if next_ep in series_data:
         nxt = series_data[next_ep]
@@ -219,8 +217,6 @@ def get_series_nav_html(topic):
         html += '<div>' + next_html + '</div>'
     html += '</div></div>\n'
     return html
-
-
 
 
 def load_used_topics():
@@ -332,6 +328,14 @@ def generate_post():
         "예시|3|12회|60초|대퇴사두근|하체 강화\n"
         "[TABLE_END]\n"
         "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄.\n\n"
+        "쿠팡 상품 추천 멘트: [COUPANG_START]와 [COUPANG_END] 사이에 작성.\n"
+        "글 주제와 자연스럽게 연결되는 실용적인 상품 1~2가지를 추천하세요.\n"
+        "광고처럼 느껴지지 않고 독자에게 유용한 정보처럼 자연스럽게 녹여내세요.\n"
+        "예시: '오늘 소개해드린 스쿼트 루틴을 따라하신다면 무릎보호대 착용을 추천드려요. "
+        "무릎 온도를 유지하고 관절 안정성을 높여주거든요. 아래 링크에서 검색해보세요!'\n"
+        "[COUPANG_START]\n"
+        "(글 주제와 연관된 상품 추천 멘트)\n"
+        "[COUPANG_END]\n\n"
         "분량은 4000자에서 6000자. 깊이 있게 충분히 써주세요.\n"
         "AI가 쓴 티 나는 나열식 표현 금지.\n\n"
         "카테고리: " + topic["sport"] + "\n"
@@ -376,8 +380,8 @@ def get_images_unsplash(keyword, count=3):
             "https://api.unsplash.com/search/photos",
             params={
                 "query": keyword,
-                "per_page": 10,                      # 10장 가져와서
-                "page": random.randint(1, 3),        # 랜덤 페이지
+                "per_page": 10,
+                "page": random.randint(1, 3),
                 "orientation": "landscape",
                 "client_id": UNSPLASH_ACCESS_KEY
             },
@@ -393,19 +397,8 @@ def get_images_unsplash(keyword, count=3):
                     "author_url": photo["user"]["links"]["html"],
                     "source": "Unsplash"
                 })
-            random.shuffle(images)      # 결과 섞기
-            return images[:count]       # 그 중 count장 반환
-        if response.status_code == 200:
-            images = []
-            for photo in response.json().get("results", []):
-                images.append({
-                    "url": photo["urls"]["regular"],
-                    "alt": photo.get("alt_description", keyword) or keyword,
-                    "author": photo["user"]["name"],
-                    "author_url": photo["user"]["links"]["html"],
-                    "source": "Unsplash"
-                })
-            return images
+            random.shuffle(images)
+            return images[:count]
     except Exception as e:
         print("[Unsplash 오류] " + str(e))
     return []
@@ -523,7 +516,27 @@ def make_summary_html(summary_text):
     return html
 
 
-# [수정1] 이미지 출처 source 동적 처리
+# ✅ 쿠팡 추천 박스 HTML 생성
+def make_coupang_html(coupang_text):
+    html = (
+        '<div style="background:#fff8f0;border:2px solid #ff6600;border-radius:12px;'
+        'padding:20px 24px;margin:40px 0;">'
+        '<p style="font-weight:700;font-size:16px;color:#ff6600;margin-bottom:10px;">🛍️ 관련 상품 추천</p>'
+        '<p style="font-size:15px;line-height:1.8;color:#333;margin-bottom:16px;">'
+        + coupang_text.strip() + '</p>'
+        '<a href="' + COUPANG_LINK + '" target="_blank" rel="noopener noreferrer" '
+        'style="display:inline-block;background:#ff6600;color:#fff;'
+        'padding:11px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">'
+        '🔍 쿠팡에서 검색하기</a>'
+        # ✅ 법적 고지 — 작은 텍스트, 별표 앞에
+        '<p style="font-size:11px;color:#aaa;margin-top:14px;line-height:1.6;">'
+        '* 이 링크를 통해 구매 시 소정의 수수료를 받을 수 있습니다. 구매자에게는 추가 비용이 발생하지 않습니다.'
+        '</p>'
+        '</div>\n'
+    )
+    return html
+
+
 def make_image_html(img, margin_top="0"):
     source = img.get("source", "Unsplash")
     html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
@@ -553,15 +566,19 @@ def body_to_html(body, images, topic):
 
     table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
+    coupang_pattern = re.compile(r'\[COUPANG_START\](.*?)\[COUPANG_END\]', re.DOTALL)
 
     table_match = table_pattern.search(body)
     summary_match = summary_pattern.search(body)
+    coupang_match = coupang_pattern.search(body)
 
     table_html = make_table_html(table_match.group(1)) if table_match else ""
     summary_html = make_summary_html(summary_match.group(1)) if summary_match else ""
+    coupang_html = make_coupang_html(coupang_match.group(1)) if coupang_match else make_coupang_html("오늘 소개해드린 내용과 관련된 운동 용품을 아래 링크에서 찾아보세요!")
 
     clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
+    clean_body = coupang_pattern.sub("", clean_body)
 
     headings = re.findall(r'\[([^\]]+)\]', clean_body)
     headings = [h for h in headings if h not in ["TABLE_PLACEHOLDER", "SUMMARY_PLACEHOLDER"]]
@@ -647,6 +664,9 @@ def body_to_html(body, images, topic):
 
     if len(images) >= 3:
         html += make_image_html(images[2], margin_top="20px")
+
+    # ✅ 쿠팡 추천 박스 (본문 맨 하단)
+    html += coupang_html
 
     # 시리즈 내부 링크 네비게이션
     html += get_series_nav_html(topic)
@@ -735,7 +755,6 @@ def post_to_blogger(post_data, images, retry=2):
                 post_url = result.get("url", "")
                 print("\n발행 완료!")
                 print("   링크: " + post_url)
-                # 시리즈 링크 저장 (내부 링크 자동 연결용)
                 save_series_link(
                     topic.get("series", ""),
                     topic.get("episode", 1),
