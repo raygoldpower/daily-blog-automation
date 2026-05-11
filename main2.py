@@ -200,7 +200,7 @@ def collect_news(category):
     return news_context
 
 
-def call_gemini(prompt, max_tokens=4000):
+def call_gemini(prompt, max_tokens=8000):
     """Gemini 2.5 Flash API 호출"""
     if not GEMINI_API_KEY:
         raise Exception("GEMINI_API_KEY 없음")
@@ -319,7 +319,8 @@ def generate_post():
         "핵심2 (배경이나 맥락)\n"
         "핵심3 (앞으로의 전망)\n"
         "[SUMMARY_END]\n\n"
-        "분량 필수: 반드시 3500자 이상 4500자 이하로 작성하세요.\n"
+        "분량 필수: 반드시 3000자 이상 4000자 이하로 작성하세요.\n"
+        "절대로 글을 중간에 끊지 말고 반드시 완성된 문장으로 마무리하세요.\n"
         "AI 티 나는 나열식 표현 금지. 존댓말 필수.\n\n"
         "카테고리: " + category + "\n\n"
         "출력 형식:\n"
@@ -330,7 +331,7 @@ def generate_post():
     )
 
     print("[AI] Gemini 2.5 Flash 기사 작성 중...")
-    full_text = call_gemini(prompt, max_tokens=6000)
+    full_text = call_gemini(prompt, max_tokens=8000)
 
     lines = full_text.strip().split("\n")
     title = ""
