@@ -693,7 +693,7 @@ def send_facebook(title, post_url, category, image_url=""):
     if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
         return
     emoji = CATEGORY_EMOJI.get(category, "📰")
-    message = emoji + " 새 포스팅\n\n" + title + "\n\n자세히 읽기 👉 " + post_url
+    message = emoji + " " + title + "\n\n자세히 읽기 👉 " + post_url
     try:
         if image_url:
             requests.post(
