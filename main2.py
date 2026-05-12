@@ -677,7 +677,7 @@ def send_telegram(title, post_url, category):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         return
     emoji = CATEGORY_EMOJI.get(category, "📰")
-    message = emoji + " 새 포스팅\n\n📌 " + title + "\n\n🔗 " + post_url
+    message = emoji + " " + title + "\n\n🔗 " + post_url
     try:
         requests.post(
             "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
