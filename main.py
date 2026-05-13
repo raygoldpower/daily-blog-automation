@@ -15,9 +15,6 @@ FACEBOOK_PAGE_ID = os.environ.get("FACEBOOK_PAGE_ID", "")
 FACEBOOK_ACCESS_TOKEN = os.environ.get("FACEBOOK_ACCESS_TOKEN", "")
 BLOG_ID = "4393162034375416055"
 
-# ✅ 쿠팡 파트너스 간편링크
-COUPANG_LINK = "https://www.coupang.com/np/goldbox"
-
 SPORT_EMOJI = {
     "축구": "⚽", "농구": "🏀", "야구": "⚾", "공통": "🏆",
     "근육학": "💪", "재활": "🩺", "영양": "🥗", "심리": "🧠",
@@ -144,6 +141,48 @@ TOPICS = [
     {"title": "경기 전 긴장감을 흥분으로 전환하는 인지 재구성 방법", "keyword": "pre-game anxiety cognitive reappraisal sports", "img_keyword": "athlete pregame", "sport": "심리", "series": "엘리트 마인드", "episode": 3},
     {"title": "슬럼프를 탈피하는 3단계 심리학적 루틴, 통제 가능한 요소에 집중하라", "keyword": "sports slump recovery 3 steps psychology", "img_keyword": "sports motivation", "sport": "심리", "series": "엘리트 마인드", "episode": 4},
     {"title": "운동 강도와 도파민 수용체의 상관관계, 오버트레이닝을 막는 멘탈 가이드", "keyword": "exercise intensity dopamine overtraining mental", "img_keyword": "overtraining fatigue", "sport": "스포츠의학", "series": "엘리트 마인드", "episode": 5},
+
+    # 통증 케어
+    {"title": "어깨 통증의 80%는 이 근육 때문이에요, 전거근 약화 자가 진단법", "keyword": "shoulder pain serratus anterior weakness", "img_keyword": "shoulder pain relief", "sport": "물리치료", "series": "통증 케어", "episode": 1},
+    {"title": "무릎 앞쪽이 계단 내려갈 때 아프다면, 슬개건염 원인과 해결법", "keyword": "knee pain stairs patellar tendinitis", "img_keyword": "knee pain", "sport": "물리치료", "series": "통증 케어", "episode": 2},
+    {"title": "발목을 자주 삐는 사람들의 공통점, 고유감각 훈련으로 해결하기", "keyword": "ankle sprain proprioception training", "img_keyword": "ankle stability", "sport": "물리치료", "series": "통증 케어", "episode": 3},
+    {"title": "목 디스크 없이도 팔이 저린 이유, 흉곽출구증후군 자가 체크", "keyword": "thoracic outlet syndrome arm numbness", "img_keyword": "neck shoulder pain", "sport": "물리치료", "series": "통증 케어", "episode": 4},
+    {"title": "허리 통증 있는 사람이 절대 하면 안 되는 스트레칭 3가지", "keyword": "lower back pain stretching avoid", "img_keyword": "lower back pain", "sport": "물리치료", "series": "통증 케어", "episode": 5},
+    # 사무직 자세
+    {"title": "하루 8시간 앉아있는 사람의 고관절이 굳는 이유와 해결법", "keyword": "hip flexor tightness sitting office worker", "img_keyword": "office posture hip", "sport": "신체균형", "series": "사무직 자세", "episode": 1},
+    {"title": "모니터 위치가 목 통증을 만드는 방법, 올바른 데스크 셋업 가이드", "keyword": "monitor height neck pain desk setup ergonomics", "img_keyword": "desk ergonomics monitor", "sport": "신체균형", "series": "사무직 자세", "episode": 2},
+    {"title": "의자에 앉는 자세 하나로 허리 통증 50% 줄이는 방법", "keyword": "sitting posture lower back pain office chair", "img_keyword": "sitting posture office", "sport": "신체균형", "series": "사무직 자세", "episode": 3},
+    {"title": "재택근무자의 목 어깨 통증, 5분 루틴으로 해결하는 스트레칭", "keyword": "work from home neck shoulder stretch routine", "img_keyword": "neck stretch office", "sport": "신체균형", "series": "사무직 자세", "episode": 4},
+    {"title": "손목 통증 없이 타이핑하는 방법, 키보드 자세와 손목 강화 운동", "keyword": "wrist pain typing keyboard ergonomics", "img_keyword": "wrist pain keyboard", "sport": "물리치료", "series": "사무직 자세", "episode": 5},
+    # 코어 강화
+    {"title": "코어가 약하면 왜 허리가 아플까, 복횡근과 다열근의 역할", "keyword": "core weakness back pain transverse abdominis multifidus", "img_keyword": "core strength back", "sport": "근육학", "series": "코어 강화", "episode": 1},
+    {"title": "플랭크를 해도 코어가 안 잡히는 이유, 호흡부터 바꿔야 한다", "keyword": "plank core activation breathing technique", "img_keyword": "plank exercise core", "sport": "근육학", "series": "코어 강화", "episode": 2},
+    {"title": "배가 나온 사람의 코어 훈련, 일반인을 위한 단계별 접근법", "keyword": "belly fat core training beginner progression", "img_keyword": "core workout beginner", "sport": "근육학", "series": "코어 강화", "episode": 3},
+    {"title": "데드버그 운동이 허리 재활에 최고인 이유, 올바른 자세와 단계별 난이도", "keyword": "dead bug exercise lumbar rehabilitation core", "img_keyword": "dead bug core exercise", "sport": "재활", "series": "코어 강화", "episode": 4},
+    {"title": "코어 강화 없이 스쿼트 하면 생기는 일, 요통과 무릎 통증의 연결고리", "keyword": "core stability squat lower back knee pain", "img_keyword": "squat core stability", "sport": "근육학", "series": "코어 강화", "episode": 5},
+    # 밸런스 소도구
+    {"title": "밸런스 패드 하나로 발목 무릎 고관절을 동시에 강화하는 방법", "keyword": "balance pad ankle knee hip stability training", "img_keyword": "balance pad training", "sport": "체력", "series": "밸런스 소도구", "episode": 1},
+    {"title": "폼롤러 제대로 쓰는 법, 부위별 올바른 사용법과 피해야 할 부위", "keyword": "foam roller technique correct usage avoid areas", "img_keyword": "foam roller technique", "sport": "유연성", "series": "밸런스 소도구", "episode": 2},
+    {"title": "보수볼 운동이 코어와 밸런스에 효과적인 과학적 이유", "keyword": "bosu ball core balance science effectiveness", "img_keyword": "bosu ball exercise", "sport": "체력", "series": "밸런스 소도구", "episode": 3},
+    {"title": "짐볼로 할 수 있는 허리 강화 운동 5가지, 재활부터 근력까지", "keyword": "stability ball back strengthening exercise rehabilitation", "img_keyword": "stability ball back exercise", "sport": "재활", "series": "밸런스 소도구", "episode": 4},
+    {"title": "슬라이딩 디스크 운동으로 코어와 하체를 동시에 잡는 루틴", "keyword": "sliding disc core lower body exercise routine", "img_keyword": "sliding disc exercise", "sport": "체력", "series": "밸런스 소도구", "episode": 5},
+    # 관절 보호
+    {"title": "무릎 보호대 고르는 기준, 통증 부위별 올바른 선택법", "keyword": "knee brace selection pain type guide", "img_keyword": "knee brace support", "sport": "스포츠의학", "series": "관절 보호", "episode": 1},
+    {"title": "발목 보호대가 필요한 사람과 오히려 독이 되는 사람", "keyword": "ankle brace when to use avoid muscle weakness", "img_keyword": "ankle brace support", "sport": "스포츠의학", "series": "관절 보호", "episode": 2},
+    {"title": "손목 보호대 착용법과 손목 강화 운동을 같이 해야 하는 이유", "keyword": "wrist support brace strengthening exercise", "img_keyword": "wrist support exercise", "sport": "스포츠의학", "series": "관절 보호", "episode": 3},
+    {"title": "테이핑과 보호대의 차이, 상황별 올바른 선택 가이드", "keyword": "taping vs brace difference when to use sports", "img_keyword": "sports taping", "sport": "스포츠의학", "series": "관절 보호", "episode": 4},
+    # 홈트 솔루션
+    {"title": "운동 기구 없이 집에서 할 수 있는 전신 근력 루틴 30분", "keyword": "home workout no equipment full body strength routine", "img_keyword": "home workout", "sport": "공통", "series": "홈트 솔루션", "episode": 1},
+    {"title": "요가 매트 하나로 할 수 있는 허리 통증 완화 루틴", "keyword": "yoga mat lower back pain relief routine", "img_keyword": "yoga mat back exercise", "sport": "재활", "series": "홈트 솔루션", "episode": 2},
+    {"title": "저항 밴드로 상체 근력을 키우는 6가지 운동, 어깨부터 등까지", "keyword": "resistance band upper body shoulder back exercise", "img_keyword": "resistance band exercise", "sport": "근육학", "series": "홈트 솔루션", "episode": 3},
+    {"title": "아침 10분 루틴으로 하루 종일 자세가 달라지는 이유", "keyword": "morning routine posture improvement daily habit", "img_keyword": "morning stretch routine", "sport": "신체균형", "series": "홈트 솔루션", "episode": 4},
+    {"title": "폼롤러 마사지볼로 퇴근 후 몸을 회복하는 15분 루틴", "keyword": "foam roller massage ball recovery evening routine", "img_keyword": "foam roller recovery", "sport": "유연성", "series": "홈트 솔루션", "episode": 5},
+    # 체형 교정 심화
+    {"title": "O자 다리를 만드는 진짜 원인, 고관절 외회전 근육부터 잡아야 한다", "keyword": "bow legs hip external rotation correction cause", "img_keyword": "bow legs correction", "sport": "신체균형", "series": "체형 교정 심화", "episode": 1},
+    {"title": "새우등 교정, 흉추를 펴기 전에 이 근육부터 풀어야 하는 이유", "keyword": "kyphosis correction thoracic spine pectoral stretch", "img_keyword": "posture correction back", "sport": "신체균형", "series": "체형 교정 심화", "episode": 2},
+    {"title": "짝다리 짚는 습관이 골반과 척추에 미치는 영향", "keyword": "weight shifting habit pelvic imbalance spine", "img_keyword": "posture balance standing", "sport": "신체균형", "series": "체형 교정 심화", "episode": 3},
+    {"title": "발 모양이 체형을 결정한다, 회내족과 회외족 교정 방법", "keyword": "overpronation supination foot correction posture", "img_keyword": "foot pronation correction", "sport": "신체균형", "series": "체형 교정 심화", "episode": 4},
+    {"title": "골반 전방경사 교정 루틴, 장요근과 복근을 동시에 잡는 방법", "keyword": "anterior pelvic tilt correction psoas abdominal", "img_keyword": "pelvic tilt exercise", "sport": "신체균형", "series": "체형 교정 심화", "episode": 5},
 ]
 
 USED_TOPICS_FILE = "used_topics.json"
@@ -151,6 +190,7 @@ SERIES_LINKS_FILE = "series_links.json"
 
 
 def load_series_links():
+    """발행된 글의 시리즈 링크 정보 로드"""
     try:
         with open(SERIES_LINKS_FILE, "r") as f:
             return json.load(f)
@@ -159,6 +199,7 @@ def load_series_links():
 
 
 def save_series_link(series, episode, title, url):
+    """발행 완료된 글의 시리즈 링크 저장"""
     links = load_series_links()
     if series not in links:
         links[series] = {}
@@ -172,6 +213,7 @@ def save_series_link(series, episode, title, url):
 
 
 def get_series_nav_html(topic):
+    """이전편/다음편 내부 링크 HTML 생성"""
     series = topic.get("series", "")
     episode = topic.get("episode", 1)
     if not series:
@@ -183,6 +225,7 @@ def get_series_nav_html(topic):
     prev_html = ""
     next_html = ""
 
+    # 이전 편
     prev_ep = str(episode - 1)
     if prev_ep in series_data:
         prev = series_data[prev_ep]
@@ -192,6 +235,7 @@ def get_series_nav_html(topic):
             '◀ 이전편: ' + prev["title"] + '</a>'
         )
 
+    # 다음 편
     next_ep = str(episode + 1)
     if next_ep in series_data:
         nxt = series_data[next_ep]
@@ -217,6 +261,8 @@ def get_series_nav_html(topic):
         html += '<div>' + next_html + '</div>'
     html += '</div></div>\n'
     return html
+
+
 
 
 def load_used_topics():
@@ -328,16 +374,14 @@ def generate_post():
         "예시|3|12회|60초|대퇴사두근|하체 강화\n"
         "[TABLE_END]\n"
         "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄.\n\n"
-        "쿠팡 상품 추천 멘트: [COUPANG_START]와 [COUPANG_END] 사이에 작성.\n"
-        "글 주제와 자연스럽게 연결되는 실용적인 상품 1~2가지를 추천하세요.\n"
-        "광고처럼 느껴지지 않고 독자에게 유용한 정보처럼 자연스럽게 녹여내세요.\n"
-        "예시: '오늘 소개해드린 스쿼트 루틴을 따라하신다면 무릎보호대 착용을 추천드려요. "
-        "무릎 온도를 유지하고 관절 안정성을 높여주거든요. 아래 링크에서 검색해보세요!'\n"
-        "[COUPANG_START]\n"
-        "(글 주제와 연관된 상품 추천 멘트)\n"
-        "[COUPANG_END]\n\n"
         "분량은 4000자에서 6000자. 깊이 있게 충분히 써주세요.\n"
         "AI가 쓴 티 나는 나열식 표현 금지.\n\n"
+        "글 맨 마지막에 반드시 아래 형식으로 상품 추천 멘트를 작성하세요:\n"
+        "[COUPANG_START]\n"
+        "(이 글의 주제와 자연스럽게 연결되는 실용적인 소도구나 용품 1~2가지를 구체적으로 추천.\n"
+        "예: 오늘 소개해드린 발목 강화 운동을 꾸준히 하신다면 밸런스 패드나 발목 보호대를 함께 활용해보세요.\n"
+        "아래 링크에서 검색하시면 다양한 제품을 비교해보실 수 있어요!)\n"
+        "[COUPANG_END]\n\n"
         "카테고리: " + topic["sport"] + "\n"
         "주제: " + topic["title"] + "\n\n"
         "출력 형식:\n"
@@ -378,13 +422,7 @@ def get_images_unsplash(keyword, count=3):
     try:
         response = requests.get(
             "https://api.unsplash.com/search/photos",
-            params={
-                "query": keyword,
-                "per_page": 10,
-                "page": random.randint(1, 3),
-                "orientation": "landscape",
-                "client_id": UNSPLASH_ACCESS_KEY
-            },
+            params={"query": keyword, "per_page": count, "orientation": "landscape", "client_id": UNSPLASH_ACCESS_KEY},
             timeout=10
         )
         if response.status_code == 200:
@@ -397,8 +435,7 @@ def get_images_unsplash(keyword, count=3):
                     "author_url": photo["user"]["links"]["html"],
                     "source": "Unsplash"
                 })
-            random.shuffle(images)
-            return images[:count]
+            return images
     except Exception as e:
         print("[Unsplash 오류] " + str(e))
     return []
@@ -516,33 +553,36 @@ def make_summary_html(summary_text):
     return html
 
 
-# ✅ 쿠팡 추천 박스 HTML 생성
-def make_coupang_html(coupang_text):
-    html = (
-        '<div style="background:#fff8f0;border:2px solid #ff6600;border-radius:12px;'
-        'padding:20px 24px;margin:40px 0;">'
-        '<p style="font-weight:700;font-size:16px;color:#ff6600;margin-bottom:10px;">🛍️ 관련 상품 추천</p>'
-        '<p style="font-size:15px;line-height:1.8;color:#333;margin-bottom:16px;">'
-        + coupang_text.strip() + '</p>'
-        '<a href="' + COUPANG_LINK + '" target="_blank" rel="noopener noreferrer" '
-        'style="display:inline-block;background:#ff6600;color:#fff;'
-        'padding:11px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">'
-        '🔍 쿠팡에서 검색하기</a>'
-        # ✅ 법적 고지 — 작은 텍스트, 별표 앞에
-        '<p style="font-size:11px;color:#aaa;margin-top:14px;line-height:1.6;">'
-        '* 이 링크를 통해 구매 시 소정의 수수료를 받을 수 있습니다. 구매자에게는 추가 비용이 발생하지 않습니다.'
-        '</p>'
-        '</div>\n'
-    )
-    return html
-
-
+# [수정1] 이미지 출처 source 동적 처리
 def make_image_html(img, margin_top="0"):
     source = img.get("source", "Unsplash")
     html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
     html += '<img src="' + img["url"] + '" alt="' + img["alt"] + '" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);"/>'
     html += '<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="' + img["author_url"] + '" style="color:#999;">' + img["author"] + '</a> on ' + source + '</p>'
     html += "</div>\n"
+    return html
+
+
+COUPANG_LINK = "https://www.coupang.com/np/goldbox"
+
+
+def make_coupang_html(coupang_text):
+    html = (
+        '<div style="background:#fff8e1;border:2px solid #f57f17;border-radius:12px;'
+        'padding:20px 24px;margin:40px 0;">'
+        '<p style="font-weight:700;font-size:16px;color:#f57f17;margin-bottom:10px;">🛍️ 관련 상품 추천</p>'
+        '<p style="font-size:15px;line-height:1.9;color:#333;margin-bottom:16px;">'
+        + coupang_text.strip() +
+        '</p>'
+        '<a href="' + COUPANG_LINK + '" target="_blank" '
+        'style="display:inline-block;background:#f57f17;color:#fff;'
+        'padding:11px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">'
+        '🔍 쿠팡에서 검색하기</a>'
+        '<p style="font-size:11px;color:#aaa;margin-top:14px;line-height:1.6;">'
+        '※ 이 링크를 통해 구매 시 소정의 수수료를 받을 수 있습니다. '
+        '구매자에게는 추가 비용이 발생하지 않습니다.</p>'
+        '</div>\n'
+    )
     return html
 
 
@@ -566,19 +606,16 @@ def body_to_html(body, images, topic):
 
     table_pattern = re.compile(r'\[TABLE_START\](.*?)\[TABLE_END\]', re.DOTALL)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
-    coupang_pattern = re.compile(r'\[COUPANG_START\](.*?)\[COUPANG_END\]', re.DOTALL)
 
     table_match = table_pattern.search(body)
     summary_match = summary_pattern.search(body)
-    coupang_match = coupang_pattern.search(body)
 
     table_html = make_table_html(table_match.group(1)) if table_match else ""
     summary_html = make_summary_html(summary_match.group(1)) if summary_match else ""
-    coupang_html = make_coupang_html(coupang_match.group(1)) if coupang_match else make_coupang_html("오늘 소개해드린 내용과 관련된 운동 용품을 아래 링크에서 찾아보세요!")
 
     clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
-    clean_body = coupang_pattern.sub("", clean_body)
+    clean_body = re.sub(r'\[COUPANG_START\].*?\[COUPANG_END\]', '', clean_body, flags=re.DOTALL)
 
     headings = re.findall(r'\[([^\]]+)\]', clean_body)
     headings = [h for h in headings if h not in ["TABLE_PLACEHOLDER", "SUMMARY_PLACEHOLDER"]]
@@ -665,8 +702,11 @@ def body_to_html(body, images, topic):
     if len(images) >= 3:
         html += make_image_html(images[2], margin_top="20px")
 
-    # ✅ 쿠팡 추천 박스 (본문 맨 하단)
-    html += coupang_html
+    # 쿠팡 파트너스 추천 박스
+    coupang_pattern = re.compile(r'\[COUPANG_START\](.*?)\[COUPANG_END\]', re.DOTALL)
+    coupang_match = coupang_pattern.search(body)
+    if coupang_match:
+        html += make_coupang_html(coupang_match.group(1))
 
     # 시리즈 내부 링크 네비게이션
     html += get_series_nav_html(topic)
@@ -755,6 +795,7 @@ def post_to_blogger(post_data, images, retry=2):
                 post_url = result.get("url", "")
                 print("\n발행 완료!")
                 print("   링크: " + post_url)
+                # 시리즈 링크 저장 (내부 링크 자동 연결용)
                 save_series_link(
                     topic.get("series", ""),
                     topic.get("episode", 1),
