@@ -422,7 +422,9 @@ def get_access_token():
             },
             timeout=15
         )
-        return r.json().get("access_token", "")
+        data = r.json()
+        print(f"[토큰 응답] {data}")  # ← 이 줄 추가
+        return data.get("access_token", "")
     except Exception as e:
         print(f"[토큰 갱신 오류] {e}")
         return ""
