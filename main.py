@@ -744,7 +744,7 @@ def send_facebook(title, post_url, topic):
         return
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
     message = (
-        sport_emoji + " 새 포스팅\n\n"
+        sport_emoji + "\n\n"
         + title + "\n\n"
         + "자세히 읽기 👉 " + post_url
     )
