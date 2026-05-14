@@ -21,7 +21,7 @@ TELEGRAM_CHAT_ID      = os.environ.get("TELEGRAM_CHAT_ID", "")
 FACEBOOK_PAGE_ID      = os.environ.get("FACEBOOK_PAGE_ID", "")
 FACEBOOK_ACCESS_TOKEN = os.environ.get("FACEBOOK_ACCESS_TOKEN", "")
 
-COUPANG_LINK = "https://www.coupang.com/np/goldbox"
+COUPANG_LINK = "https://link.coupang.com/a/dKE0aIHdlY"
 
 KST = timezone(timedelta(hours=9))
 TODAY = datetime.now(KST).strftime("%Y년 %m월 %d일")
@@ -183,9 +183,11 @@ def build_prompt(topic):
         "(본문 — 2500자 이상)\n\n"
         "## 쿠팡 추천 섹션 (글 맨 마지막에 반드시 포함)\n"
         "[COUPANG_START]\n"
-        "(이 글의 내용과 자연스럽게 연결되는 제품 유형 1~2가지를 구체적으로 언급."
-        " 쿠팡 검색 키워드도 함께 제안. 자연스럽고 친근한 말투로.)\n"
+        "(이 글의 내용과 자연스럽게 연결되는 제품 설명 1~2문장. 친근한 말투로.)\n"
+        "[KEYWORDS: 검색키워드1, 검색키워드2]\n"
         "[COUPANG_END]\n\n"
+        "키워드 예시: 무릎보호대 측면지지, 기능성깔창 아치서포트\n"
+        "키워드는 쿠팡에서 검색할 때 쓸 법한 구체적인 단어로 2개 작성.\n\n"
         f"## 오늘의 주제\n"
         f"증상/상황: {symptom}\n"
         f"카테고리: {category}\n"
@@ -256,6 +258,35 @@ def get_images(keyword):
 # 쿠팡 박스 HTML
 # ============================================================
 def make_coupang_html(coupang_text):
+    # 키워드 파싱: [KEYWORDS: 키워드1, 키워드2]
+    keyword_pattern = re.compile(r'\[KEYWORDS:\s*(.+?)\]', re.DOTALL)
+    keyword_match = keyword_pattern.search(coupang_text)
+    keywords = []
+    if keyword_match:
+        keywords = [k.strip() for k in keyword_match.group(1).split(',') if k.strip()]
+        coupang_text = keyword_pattern.sub('', coupang_text).strip()
+
+    # 키워드 버튼 HTML 생성
+    buttons_html = ''
+    if keywords:
+        buttons_html += '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;">'
+        for kw in keywords:
+            buttons_html += (
+                '<a href="' + COUPANG_LINK + '" target="_blank" rel="nofollow" '
+                'style="display:inline-block;background:#f57f17;color:#fff;'
+                'padding:11px 20px;border-radius:8px;text-decoration:none;'
+                'font-weight:700;font-size:14px;white-space:nowrap;">'
+                '🔍 &quot;' + kw + '&quot; 쿠팡에서 보기</a>'
+            )
+        buttons_html += '</div>'
+    else:
+        buttons_html = (
+            '<a href="' + COUPANG_LINK + '" target="_blank" rel="nofollow" '
+            'style="display:inline-block;background:#f57f17;color:#fff;'
+            'padding:12px 24px;border-radius:8px;text-decoration:none;'
+            'font-weight:700;font-size:15px;margin-bottom:16px;">🔍 쿠팡에서 검색하기</a>'
+        )
+
     return (
         '<div style="background:#fff8e1;border:2px solid #f57f17;'
         'border-radius:12px;padding:24px 28px;margin:48px 0 32px 0;">'
@@ -264,10 +295,7 @@ def make_coupang_html(coupang_text):
         '<p style="font-size:15px;line-height:1.9;color:#333;margin:0 0 20px 0;">'
         + coupang_text.strip() +
         '</p>'
-        '<a href="' + COUPANG_LINK + '" target="_blank" rel="nofollow" '
-        'style="display:inline-block;background:#f57f17;color:#fff;'
-        'padding:12px 24px;border-radius:8px;text-decoration:none;'
-        'font-weight:700;font-size:15px;">🔍 쿠팡에서 검색하기</a>'
+        + buttons_html +
         '<p style="font-size:11px;color:#aaa;margin:16px 0 0 0;line-height:1.6;">'
         '※ 이 링크를 통해 구매 시 소정의 수수료를 받을 수 있습니다. '
         '구매자에게는 추가 비용이 발생하지 않습니다.</p>'
