@@ -738,24 +738,26 @@ def send_telegram(title, post_url, topic):
         print("[텔레그램 오류] " + str(e))
 
 
-def send_facebook(title, post_url, topic):
+def send_facebook(title, post_url, topic, image_url=""):
     if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
         print("[페이스북] 설정값 없음 - 건너뜀")
         return
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
     message = (
-        sport_emoji + "\n\n"
-        + title + "\n\n"
+        sport_emoji + " " + title + "\n\n"
         + "자세히 읽기 👉 " + post_url
     )
     try:
+        post_data = {
+            "message": message,
+            "link": post_url,
+            "access_token": FACEBOOK_ACCESS_TOKEN
+        }
+        if image_url:
+            post_data["picture"] = image_url
         response = requests.post(
             "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
-            data={
-                "message": message,
-                "link": post_url,
-                "access_token": FACEBOOK_ACCESS_TOKEN
-            },
+            data=post_data,
             timeout=10
         )
         if response.status_code == 200:
@@ -803,7 +805,8 @@ def post_to_blogger(post_data, images, retry=2):
                     post_url
                 )
                 send_telegram(post_data["title"], post_url, topic)
-                send_facebook(post_data["title"], post_url, topic)
+                image_url = images[0]["url"] if images else ""
+                send_facebook(post_data["title"], post_url, topic, image_url)
                 return True
             else:
                 print("실패: " + response.text[:300])
