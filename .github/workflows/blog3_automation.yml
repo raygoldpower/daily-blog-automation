@@ -1,0 +1,55 @@
+name: Blog3 Product Recommendation Automation
+
+on:
+  schedule:
+    - cron: '0 1 * * *'    # 한국시간 오전 11시
+    - cron: '0 5 * * *'    # 한국시간 오후 3시
+    - cron: '0 12 * * *'   # 한국시간 오후 10시
+  workflow_dispatch:
+
+jobs:
+  post-blog3:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Python 설치
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 패키지 설치
+        run: pip install requests
+
+      - name: 현재 코드 확인
+        run: |
+          git log --oneline -3
+          head -10 main3.py
+
+      - name: 블로그3 자동 발행
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN3: ${{ secrets.GOOGLE_REFRESH_TOKEN3 }}
+          BLOGGER_BLOG_ID3: ${{ secrets.BLOGGER_BLOG_ID3 }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+          FACEBOOK_ACCESS_TOKEN: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+        run: python main3.py
+
+      - name: used_topics3.json 커밋 (중복 방지 저장)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add used_topics3.json || true
+          git diff --cached --quiet || git commit -m "chore: update used_topics3 [skip ci]"
+          git push || true
