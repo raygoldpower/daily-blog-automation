@@ -422,9 +422,7 @@ def get_access_token():
             },
             timeout=15
         )
-        data = r.json()
-        print(f"[토큰 응답] {data}")  # ← 이 줄 추가
-        return data.get("access_token", "")
+        return r.json().get("access_token", "")
     except Exception as e:
         print(f"[토큰 갱신 오류] {e}")
         return ""
@@ -480,18 +478,21 @@ def send_telegram(title, post_url):
 # ============================================================
 # 페이스북 공유
 # ============================================================
-def share_facebook(title, post_url):
+def share_facebook(title, post_url, image_url=""):
     if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
         return
     message = f"{title}\n\n자세한 내용은 아래 링크에서 확인하세요 👇\n{post_url}"
     try:
+        post_data = {
+            "message": message,
+            "link": post_url,
+            "access_token": FACEBOOK_ACCESS_TOKEN,
+        }
+        if image_url:
+            post_data["picture"] = image_url
         r = requests.post(
             f"https://graph.facebook.com/{FACEBOOK_PAGE_ID}/feed",
-            data={
-                "message": message,
-                "link": post_url,
-                "access_token": FACEBOOK_ACCESS_TOKEN,
-            },
+            data=post_data,
             timeout=15
         )
         if r.status_code == 200:
@@ -521,7 +522,9 @@ def main():
     if post_url:
         save_used_topic(topic["symptom"])
         send_telegram(title, post_url)
-        share_facebook(title, post_url)
+        images = get_images(topic["img_keyword"])
+        image_url = images[0] if images else ""
+        share_facebook(title, post_url, image_url)
         print(f"=== 완료 ===")
     else:
         print("[오류] 발행 실패")
