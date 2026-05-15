@@ -502,8 +502,8 @@ def send_telegram(title, post_url):
 # ============================================================
 # 페이스북 공유
 # ============================================================
-def share_facebook(title, post_url, image_url=""):
-    if not FACEBOOK_PAGE_ID or not :
+def share_facebook(title, post_url):
+    if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
         return
     message = f"{title}\n\n자세한 내용은 아래 링크에서 확인하세요 👇\n{post_url}"
     try:
