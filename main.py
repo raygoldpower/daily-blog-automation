@@ -753,8 +753,6 @@ def send_facebook(title, post_url, topic, image_url=""):
             "link": post_url,
             "access_token": FACEBOOK_ACCESS_TOKEN
         }
-        if image_url:
-            post_data["picture"] = image_url
         response = requests.post(
             "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
             data=post_data,
