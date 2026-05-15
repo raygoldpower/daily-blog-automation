@@ -266,36 +266,32 @@ def make_coupang_html(coupang_text):
         keywords = [k.strip() for k in keyword_match.group(1).split(',') if k.strip()]
         coupang_text = keyword_pattern.sub('', coupang_text).strip()
 
-    # 키워드 버튼 HTML 생성
-    buttons_html = ''
+    # 키워드 텍스트 HTML
+    keywords_html = ''
     if keywords:
-        buttons_html += '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;">'
+        keywords_html += '<p style="font-size:14px;color:#e65100;font-weight:700;margin:0 0 16px 0;">🔎 추천 검색어 &nbsp;'
         for kw in keywords:
-            buttons_html += (
-                '<a href="' + COUPANG_LINK + '" target="_blank" rel="nofollow" '
-                'style="display:inline-block;background:#f57f17;color:#fff;'
-                'padding:11px 20px;border-radius:8px;text-decoration:none;'
-                'font-weight:700;font-size:14px;white-space:nowrap;">'
-                '🔍 &quot;' + kw + '&quot; 쿠팡에서 보기</a>'
+            keywords_html += (
+                '<span style="display:inline-block;background:#fff3e0;'
+                'border:1.5px solid #f57f17;border-radius:20px;'
+                'padding:4px 14px;margin:0 6px 6px 0;font-size:14px;'
+                'color:#e65100;font-weight:700;">' + kw + '</span>'
             )
-        buttons_html += '</div>'
-    else:
-        buttons_html = (
-            '<a href="' + COUPANG_LINK + '" target="_blank" rel="nofollow" '
-            'style="display:inline-block;background:#f57f17;color:#fff;'
-            'padding:12px 24px;border-radius:8px;text-decoration:none;'
-            'font-weight:700;font-size:15px;margin-bottom:16px;">🔍 쿠팡에서 검색하기</a>'
-        )
+        keywords_html += '</p>'
 
     return (
         '<div style="background:#fff8e1;border:2px solid #f57f17;'
         'border-radius:12px;padding:24px 28px;margin:48px 0 32px 0;">'
         '<p style="font-weight:700;font-size:17px;color:#e65100;margin:0 0 12px 0;">'
         '🛍️ 관련 상품 추천</p>'
-        '<p style="font-size:15px;line-height:1.9;color:#333;margin:0 0 20px 0;">'
+        '<p style="font-size:15px;line-height:1.9;color:#333;margin:0 0 16px 0;">'
         + coupang_text.strip() +
         '</p>'
-        + buttons_html +
+        + keywords_html +
+        '<a href="' + COUPANG_LINK + '" target="_blank" rel="nofollow" '
+        'style="display:inline-block;background:#f57f17;color:#fff;'
+        'padding:12px 24px;border-radius:8px;text-decoration:none;'
+        'font-weight:700;font-size:15px;">🔍 쿠팡에서 검색하기</a>'
         '<p style="font-size:11px;color:#aaa;margin:16px 0 0 0;line-height:1.6;">'
         '※ 이 링크를 통해 구매 시 소정의 수수료를 받을 수 있습니다. '
         '구매자에게는 추가 비용이 발생하지 않습니다.</p>'
