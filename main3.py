@@ -544,7 +544,7 @@ def main():
     if post_url:
         save_used_topic(topic["symptom"])
         send_telegram(title, post_url)
-        share_facebook(title, post_url, image_url)
+        share_facebook(title, post_url)
         print(f"=== 완료 ===")
     else:
         print("[오류] 발행 실패")
