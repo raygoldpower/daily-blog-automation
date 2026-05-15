@@ -689,28 +689,21 @@ def send_telegram(title, post_url, category):
         print("[텔레그램 오류] " + str(e))
 
 
-def send_facebook(title, post_url, category, image_url=""):
+def send_facebook(title, post_url, category):
     if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
         return
     emoji = CATEGORY_EMOJI.get(category, "📰")
     message = emoji + " " + title + "\n\n자세히 읽기 👉 " + post_url
     try:
-        if image_url:
-            requests.post(
-                "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/photos",
-                data={
-                    "message": message,
-                    "url": image_url,
-                    "access_token": FACEBOOK_ACCESS_TOKEN
-                },
-                timeout=10
-            )
-        else:
-            requests.post(
-                "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
-                data={"message": message, "link": post_url, "access_token": FACEBOOK_ACCESS_TOKEN},
-                timeout=10
-            )
+        requests.post(
+            "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
+            data={
+                "message": message,
+                "link": post_url,
+                "access_token": FACEBOOK_ACCESS_TOKEN
+            },
+            timeout=10
+        )
         print("[페이스북] 공유 성공!")
     except Exception as e:
         print("[페이스북 오류] " + str(e))
@@ -740,8 +733,7 @@ def post_to_blogger(post_data, images, retry=2):
                 post_url = response.json().get("url", "")
                 print("발행 완료! " + post_url)
                 send_telegram(post_data["title"], post_url, category)
-                image_url = images[0]["url"] if images else ""
-                send_facebook(post_data["title"], post_url, category, image_url)
+                send_facebook(post_data["title"], post_url, category)
                 return True
             else:
                 print("실패: " + response.text[:200])
