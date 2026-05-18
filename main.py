@@ -563,7 +563,7 @@ def make_image_html(img, margin_top="0"):
     return html
 
 
-COUPANG_LINK = "https://www.coupang.com/np/goldbox"
+COUPANG_LINK = "https://link.coupang.com/a/dRhOlCLu5Q"
 
 
 def make_coupang_html(coupang_text):
