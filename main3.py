@@ -21,7 +21,7 @@ TELEGRAM_CHAT_ID      = os.environ.get("TELEGRAM_CHAT_ID", "")
 FACEBOOK_PAGE_ID      = os.environ.get("FACEBOOK_PAGE_ID", "")
 FACEBOOK_ACCESS_TOKEN = os.environ.get("FACEBOOK_ACCESS_TOKEN", "")
 
-COUPANG_LINK = "https://link.coupang.com/a/dKE0aIHdlY"
+COUPANG_LINK = "https://link.coupang.com/a/dRhOlCLu5Q"
 
 KST = timezone(timedelta(hours=9))
 TODAY = datetime.now(KST).strftime("%Y년 %m월 %d일")
