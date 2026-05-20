@@ -201,7 +201,6 @@ def collect_news(category):
 
 
 def call_gemini(prompt, max_tokens=8000):
-    """Gemini 2.5 Flash API 호출"""
     if not GEMINI_API_KEY:
         raise Exception("GEMINI_API_KEY 없음")
 
@@ -284,12 +283,9 @@ def generate_post():
         "2. 문장 리듬: 짧은 문장 → 긴 문장 → 짧은 문장 순으로 변화를 줘서 읽는 맛을 살리세요.\n"
         "   예: '결국 터졌습니다. 수개월간 쌓여온 갈등이 한순간에 수면 위로 올라온 것입니다. 누구도 예상 못 했습니다.'\n"
         "3. 독자 공감 포인트: 각 섹션마다 독자가 '나도 이런 생각 했는데' 하고 느끼는 한 문장을 자연스럽게 녹이세요.\n"
-        "   예: '뉴스를 접한 많은 분들이 처음엔 믿기 어려웠을 겁니다.'\n"
-        "   예: '우리 주변에서도 충분히 일어날 수 있는 일입니다.'\n"
         "4. 마무리는 '~될 것으로 보입니다' 식 결론 금지.\n"
         "   독자에게 한 가지 생각거리를 던지며 끝내세요.\n"
-        "   예: '이 문제가 단순히 남의 일로만 느껴지지 않는다면, 우리 사회가 이미 그 변화 안에 있다는 뜻일지 모릅니다.'\n"
-        "5. 절대 금지: '~알아보겠습니다', '~살펴보겠습니다', '~중요합니다', '~할 예정입니다' 같은 AI 나열 표현.\n\n"
+        "5. 절대 금지: '~알아보겠습니다', '~살펴보겠습니다', '~중요합니다' 같은 AI 나열 표현.\n\n"
 
         "아래는 오늘(" + TODAY + ") 실제 수집된 뉴스입니다:\n"
         + news_context + "\n\n"
@@ -320,7 +316,7 @@ def generate_post():
         "수치, 날짜, 출처 반드시 표기. 빈 줄로 단락 구분.\n\n"
         "4. 전망 + 독자 생각거리 (3~4줄)\n"
         "앞으로 어떻게 될지 간략히 + 독자에게 한 가지 질문이나 생각거리를 던지며 마무리.\n"
-        "'~될 것으로 보입니다' 식 결론 절대 금지. 독자가 멈추고 생각하게 만드세요.\n\n"
+        "'~될 것으로 보입니다' 식 결론 절대 금지.\n\n"
         "5. 핵심 요약\n"
         "[SUMMARY_START]\n"
         "핵심1 (구체적 수치나 팩트 포함)\n"
@@ -334,7 +330,7 @@ def generate_post():
         "카테고리: " + category + "\n\n"
         "출력 형식:\n"
         "제목: (반드시 첫 줄에 '제목: '으로 시작. 실제 이슈명과 핵심 팩트 포함. "
-        "날짜·카테고리명·'핫이슈' 같은 일반어 절대 금지. 예: '손흥민, 시즌 20호골 폭발…토트넘 4강 진출')\n"
+        "날짜·카테고리명·'핫이슈' 같은 일반어 절대 금지)\n"
         "---\n"
         "(본문 시작 — 리드문부터 바로 작성. 반드시 완성된 전체 글 출력)"
     )
@@ -674,6 +670,7 @@ def get_access_token():
 
 
 def request_google_indexing(post_url):
+    """Google Indexing API로 색인 자동 요청"""
     import json as json_lib, time, base64
     service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
     if not service_account_json:
@@ -736,6 +733,10 @@ def send_telegram(title, post_url, category):
             "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
             json={"chat_id": TELEGRAM_CHAT_ID, "text": message},
             timeout=10
+        )
+        print("[텔레그램] 공유 성공!")
+    except Exception as e:
+        print("[텔레그램 오류] " + str(e))
 
 
 def send_facebook(title, post_url, category):
@@ -798,7 +799,7 @@ def post_to_blogger(post_data, images, retry=2):
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("insaplayer - 실시간 뉴스 블로그 v5 (Gemini 2.5 Flash)")
+    print("insaplayer - 실시간 뉴스 블로그 v6 (Gemini 2.5 Flash + 색인 자동화)")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
     test_apis()
