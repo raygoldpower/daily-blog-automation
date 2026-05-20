@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: 패키지 설치
-        run: pip install requests
+        run: pip install requests cryptography
       - name: 현재 코드 확인
         run: |
           git log --oneline -3
@@ -39,4 +39,5 @@ jobs:
           FACEBOOK_ACCESS_TOKEN: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: python main.py
