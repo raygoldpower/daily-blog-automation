@@ -673,6 +673,59 @@ def get_access_token():
     return response.json()["access_token"]
 
 
+def request_google_indexing(post_url):
+    import json as json_lib, time, base64
+    service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
+    if not service_account_json:
+        print("[색인] GOOGLE_SERVICE_ACCOUNT_JSON 없음 - 건너뜀")
+        return
+    try:
+        sa_info = json_lib.loads(service_account_json)
+        now = int(time.time())
+        header = base64.urlsafe_b64encode(
+            json_lib.dumps({"alg": "RS256", "typ": "JWT"}).encode()
+        ).rstrip(b"=").decode()
+        payload_data = {
+            "iss": sa_info["client_email"],
+            "scope": "https://www.googleapis.com/auth/indexing",
+            "aud": "https://oauth2.googleapis.com/token",
+            "exp": now + 3600,
+            "iat": now
+        }
+        payload_b64 = base64.urlsafe_b64encode(
+            json_lib.dumps(payload_data).encode()
+        ).rstrip(b"=").decode()
+        from cryptography.hazmat.primitives import hashes, serialization
+        from cryptography.hazmat.primitives.asymmetric import padding
+        private_key = serialization.load_pem_private_key(
+            sa_info["private_key"].encode(), password=None
+        )
+        sign_input = (header + "." + payload_b64).encode()
+        signature = private_key.sign(sign_input, padding.PKCS1v15(), hashes.SHA256())
+        jwt_token = header + "." + payload_b64 + "." + base64.urlsafe_b64encode(signature).rstrip(b"=").decode()
+        token_response = requests.post(
+            "https://oauth2.googleapis.com/token",
+            data={"grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer", "assertion": jwt_token},
+            timeout=10
+        )
+        if token_response.status_code != 200:
+            print("[색인] 토큰 발급 실패: " + token_response.text[:200])
+            return
+        access_token = token_response.json().get("access_token", "")
+        index_response = requests.post(
+            "https://indexing.googleapis.com/v3/urlNotifications:publish",
+            headers={"Authorization": "Bearer " + access_token, "Content-Type": "application/json"},
+            json={"url": post_url, "type": "URL_UPDATED"},
+            timeout=10
+        )
+        if index_response.status_code == 200:
+            print("[색인] 구글 색인 요청 완료! ✅ " + post_url)
+        else:
+            print("[색인] 색인 요청 실패: " + index_response.text[:200])
+    except Exception as e:
+        print("[색인 오류] " + str(e))
+
+
 def send_telegram(title, post_url, category):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         return
@@ -683,10 +736,6 @@ def send_telegram(title, post_url, category):
             "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
             json={"chat_id": TELEGRAM_CHAT_ID, "text": message},
             timeout=10
-        )
-        print("[텔레그램] 공유 성공!")
-    except Exception as e:
-        print("[텔레그램 오류] " + str(e))
 
 
 def send_facebook(title, post_url, category):
@@ -732,6 +781,7 @@ def post_to_blogger(post_data, images, retry=2):
             if response.status_code == 200:
                 post_url = response.json().get("url", "")
                 print("발행 완료! " + post_url)
+                request_google_indexing(post_url)
                 send_telegram(post_data["title"], post_url, category)
                 send_facebook(post_data["title"], post_url, category)
                 return True
