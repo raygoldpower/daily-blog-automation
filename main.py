@@ -422,7 +422,7 @@ def get_images_unsplash(keyword, count=3):
     try:
         response = requests.get(
             "https://api.unsplash.com/search/photos",
-            params={"query": keyword, "per_page": count, "orientation": "landscape", "client_id": UNSPLASH_ACCESS_KEY},
+            params={"query": keyword, "per_page": 10, "page": random.randint(1, 3), "orientation": "landscape", "client_id": UNSPLASH_ACCESS_KEY},
             timeout=10
         )
         if response.status_code == 200:
@@ -435,7 +435,8 @@ def get_images_unsplash(keyword, count=3):
                     "author_url": photo["user"]["links"]["html"],
                     "source": "Unsplash"
                 })
-            return images
+            random.shuffle(images)
+            return images[:count]
     except Exception as e:
         print("[Unsplash 오류] " + str(e))
     return []
@@ -563,7 +564,7 @@ def make_image_html(img, margin_top="0"):
     return html
 
 
-COUPANG_LINK = "https://link.coupang.com/a/dRhOlCLu5Q"
+COUPANG_LINK = "https://www.coupang.com/np/goldbox"
 
 
 def make_coupang_html(coupang_text):
@@ -714,6 +715,95 @@ def body_to_html(body, images, topic):
     return html
 
 
+def request_google_indexing(post_url):
+    """Google Indexing API로 색인 요청"""
+    import json as json_lib
+    service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
+    if not service_account_json:
+        print("[색인] GOOGLE_SERVICE_ACCOUNT_JSON 없음 - 건너뜀")
+        return
+
+    try:
+        sa_info = json_lib.loads(service_account_json)
+
+        # JWT 토큰 생성
+        import time
+        import base64
+        import hmac
+        import hashlib
+
+        now = int(time.time())
+        header = base64.urlsafe_b64encode(
+            json_lib.dumps({"alg": "RS256", "typ": "JWT"}).encode()
+        ).rstrip(b"=").decode()
+
+        payload_data = {
+            "iss": sa_info["client_email"],
+            "scope": "https://www.googleapis.com/auth/indexing",
+            "aud": "https://oauth2.googleapis.com/token",
+            "exp": now + 3600,
+            "iat": now
+        }
+        payload_b64 = base64.urlsafe_b64encode(
+            json_lib.dumps(payload_data).encode()
+        ).rstrip(b"=").decode()
+
+        # RSA 서명 (cryptography 라이브러리 사용)
+        try:
+            from cryptography.hazmat.primitives import hashes, serialization
+            from cryptography.hazmat.primitives.asymmetric import padding
+
+            private_key = serialization.load_pem_private_key(
+                sa_info["private_key"].encode(),
+                password=None
+            )
+            sign_input = (header + "." + payload_b64).encode()
+            signature = private_key.sign(sign_input, padding.PKCS1v15(), hashes.SHA256())
+            jwt_token = header + "." + payload_b64 + "." + base64.urlsafe_b64encode(signature).rstrip(b"=").decode()
+        except ImportError:
+            print("[색인] cryptography 라이브러리 없음 - pip install cryptography 필요")
+            return
+
+        # Access Token 발급
+        token_response = requests.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
+                "assertion": jwt_token
+            },
+            timeout=10
+        )
+        if token_response.status_code != 200:
+            print("[색인] 토큰 발급 실패: " + token_response.text[:200])
+            return
+
+        access_token = token_response.json().get("access_token", "")
+        if not access_token:
+            print("[색인] 액세스 토큰 없음")
+            return
+
+        # Indexing API 색인 요청
+        index_response = requests.post(
+            "https://indexing.googleapis.com/v3/urlNotifications:publish",
+            headers={
+                "Authorization": "Bearer " + access_token,
+                "Content-Type": "application/json"
+            },
+            json={
+                "url": post_url,
+                "type": "URL_UPDATED"
+            },
+            timeout=10
+        )
+        if index_response.status_code == 200:
+            print("[색인] 구글 색인 요청 완료! ✅ " + post_url)
+        else:
+            print("[색인] 색인 요청 실패: " + index_response.text[:200])
+
+    except Exception as e:
+        print("[색인 오류] " + str(e))
+
+
 def send_telegram(title, post_url, topic):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("[텔레그램] 설정값 없음 - 건너뜀")
@@ -738,24 +828,24 @@ def send_telegram(title, post_url, topic):
         print("[텔레그램 오류] " + str(e))
 
 
-def send_facebook(title, post_url, topic, image_url=""):
+def send_facebook(title, post_url, topic):
     if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
         print("[페이스북] 설정값 없음 - 건너뜀")
         return
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
     message = (
-        sport_emoji + " " + title + "\n\n"
+        sport_emoji + " 새 포스팅\n\n"
+        + title + "\n\n"
         + "자세히 읽기 👉 " + post_url
     )
     try:
-        post_data = {
-            "message": message,
-            "link": post_url,
-            "access_token": FACEBOOK_ACCESS_TOKEN
-        }
         response = requests.post(
             "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
-            data=post_data,
+            data={
+                "message": message,
+                "link": post_url,
+                "access_token": FACEBOOK_ACCESS_TOKEN
+            },
             timeout=10
         )
         if response.status_code == 200:
@@ -802,9 +892,10 @@ def post_to_blogger(post_data, images, retry=2):
                     post_data["title"],
                     post_url
                 )
+                # Google 색인 자동 요청
+                request_google_indexing(post_url)
                 send_telegram(post_data["title"], post_url, topic)
-                image_url = images[0]["url"] if images else ""
-                send_facebook(post_data["title"], post_url, topic, image_url)
+                send_facebook(post_data["title"], post_url, topic)
                 return True
             else:
                 print("실패: " + response.text[:300])
