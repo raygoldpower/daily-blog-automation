@@ -1,0 +1,32 @@
+name: Search Console 색인 자동 요청
+on:
+  schedule:
+    - cron: '0 2 * * *'    # 매일 한국시간 오전 11시 자동 실행
+  workflow_dispatch:        # 수동 실행도 가능
+jobs:
+  request-indexing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Python 설치
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: 패키지 설치
+        run: pip install requests
+      - name: 색인 요청 실행
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+        run: python request_indexing.py
+      - name: indexed_urls.json 저장 (진행상황 보존)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add indexed_urls.json || true
+          git diff --cached --quiet || git commit -m "chore: update indexed_urls [skip ci]"
+          git push || true
