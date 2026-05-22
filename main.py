@@ -3,6 +3,7 @@ import requests
 import random
 from datetime import datetime
 import json
+import re
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
@@ -141,7 +142,6 @@ TOPICS = [
     {"title": "경기 전 긴장감을 흥분으로 전환하는 인지 재구성 방법", "keyword": "pre-game anxiety cognitive reappraisal sports", "img_keyword": "athlete pregame", "sport": "심리", "series": "엘리트 마인드", "episode": 3},
     {"title": "슬럼프를 탈피하는 3단계 심리학적 루틴, 통제 가능한 요소에 집중하라", "keyword": "sports slump recovery 3 steps psychology", "img_keyword": "sports motivation", "sport": "심리", "series": "엘리트 마인드", "episode": 4},
     {"title": "운동 강도와 도파민 수용체의 상관관계, 오버트레이닝을 막는 멘탈 가이드", "keyword": "exercise intensity dopamine overtraining mental", "img_keyword": "overtraining fatigue", "sport": "스포츠의학", "series": "엘리트 마인드", "episode": 5},
-
     # 통증 케어
     {"title": "어깨 통증의 80%는 이 근육 때문이에요, 전거근 약화 자가 진단법", "keyword": "shoulder pain serratus anterior weakness", "img_keyword": "shoulder pain relief", "sport": "물리치료", "series": "통증 케어", "episode": 1},
     {"title": "무릎 앞쪽이 계단 내려갈 때 아프다면, 슬개건염 원인과 해결법", "keyword": "knee pain stairs patellar tendinitis", "img_keyword": "knee pain", "sport": "물리치료", "series": "통증 케어", "episode": 2},
@@ -190,7 +190,6 @@ SERIES_LINKS_FILE = "series_links.json"
 
 
 def load_series_links():
-    """발행된 글의 시리즈 링크 정보 로드"""
     try:
         with open(SERIES_LINKS_FILE, "r") as f:
             return json.load(f)
@@ -199,7 +198,6 @@ def load_series_links():
 
 
 def save_series_link(series, episode, title, url):
-    """발행 완료된 글의 시리즈 링크 저장"""
     links = load_series_links()
     if series not in links:
         links[series] = {}
@@ -213,19 +211,14 @@ def save_series_link(series, episode, title, url):
 
 
 def get_series_nav_html(topic):
-    """이전편/다음편 내부 링크 HTML 생성"""
     series = topic.get("series", "")
     episode = topic.get("episode", 1)
     if not series:
         return ""
-
     links = load_series_links()
     series_data = links.get(series, {})
-
     prev_html = ""
     next_html = ""
-
-    # 이전 편
     prev_ep = str(episode - 1)
     if prev_ep in series_data:
         prev = series_data[prev_ep]
@@ -234,8 +227,6 @@ def get_series_nav_html(topic):
             'text-decoration:none;color:#1565c0;font-size:14px;font-weight:600;">'
             '◀ 이전편: ' + prev["title"] + '</a>'
         )
-
-    # 다음 편
     next_ep = str(episode + 1)
     if next_ep in series_data:
         nxt = series_data[next_ep]
@@ -244,10 +235,8 @@ def get_series_nav_html(topic):
             'text-decoration:none;color:#1565c0;font-size:14px;font-weight:600;">'
             '다음편: ' + nxt["title"] + ' ▶</a>'
         )
-
     if not prev_html and not next_html:
         return ""
-
     html = (
         '<div style="background:#f0f4ff;border:2px solid #1565c0;border-radius:12px;'
         'padding:20px 24px;margin:40px 0;">'
@@ -261,8 +250,6 @@ def get_series_nav_html(topic):
         html += '<div>' + next_html + '</div>'
     html += '</div></div>\n'
     return html
-
-
 
 
 def load_used_topics():
@@ -364,9 +351,14 @@ def generate_post():
         "독자가 읽다가 '이거 완전 내 얘기잖아'라고 느끼는 순간을 만들어주세요.\n"
         "전문 용어는 쉬운 말로 먼저 설명하고 괄호에 전문 용어를 넣으세요.\n"
         "친근한 존댓말로 쓰세요. ~이에요, ~거든요, ~잖아요 스타일.\n\n"
+        "문단 작성 규칙 (구글 SEO 필수):\n"
+        "각 문단은 반드시 4~6문장 이상을 하나의 덩어리로 묶어서 작성하세요.\n"
+        "한두 문장 쓰고 줄바꿈 금지. 하나의 소주제를 충분히 설명한 후에만 줄바꿈하세요.\n"
+        "소제목은 반드시 [이모지 소제목 이모지] 형식으로만 표시하세요.\n"
+        "본문 중간에는 이모지 사용을 최소화하고 내용의 깊이에 집중하세요.\n\n"
         "반드시 포함할 요소:\n"
         "핵심 키워드: ##키워드## 형식으로 글의 핵심 개념 하나를 크게 던지고 풀어쓰세요.\n"
-        "소제목: [이모지 소제목 이모지] 형식으로 앞뒤 이모지 필수.\n"
+        "소제목: [이모지 소제목 이모지] 형식으로 앞뒤 이모지 필수. 최소 4개 이상.\n"
         "훈련 표: [TABLE_START]와 [TABLE_END] 사이에 작성.\n"
         "형식: 훈련명|세트|횟수|휴식|작용 근육|효과\n"
         "[TABLE_START]\n"
@@ -376,12 +368,6 @@ def generate_post():
         "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄.\n\n"
         "분량은 4000자에서 6000자. 깊이 있게 충분히 써주세요.\n"
         "AI가 쓴 티 나는 나열식 표현 금지.\n\n"
-        "글 맨 마지막에 반드시 아래 형식으로 상품 추천 멘트를 작성하세요:\n"
-        "[COUPANG_START]\n"
-        "(이 글의 주제와 자연스럽게 연결되는 실용적인 소도구나 용품 1~2가지를 구체적으로 추천.\n"
-        "예: 오늘 소개해드린 발목 강화 운동을 꾸준히 하신다면 밸런스 패드나 발목 보호대를 함께 활용해보세요.\n"
-        "아래 링크에서 검색하시면 다양한 제품을 비교해보실 수 있어요!)\n"
-        "[COUPANG_END]\n\n"
         "카테고리: " + topic["sport"] + "\n"
         "주제: " + topic["title"] + "\n\n"
         "출력 형식:\n"
@@ -422,7 +408,13 @@ def get_images_unsplash(keyword, count=3):
     try:
         response = requests.get(
             "https://api.unsplash.com/search/photos",
-            params={"query": keyword, "per_page": 10, "page": random.randint(1, 3), "orientation": "landscape", "client_id": UNSPLASH_ACCESS_KEY},
+            params={
+                "query": keyword,
+                "per_page": 10,
+                "page": random.randint(1, 3),
+                "orientation": "landscape",
+                "client_id": UNSPLASH_ACCESS_KEY
+            },
             timeout=10
         )
         if response.status_code == 200:
@@ -504,22 +496,18 @@ def get_images_pixabay(keyword, count=3):
 
 def get_images(keyword, count=3):
     print("[이미지 검색] 키워드: " + keyword)
-
     images = get_images_unsplash(keyword, count)
     if images:
         print("[이미지] Unsplash " + str(len(images)) + "장")
         return images
-
     images = get_images_pexels(keyword, count)
     if images:
         print("[이미지] Pexels " + str(len(images)) + "장")
         return images
-
     images = get_images_pixabay(keyword, count)
     if images:
         print("[이미지] Pixabay " + str(len(images)) + "장")
         return images
-
     print("[이미지] 모든 소스 실패")
     return []
 
@@ -554,7 +542,6 @@ def make_summary_html(summary_text):
     return html
 
 
-# [수정1] 이미지 출처 source 동적 처리
 def make_image_html(img, margin_top="0"):
     source = img.get("source", "Unsplash")
     html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
@@ -564,32 +551,7 @@ def make_image_html(img, margin_top="0"):
     return html
 
 
-COUPANG_LINK = "https://www.coupang.com/np/goldbox"
-
-
-def make_coupang_html(coupang_text):
-    html = (
-        '<div style="background:#fff8e1;border:2px solid #f57f17;border-radius:12px;'
-        'padding:20px 24px;margin:40px 0;">'
-        '<p style="font-weight:700;font-size:16px;color:#f57f17;margin-bottom:10px;">🛍️ 관련 상품 추천</p>'
-        '<p style="font-size:15px;line-height:1.9;color:#333;margin-bottom:16px;">'
-        + coupang_text.strip() +
-        '</p>'
-        '<a href="' + COUPANG_LINK + '" target="_blank" '
-        'style="display:inline-block;background:#f57f17;color:#fff;'
-        'padding:11px 22px;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px;">'
-        '🔍 쿠팡에서 검색하기</a>'
-        '<p style="font-size:11px;color:#aaa;margin-top:14px;line-height:1.6;">'
-        '※ 이 링크를 통해 구매 시 소정의 수수료를 받을 수 있습니다. '
-        '구매자에게는 추가 비용이 발생하지 않습니다.</p>'
-        '</div>\n'
-    )
-    return html
-
-
 def body_to_html(body, images, topic):
-    import re
-
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
 
     series_badge = ""
@@ -616,7 +578,6 @@ def body_to_html(body, images, topic):
 
     clean_body = table_pattern.sub("[TABLE_PLACEHOLDER]", body)
     clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", clean_body)
-    clean_body = re.sub(r'\[COUPANG_START\].*?\[COUPANG_END\]', '', clean_body, flags=re.DOTALL)
 
     headings = re.findall(r'\[([^\]]+)\]', clean_body)
     headings = [h for h in headings if h not in ["TABLE_PLACEHOLDER", "SUMMARY_PLACEHOLDER"]]
@@ -646,7 +607,6 @@ def body_to_html(body, images, topic):
 
     for i, para in enumerate(paragraphs):
         if not para.strip():
-            html += '<div style="margin:10px 0;"></div>\n'
             continue
 
         if para.strip() == "[TABLE_PLACEHOLDER]":
@@ -692,7 +652,7 @@ def body_to_html(body, images, topic):
             )
         else:
             html += (
-                '<p style="margin:14px 0;line-height:1.9;font-size:16px;color:#333;">'
+                '<p style="margin:0 0 20px 0;line-height:2.0;font-size:16px;color:#333;text-align:justify;">'
                 + para.strip() + '</p>\n'
             )
 
@@ -703,40 +663,23 @@ def body_to_html(body, images, topic):
     if len(images) >= 3:
         html += make_image_html(images[2], margin_top="20px")
 
-    # 쿠팡 파트너스 추천 박스
-    coupang_pattern = re.compile(r'\[COUPANG_START\](.*?)\[COUPANG_END\]', re.DOTALL)
-    coupang_match = coupang_pattern.search(body)
-    if coupang_match:
-        html += make_coupang_html(coupang_match.group(1))
-
-    # 시리즈 내부 링크 네비게이션
     html += get_series_nav_html(topic)
 
     return html
 
 
 def request_google_indexing(post_url):
-    """Google Indexing API로 색인 요청"""
-    import json as json_lib
+    import json as json_lib, time, base64
     service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
     if not service_account_json:
         print("[색인] GOOGLE_SERVICE_ACCOUNT_JSON 없음 - 건너뜀")
         return
-
     try:
         sa_info = json_lib.loads(service_account_json)
-
-        # JWT 토큰 생성
-        import time
-        import base64
-        import hmac
-        import hashlib
-
         now = int(time.time())
         header = base64.urlsafe_b64encode(
             json_lib.dumps({"alg": "RS256", "typ": "JWT"}).encode()
         ).rstrip(b"=").decode()
-
         payload_data = {
             "iss": sa_info["client_email"],
             "scope": "https://www.googleapis.com/auth/indexing",
@@ -747,59 +690,33 @@ def request_google_indexing(post_url):
         payload_b64 = base64.urlsafe_b64encode(
             json_lib.dumps(payload_data).encode()
         ).rstrip(b"=").decode()
-
-        # RSA 서명 (cryptography 라이브러리 사용)
-        try:
-            from cryptography.hazmat.primitives import hashes, serialization
-            from cryptography.hazmat.primitives.asymmetric import padding
-
-            private_key = serialization.load_pem_private_key(
-                sa_info["private_key"].encode(),
-                password=None
-            )
-            sign_input = (header + "." + payload_b64).encode()
-            signature = private_key.sign(sign_input, padding.PKCS1v15(), hashes.SHA256())
-            jwt_token = header + "." + payload_b64 + "." + base64.urlsafe_b64encode(signature).rstrip(b"=").decode()
-        except ImportError:
-            print("[색인] cryptography 라이브러리 없음 - pip install cryptography 필요")
-            return
-
-        # Access Token 발급
+        from cryptography.hazmat.primitives import hashes, serialization
+        from cryptography.hazmat.primitives.asymmetric import padding
+        private_key = serialization.load_pem_private_key(
+            sa_info["private_key"].encode(), password=None
+        )
+        sign_input = (header + "." + payload_b64).encode()
+        signature = private_key.sign(sign_input, padding.PKCS1v15(), hashes.SHA256())
+        jwt_token = header + "." + payload_b64 + "." + base64.urlsafe_b64encode(signature).rstrip(b"=").decode()
         token_response = requests.post(
             "https://oauth2.googleapis.com/token",
-            data={
-                "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-                "assertion": jwt_token
-            },
+            data={"grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer", "assertion": jwt_token},
             timeout=10
         )
         if token_response.status_code != 200:
             print("[색인] 토큰 발급 실패: " + token_response.text[:200])
             return
-
         access_token = token_response.json().get("access_token", "")
-        if not access_token:
-            print("[색인] 액세스 토큰 없음")
-            return
-
-        # Indexing API 색인 요청
         index_response = requests.post(
             "https://indexing.googleapis.com/v3/urlNotifications:publish",
-            headers={
-                "Authorization": "Bearer " + access_token,
-                "Content-Type": "application/json"
-            },
-            json={
-                "url": post_url,
-                "type": "URL_UPDATED"
-            },
+            headers={"Authorization": "Bearer " + access_token, "Content-Type": "application/json"},
+            json={"url": post_url, "type": "URL_UPDATED"},
             timeout=10
         )
         if index_response.status_code == 200:
             print("[색인] 구글 색인 요청 완료! ✅ " + post_url)
         else:
             print("[색인] 색인 요청 실패: " + index_response.text[:200])
-
     except Exception as e:
         print("[색인 오류] " + str(e))
 
@@ -809,11 +726,7 @@ def send_telegram(title, post_url, topic):
         print("[텔레그램] 설정값 없음 - 건너뜀")
         return
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
-    message = (
-        sport_emoji + " 새 포스팅\n\n"
-        + "📌 " + title + "\n\n"
-        + "🔗 " + post_url
-    )
+    message = sport_emoji + " 새 포스팅\n\n📌 " + title + "\n\n🔗 " + post_url
     try:
         response = requests.post(
             "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
@@ -833,19 +746,11 @@ def send_facebook(title, post_url, topic):
         print("[페이스북] 설정값 없음 - 건너뜀")
         return
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
-    message = (
-        sport_emoji + " 새 포스팅\n\n"
-        + title + "\n\n"
-        + "자세히 읽기 👉 " + post_url
-    )
+    message = sport_emoji + " " + title + "\n\n자세히 읽기 👉 " + post_url
     try:
         response = requests.post(
             "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
-            data={
-                "message": message,
-                "link": post_url,
-                "access_token": FACEBOOK_ACCESS_TOKEN
-            },
+            data={"message": message, "link": post_url, "access_token": FACEBOOK_ACCESS_TOKEN},
             timeout=10
         )
         if response.status_code == 200:
@@ -885,14 +790,12 @@ def post_to_blogger(post_data, images, retry=2):
                 post_url = result.get("url", "")
                 print("\n발행 완료!")
                 print("   링크: " + post_url)
-                # 시리즈 링크 저장 (내부 링크 자동 연결용)
                 save_series_link(
                     topic.get("series", ""),
                     topic.get("episode", 1),
                     post_data["title"],
                     post_url
                 )
-                # Google 색인 자동 요청
                 request_google_indexing(post_url)
                 send_telegram(post_data["title"], post_url, topic)
                 send_facebook(post_data["title"], post_url, topic)
