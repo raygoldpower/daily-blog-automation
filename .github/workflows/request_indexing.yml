@@ -30,6 +30,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main || true
           git add indexed_urls.json || true
           git diff --cached --quiet || git commit -m "chore: update indexed_urls [skip ci]"
           git push || true
