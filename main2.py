@@ -36,6 +36,42 @@ CATEGORIES = ["스포츠이슈", "경제뉴스", "전국이슈", "연예이슈"]
 USED_TITLES_FILE = "used_titles2.json"
 
 
+# ──────────────────────────────────────────────
+# ✅ 이미지 키워드: 이슈/인물과 완전히 분리된
+#    중립적 분위기 키워드만 사용 (저작권 리스크 제거)
+# ──────────────────────────────────────────────
+CATEGORY_IMAGE_KEYWORDS = {
+    "스포츠이슈": [
+        "stadium lights empty seats",
+        "running track morning",
+        "sports field grass sunlight",
+        "finish line ribbon",
+        "crowd cheering blur",
+    ],
+    "경제뉴스": [
+        "city buildings skyline dusk",
+        "office desk morning coffee",
+        "graph chart paper desk",
+        "coins stack blurred background",
+        "busy street people walking",
+    ],
+    "전국이슈": [
+        "city street Korea",
+        "bridge river sunset",
+        "crowd walking street blur",
+        "newspaper coffee table",
+        "urban night lights",
+    ],
+    "연예이슈": [
+        "stage spotlight empty",
+        "microphone stand concert hall",
+        "dark auditorium lights",
+        "music notes blur background",
+        "curtain stage theater",
+    ],
+}
+
+
 def load_used_titles():
     try:
         with open(USED_TITLES_FILE, "r") as f:
@@ -213,7 +249,7 @@ def call_gemini(prompt, max_tokens=8000):
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {
             "maxOutputTokens": max_tokens,
-            "temperature": 0.8,
+            "temperature": 0.85,
             "topP": 0.95,
         }
     }
@@ -267,6 +303,12 @@ def test_apis():
         raise Exception("GEMINI_API_KEY 없음 — GitHub Secrets 및 yml 확인 필요")
 
 
+# ──────────────────────────────────────────────
+# ✅ 핵심 변경: 프롬프트 전면 교체
+#    - 페르소나: 기자 → 시사 해설 칼럼니스트
+#    - 구조: 사건 나열 → 훅 질문 + 해석 + 이면 + 독자 연결
+#    - 금지: "중립 객관" 강제 제거 → 해석과 관점 허용
+# ──────────────────────────────────────────────
 def generate_post():
     category = random.choice(CATEGORIES)
     print("[카테고리] " + category)
@@ -274,68 +316,71 @@ def generate_post():
     news_context = collect_news(category)
 
     prompt = (
-        "당신은 20년 경력의 베테랑 시니어 기자입니다.\n"
-        "독자가 첫 문장에 멈추고, 끝까지 읽고, 주변에 공유하게 만드는 글을 씁니다.\n"
+        "당신은 날카로운 시각을 가진 시사 해설 칼럼니스트입니다.\n"
+        "사건을 '전달'하는 것이 아니라, 사건의 이면과 의미를 독자에게 '해석'해주는 사람입니다.\n"
+        "독자가 다 읽고 나서 '이런 시각은 처음 봤다'고 느끼게 만드는 글을 씁니다.\n"
         "한국어만 사용하세요. 외국 문자 절대 금지.\n\n"
 
         "✅ 글쓰기 핵심 원칙:\n"
-        "1. 사실은 구체적 수치로, 감정은 독자 공감으로, 배경은 스토리로 풀어냅니다.\n"
-        "2. 문장 리듬: 짧은 문장 → 긴 문장 → 짧은 문장 순으로 변화를 줘서 읽는 맛을 살리세요.\n"
-        "   예: '결국 터졌습니다. 수개월간 쌓여온 갈등이 한순간에 수면 위로 올라온 것입니다. 누구도 예상 못 했습니다.'\n"
-        "3. 독자 공감 포인트: 각 섹션마다 독자가 '나도 이런 생각 했는데' 하고 느끼는 한 문장을 자연스럽게 녹이세요.\n"
-        "4. 마무리는 '~될 것으로 보입니다' 식 결론 금지.\n"
-        "   독자에게 한 가지 생각거리를 던지며 끝내세요.\n"
-        "5. 절대 금지: '~알아보겠습니다', '~살펴보겠습니다', '~중요합니다' 같은 AI 나열 표현.\n\n"
+        "1. 첫 문장은 독자에게 던지는 날카로운 질문 또는 역설적 사실로 시작하세요.\n"
+        "   예: '우리는 이 뉴스를 왜 이렇게 빨리 잊을까요?'\n"
+        "   예: '승리했지만, 아무도 박수를 치지 않았습니다.'\n"
+        "2. 팩트는 3줄 이내로 압축. 나머지 공간은 해석과 의미로 채우세요.\n"
+        "3. '대부분 언론이 다루지 않는 이면'을 반드시 한 섹션 포함하세요.\n"
+        "4. 독자의 일상과 연결되는 지점을 반드시 한 섹션 포함하세요.\n"
+        "   (예: 이 경제 이슈가 내 월급·집값·소비에 어떤 영향을 주는가)\n"
+        "5. 마지막은 '~될 것입니다' 결론 금지. 독자에게 생각거리를 던지는 질문으로 마무리.\n"
+        "6. 문장 리듬: 짧은 문장 → 긴 문장 → 짧은 문장으로 변화를 주세요.\n"
+        "7. 절대 금지: '~알아보겠습니다', '~살펴보겠습니다', '중요합니다', AI 나열식 표현.\n"
+        "8. 반드시 존댓말. '~이다', '~한다' 반말 종결 절대 금지.\n\n"
 
         "아래는 오늘(" + TODAY + ") 실제 수집된 뉴스입니다:\n"
         + news_context + "\n\n"
-        "위 뉴스 중 가장 핫하고 독자 관심이 높을 이슈 하나를 선택해서 깊이 있는 기사를 작성하세요.\n"
-        "단순 사실 나열이 아니라 배경, 맥락, 의미까지 풀어내야 합니다.\n"
-        "국내 이슈 중심으로 쓰되, 해외 반응이나 비교가 있으면 한 섹션 자연스럽게 추가하세요.\n\n"
+
+        "위 뉴스 중 가장 사람들이 궁금해할 이슈 하나를 선택해서 칼럼을 작성하세요.\n"
+        "단순 사실 나열이 절대 아닙니다. 이 사건이 왜 일어났는지, 무엇을 의미하는지,\n"
+        "우리 삶과 어떻게 연결되는지를 풀어내야 합니다.\n\n"
 
         "절대 지켜야 할 원칙:\n"
-        "1. 공식 확인된 팩트만 작성. 루머, 추측 절대 금지.\n"
+        "1. 공식 확인된 팩트 기반으로 작성. 단, 해석과 분석은 적극적으로.\n"
         "2. 명예훼손 절대 금지.\n"
-        "3. 반드시 존댓말. '~이다', '~한다' 반말 종결 절대 금지.\n"
-        "4. 중립적이고 객관적인 시각 유지.\n"
-        "5. 제목과 내용 일치. 낚시성 제목 금지.\n"
-        "6. 각 소제목 아래 내용은 최소 5문장 이상 충분히 작성할 것.\n"
-        "7. 절대로 글을 중간에 끊거나 생략하지 말 것. 반드시 완성된 글을 출력할 것.\n\n"
+        "3. 제목과 내용 일치. 낚시성 제목 금지.\n"
+        "4. 각 소제목 아래 최소 5문장 이상.\n"
+        "5. 절대로 글을 중간에 끊거나 생략하지 말 것. 반드시 완성된 글 출력.\n\n"
 
-        "글 구조 (반드시 이 순서로, 각 섹션 충분히 작성):\n\n"
-        "1. 리드문 (3~4줄)\n"
-        "핵심 팩트를 강렬하게 전달. 독자가 첫 문장에 멈추게 만드세요.\n"
-        "왜 이 뉴스가 지금 중요한지 한 문장으로 설명하세요.\n\n"
+        "글 구조 (반드시 이 순서로):\n\n"
+        "1. 훅 (2~3줄)\n"
+        "   독자를 멈추는 날카로운 질문 또는 역설적 사실. 이 글을 왜 읽어야 하는지 암시.\n\n"
         "2. ##핵심키워드##\n"
-        "이슈의 핵심을 한 단어나 짧은 구로 던지세요.\n"
-        "그 아래 3~4문장으로 충분히 풀어쓰세요.\n\n"
+        "   이슈의 본질을 한 단어나 짧은 구로 던지세요. 아래 3~4문장으로 압축 설명.\n\n"
         "3. 소제목 구조 (4개 필수)\n"
-        "소제목: [이모지 소제목내용 이모지] 형식. 앞뒤 이모지 필수.\n"
-        "예: [📌 사건의 전말 📌], [💬 각계 반응 💬], [🔍 배경과 맥락 🔍], [🌍 해외 반응 🌍]\n"
-        "각 소제목 아래: 최소 5문장 이상. 배경→팩트→반응→의미 순으로.\n"
-        "수치, 날짜, 출처 반드시 표기. 빈 줄로 단락 구분.\n\n"
-        "4. 전망 + 독자 생각거리 (3~4줄)\n"
-        "앞으로 어떻게 될지 간략히 + 독자에게 한 가지 질문이나 생각거리를 던지며 마무리.\n"
-        "'~될 것으로 보입니다' 식 결론 절대 금지.\n\n"
+        "   소제목 형식: [이모지 소제목내용 이모지]\n"
+        "   ① [📌 핵심 팩트 📌] — 수치·날짜 포함, 3~4문장으로 압축\n"
+        "   ② [🔍 왜 지금인가 🔍] — 이 이슈가 지금 터진 배경과 맥락\n"
+        "   ③ [💡 대부분이 모르는 이면 💡] — 언론이 잘 다루지 않는 시각, 구조적 원인\n"
+        "   ④ [🙋 나와 무슨 상관인가 🙋] — 독자 일상(돈·직업·소비·관계)과의 연결\n\n"
+        "4. 마무리 질문 (2~3줄)\n"
+        "   독자에게 하나의 생각거리를 던지며 끝. '~될 것입니다' 식 결론 절대 금지.\n\n"
         "5. 핵심 요약\n"
         "[SUMMARY_START]\n"
-        "핵심1 (구체적 수치나 팩트 포함)\n"
-        "핵심2 (배경이나 맥락)\n"
-        "핵심3 (앞으로의 전망 또는 독자에게 의미하는 것)\n"
+        "핵심1 (구체적 수치나 팩트)\n"
+        "핵심2 (이면 또는 구조적 원인)\n"
+        "핵심3 (독자 삶과의 연결 또는 생각거리)\n"
         "[SUMMARY_END]\n\n"
 
-        "분량 필수: 반드시 3000자 이상 4000자 이하로 작성하세요.\n"
-        "절대로 글을 중간에 끊지 말고 반드시 완성된 문장으로 마무리하세요.\n"
-        "AI 티 나는 나열식 표현 금지. 존댓말 필수.\n\n"
+        "분량: 반드시 3000자 이상 4000자 이하.\n"
+        "절대로 글을 중간에 끊지 말고 반드시 완성된 문장으로 마무리하세요.\n\n"
         "카테고리: " + category + "\n\n"
         "출력 형식:\n"
-        "제목: (반드시 첫 줄에 '제목: '으로 시작. 실제 이슈명과 핵심 팩트 포함. "
-        "날짜·카테고리명·'핫이슈' 같은 일반어 절대 금지)\n"
+        "제목: (첫 줄에 '제목: '으로 시작. 실제 이슈의 핵심 팩트 + 해석적 시각 포함.\n"
+        "       날짜·카테고리명·'핫이슈' 같은 일반어 절대 금지.\n"
+        "       예시 스타일: '웸반야마가 MVP보다 더 위험한 이유'\n"
+        "                    '금리 동결, 서민에게는 왜 기쁜 소식이 아닌가')\n"
         "---\n"
-        "(본문 시작 — 리드문부터 바로 작성. 반드시 완성된 전체 글 출력)"
+        "(본문 시작 — 훅부터 바로 작성. 반드시 완성된 전체 글 출력)"
     )
 
-    print("[AI] Gemini 2.5 Flash 기사 작성 중...")
+    print("[AI] Gemini 2.5 Flash 칼럼 작성 중...")
     full_text = call_gemini(prompt, max_tokens=8000)
 
     lines = full_text.strip().split("\n")
@@ -371,7 +416,7 @@ def generate_post():
             title = call_gemini(title_prompt, max_tokens=100).strip().split("\n")[0]
             title = title.replace("제목:", "").strip()
         except Exception:
-            title = category + " 핫이슈 " + datetime.now().strftime("%H%M")
+            title = category + " 칼럼 " + datetime.now().strftime("%H%M")
 
     if not body:
         body = full_text
@@ -386,34 +431,16 @@ def generate_post():
     return {"title": title, "body": body, "category": category}
 
 
-def get_image_keyword_from_title(title, category):
-    keyword_map = {
-        "축구": "soccer football player",
-        "야구": "baseball player",
-        "농구": "basketball player",
-        "손흥민": "soccer player football",
-        "류현진": "baseball pitcher",
-        "코스피": "stock market chart",
-        "부동산": "real estate building",
-        "금리": "finance money banking",
-        "환율": "currency exchange money",
-        "드라마": "korean drama tv",
-        "아이돌": "kpop concert music",
-        "연예": "entertainment stage performance",
-        "사건": "police investigation",
-        "정치": "government politics",
-        "경제": "business finance economy",
-    }
-    for kor, eng in keyword_map.items():
-        if kor in title:
-            return eng
-    category_defaults = {
-        "스포츠이슈": "sports athlete action",
-        "경제뉴스": "business finance economy",
-        "전국이슈": "city korea urban street",
-        "연예이슈": "stage performance music concert",
-    }
-    return category_defaults.get(category, "news media")
+# ──────────────────────────────────────────────
+# ✅ 핵심 변경: 이미지 키워드를 이슈/인물과 완전 분리
+#    - 카테고리별 중립 분위기 키워드 풀에서 랜덤 선택
+#    - 특정 인물·사건명 키워드 → 저작권/초상권 리스크 제거
+# ──────────────────────────────────────────────
+def get_image_keyword(category):
+    keywords = CATEGORY_IMAGE_KEYWORDS.get(category, ["city street morning"])
+    chosen = random.choice(keywords)
+    print("[이미지 키워드] " + chosen + " (카테고리 기반 중립 키워드)")
+    return chosen
 
 
 def get_images_unsplash(keyword, count=3):
@@ -509,8 +536,8 @@ def get_images_pixabay(keyword, count=3):
 
 
 def get_images(keyword, count=3, title="", category=""):
-    if title or category:
-        keyword = get_image_keyword_from_title(title, category)
+    # title 파라미터는 더 이상 키워드 생성에 사용하지 않음 (저작권 리스크 차단)
+    keyword = get_image_keyword(category)
     print("[이미지 검색] 키워드: " + keyword)
 
     images = get_images_unsplash(keyword, count)
@@ -670,7 +697,6 @@ def get_access_token():
 
 
 def request_google_indexing(post_url):
-    """Google Indexing API로 색인 자동 요청"""
     import json as json_lib, time, base64
     service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
     if not service_account_json:
@@ -762,7 +788,8 @@ def send_facebook(title, post_url, category):
 def post_to_blogger(post_data, images, retry=2):
     print("\n[Blogger] insaplayer 포스팅 시작...")
     category = post_data["category"]
-    labels = [category, TODAY]
+    # ✅ 태그: 날짜 제거, 의미 있는 키워드만
+    labels = [category, "시사칼럼", "이슈해설"]
 
     for attempt in range(1, retry + 2):
         try:
@@ -799,7 +826,7 @@ def post_to_blogger(post_data, images, retry=2):
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("insaplayer - 실시간 뉴스 블로그 v6 (Gemini 2.5 Flash + 색인 자동화)")
+    print("insaplayer - 시사해설 칼럼 블로그 v7 (Gemini 2.5 Flash + 칼럼니스트 프롬프트)")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
     test_apis()
