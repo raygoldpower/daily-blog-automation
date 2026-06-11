@@ -25,164 +25,164 @@ SPORT_EMOJI = {
 
 TOPICS = [
     # 축구
-    {"title": "드리블 속도 올리는 발목 가동성 훈련 3가지", "keyword": "soccer dribbling ankle mobility", "img_keyword": "soccer dribbling", "sport": "축구", "series": "드리블 마스터", "episode": 1},
-    {"title": "축구 순간 스피드 높이는 가속 훈련법", "keyword": "soccer acceleration sprint training", "img_keyword": "soccer sprint", "sport": "축구", "series": "스피드 혁명", "episode": 1},
-    {"title": "축구 슈팅력을 높이는 고관절 회전 훈련", "keyword": "soccer shooting hip rotation power", "img_keyword": "soccer shooting", "sport": "축구", "series": "슈팅 마스터", "episode": 1},
-    {"title": "전반 90분 체력 유지하는 지구력 훈련 루틴", "keyword": "soccer endurance 90 minutes stamina", "img_keyword": "soccer endurance", "sport": "축구", "series": "체력 마스터", "episode": 1},
-    {"title": "축구 선수 무릎 부상 예방 스쿼트 변형 동작", "keyword": "soccer knee injury prevention squat", "img_keyword": "knee injury soccer", "sport": "축구", "series": "부상 예방", "episode": 1},
+    {"title": "발목이 굳으면 드리블 속도가 떨어지는 진짜 이유... 아무도 말 안 해줍니다", "keyword": "soccer dribbling ankle mobility", "img_keyword": "soccer dribbling", "sport": "축구", "series": "드리블 마스터", "episode": 1},
+    {"title": "100m 달리기 선수도 못 따라오는 축구 선수들의 순간 가속 비밀", "keyword": "soccer acceleration sprint training", "img_keyword": "soccer sprint", "sport": "축구", "series": "스피드 혁명", "episode": 1},
+    {"title": "슛을 아무리 세게 차도 골이 안 들어간다면... 고관절을 확인하세요", "keyword": "soccer shooting hip rotation power", "img_keyword": "soccer shooting", "sport": "축구", "series": "슈팅 마스터", "episode": 1},
+    {"title": "후반 30분에도 스프린트하는 선수들이 숨기고 있는 체력 훈련법", "keyword": "soccer endurance 90 minutes stamina", "img_keyword": "soccer endurance", "sport": "축구", "series": "체력 마스터", "episode": 1},
+    {"title": "축구하다 무릎 다치는 선수들이 공통적으로 빠뜨리는 훈련 한 가지", "keyword": "soccer knee injury prevention squat", "img_keyword": "knee injury soccer", "sport": "축구", "series": "부상 예방", "episode": 1},
     # 농구
-    {"title": "농구 점프력 높이는 플라이오메트릭 훈련 루틴", "keyword": "basketball jump plyometric training", "img_keyword": "basketball jump", "sport": "농구", "series": "점프력 혁명", "episode": 1},
-    {"title": "농구 핸들링 실력 올리는 뇌 훈련법", "keyword": "basketball dribbling brain hand coordination", "img_keyword": "basketball dribbling", "sport": "농구", "series": "핸들링 마스터", "episode": 1},
-    {"title": "3점슛 성공률 높이는 손목 스냅 훈련", "keyword": "basketball three point wrist snap shooting", "img_keyword": "basketball shooting", "sport": "농구", "series": "슈팅 마스터", "episode": 1},
+    {"title": "점프력은 타고나는 게 아닙니다... 3개월 만에 10cm 높인 훈련법", "keyword": "basketball jump plyometric training", "img_keyword": "basketball jump", "sport": "농구", "series": "점프력 혁명", "episode": 1},
+    {"title": "농구 드리블이 늘지 않는 이유는 손이 아니라 뇌에 있었습니다", "keyword": "basketball dribbling brain hand coordination", "img_keyword": "basketball dribbling", "sport": "농구", "series": "핸들링 마스터", "episode": 1},
+    {"title": "프로선수들이 숨기고 싶어하는 3점슛 성공률의 비밀", "keyword": "basketball three point wrist snap shooting", "img_keyword": "basketball shooting", "sport": "농구", "series": "슈팅 마스터", "episode": 1},
     # 야구
-    {"title": "배트 스피드 높이는 하체 회전 훈련", "keyword": "baseball bat speed hip rotation", "img_keyword": "baseball batting", "sport": "야구", "series": "타격의 과학", "episode": 1},
-    {"title": "투수 어깨 부상 막는 회전근개 강화 운동", "keyword": "baseball pitcher rotator cuff injury prevention", "img_keyword": "baseball pitcher shoulder", "sport": "야구", "series": "투구의 과학", "episode": 1},
+    {"title": "배트 스피드가 안 나온다면... 상체가 아니라 하체를 먼저 보세요", "keyword": "baseball bat speed hip rotation", "img_keyword": "baseball batting", "sport": "야구", "series": "타격의 과학", "episode": 1},
+    {"title": "투수 어깨가 망가지기 전에 반드시 나타나는 신호 4가지", "keyword": "baseball pitcher rotator cuff injury prevention", "img_keyword": "baseball pitcher shoulder", "sport": "야구", "series": "투구의 과학", "episode": 1},
     # 근육학
-    {"title": "허벅지 앞 근육 키우는 스쿼트 변형 4가지", "keyword": "quadriceps squat variation muscle building", "img_keyword": "quadriceps squat", "sport": "근육학", "series": "근육 해부학", "episode": 1},
-    {"title": "햄스트링 파열 막는 편심성 수축 훈련법", "keyword": "hamstring eccentric training injury prevention", "img_keyword": "hamstring exercise", "sport": "근육학", "series": "근육 해부학", "episode": 2},
-    {"title": "복횡근 활성화로 허리 통증 잡는 방법", "keyword": "transverse abdominis core activation back pain", "img_keyword": "core training", "sport": "근육학", "series": "코어 과학", "episode": 1},
-    {"title": "삼각근 3개 부위 균형 있게 키우는 훈련", "keyword": "deltoid three heads shoulder training", "img_keyword": "shoulder deltoid workout", "sport": "근육학", "series": "상체 해부학", "episode": 1},
-    {"title": "종아리 근육 강화로 발목 부상 예방하기", "keyword": "calf muscle ankle stability injury prevention", "img_keyword": "calf muscle", "sport": "근육학", "series": "하체 해부학", "episode": 1},
-    {"title": "근육 성장 원리, 단백질 합성을 극대화하는 자극법", "keyword": "muscle protein synthesis hypertrophy", "img_keyword": "muscle growth", "sport": "근육학", "series": "근육 성장 과학", "episode": 1},
-    {"title": "전거근 약화가 어깨 통증을 만드는 이유", "keyword": "serratus anterior weakness shoulder pain", "img_keyword": "shoulder pain", "sport": "근육학", "series": "상체 해부학", "episode": 2},
-    {"title": "중둔근 강화로 무릎 통증과 골반 불균형 잡기", "keyword": "gluteus medius knee pain pelvic balance", "img_keyword": "gluteus medius hip", "sport": "근육학", "series": "하체 해부학", "episode": 2},
+    {"title": "스쿼트만 해도 허벅지 앞이 안 커진다면... 이 변형 동작을 모르는 겁니다", "keyword": "quadriceps squat variation muscle building", "img_keyword": "quadriceps squat", "sport": "근육학", "series": "근육 해부학", "episode": 1},
+    {"title": "전력 질주 중에 왜 허벅지 뒤만 터질까... 아무도 말 안 해준 이유", "keyword": "hamstring eccentric training injury prevention", "img_keyword": "hamstring exercise", "sport": "근육학", "series": "근육 해부학", "episode": 2},
+    {"title": "허리 통증의 진짜 원인은 허리가 아닙니다... 이 근육을 아세요?", "keyword": "transverse abdominis core activation back pain", "img_keyword": "core training", "sport": "근육학", "series": "코어 과학", "episode": 1},
+    {"title": "어깨 운동 열심히 했는데 한쪽만 커지는 이유", "keyword": "deltoid three heads shoulder training", "img_keyword": "shoulder deltoid workout", "sport": "근육학", "series": "상체 해부학", "episode": 1},
+    {"title": "발목을 자주 삐는 사람들이 공통적으로 약한 근육이 있습니다", "keyword": "calf muscle ankle stability injury prevention", "img_keyword": "calf muscle", "sport": "근육학", "series": "하체 해부학", "episode": 1},
+    {"title": "헬스장에서 아무리 열심히 해도 근육이 안 크는 진짜 이유", "keyword": "muscle protein synthesis hypertrophy", "img_keyword": "muscle growth", "sport": "근육학", "series": "근육 성장 과학", "episode": 1},
+    {"title": "어깨 통증의 80%는 이 근육 때문입니다... 처음 들어보셨죠?", "keyword": "serratus anterior weakness shoulder pain", "img_keyword": "shoulder pain", "sport": "근육학", "series": "상체 해부학", "episode": 2},
+    {"title": "무릎이 아픈데 엉덩이 운동을 하라고요? 이유가 있습니다", "keyword": "gluteus medius knee pain pelvic balance", "img_keyword": "gluteus medius hip", "sport": "근육학", "series": "하체 해부학", "episode": 2},
     # 재활
-    {"title": "무릎 연골 보호하는 슬개건염 재활 운동 순서", "keyword": "patellar tendinitis rehabilitation exercise", "img_keyword": "knee rehabilitation", "sport": "재활", "series": "부상 재활", "episode": 1},
-    {"title": "허리 디스크 통증 줄이는 요추 안정화 운동", "keyword": "lumbar disc stabilization exercise", "img_keyword": "lower back pain", "sport": "재활", "series": "부상 재활", "episode": 2},
-    {"title": "발목 염좌 후 빠른 복귀를 위한 재활 단계", "keyword": "ankle sprain rehabilitation return to sport", "img_keyword": "ankle sprain", "sport": "재활", "series": "부상 재활", "episode": 3},
-    {"title": "어깨 충돌 증후군 재활, 병원 가기 전 할 수 있는 것", "keyword": "shoulder impingement home rehabilitation", "img_keyword": "shoulder impingement", "sport": "재활", "series": "부상 재활", "episode": 4},
-    {"title": "아킬레스건 통증 있을 때 하면 안 되는 운동", "keyword": "achilles tendinopathy exercise avoid", "img_keyword": "achilles tendon", "sport": "재활", "series": "부상 재활", "episode": 5},
+    {"title": "무릎 연골이 닳기 전에 반드시 해야 할 운동... 병원에서 안 알려줍니다", "keyword": "patellar tendinitis rehabilitation exercise", "img_keyword": "knee rehabilitation", "sport": "재활", "series": "부상 재활", "episode": 1},
+    {"title": "허리 디스크 진단받은 후 절대 하면 안 되는 운동 3가지", "keyword": "lumbar disc stabilization exercise", "img_keyword": "lower back pain", "sport": "재활", "series": "부상 재활", "episode": 2},
+    {"title": "발목 삐끗한 후 바로 냉찜질했다면... 잘못된 겁니다", "keyword": "ankle sprain rehabilitation return to sport", "img_keyword": "ankle sprain", "sport": "재활", "series": "부상 재활", "episode": 3},
+    {"title": "어깨 충돌 증후군... 병원 가기 전 집에서 먼저 해볼 수 있는 것들", "keyword": "shoulder impingement home rehabilitation", "img_keyword": "shoulder impingement", "sport": "재활", "series": "부상 재활", "episode": 4},
+    {"title": "아킬레스건이 아플 때 스트레칭하면 안 된다는 걸 아는 사람이 없습니다", "keyword": "achilles tendinopathy exercise avoid", "img_keyword": "achilles tendon", "sport": "재활", "series": "부상 재활", "episode": 5},
     # 영양
-    {"title": "운동 1시간 전 뭘 먹어야 할까, 탄수화물 타이밍", "keyword": "pre workout meal carbohydrate timing", "img_keyword": "pre workout meal", "sport": "영양", "series": "스포츠 영양학", "episode": 1},
-    {"title": "탄수화물이 운동 퍼포먼스를 결정하는 과학적 이유", "keyword": "carbohydrate glycogen sports performance", "img_keyword": "carbohydrate food", "sport": "영양", "series": "스포츠 영양학", "episode": 2},
-    {"title": "크레아틴 복용법, 언제 얼마나 먹어야 효과적인가", "keyword": "creatine dosage timing supplement", "img_keyword": "creatine supplement", "sport": "영양", "series": "보충제 과학", "episode": 1},
-    {"title": "운동 중 수분 보충 타이밍과 양, 탈수 막는 방법", "keyword": "hydration during exercise timing amount", "img_keyword": "hydration water sports", "sport": "영양", "series": "스포츠 영양학", "episode": 3},
-    {"title": "단백질 하루 섭취량, 체중별 정확한 계산법", "keyword": "protein daily intake calculation body weight", "img_keyword": "protein food", "sport": "영양", "series": "스포츠 영양학", "episode": 4},
-    {"title": "운동 후 회복 빠르게 하는 영양 조합 3가지", "keyword": "post workout recovery nutrition combination", "img_keyword": "post workout nutrition", "sport": "영양", "series": "스포츠 영양학", "episode": 5},
+    {"title": "운동 전에 뭘 먹느냐가 운동 효과를 50% 이상 바꿉니다", "keyword": "pre workout meal carbohydrate timing", "img_keyword": "pre workout meal", "sport": "영양", "series": "스포츠 영양학", "episode": 1},
+    {"title": "탄수화물을 끊었더니 오히려 운동 실력이 떨어진 이유", "keyword": "carbohydrate glycogen sports performance", "img_keyword": "carbohydrate food", "sport": "영양", "series": "스포츠 영양학", "episode": 2},
+    {"title": "크레아틴 먹는 사람들이 가장 많이 하는 실수", "keyword": "creatine dosage timing supplement", "img_keyword": "creatine supplement", "sport": "영양", "series": "보충제 과학", "episode": 1},
+    {"title": "운동 중 물만 마시면 오히려 쥐가 나는 이유", "keyword": "hydration during exercise timing amount", "img_keyword": "hydration water sports", "sport": "영양", "series": "스포츠 영양학", "episode": 3},
+    {"title": "단백질 얼마나 먹어야 할까... 헬스 유튜버들이 다 틀린 이유", "keyword": "protein daily intake calculation body weight", "img_keyword": "protein food", "sport": "영양", "series": "스포츠 영양학", "episode": 4},
+    {"title": "운동 후 닭가슴살만 먹으면 오히려 회복이 느린 이유", "keyword": "post workout recovery nutrition combination", "img_keyword": "post workout nutrition", "sport": "영양", "series": "스포츠 영양학", "episode": 5},
     # 심리
-    {"title": "경기 전 긴장 푸는 루틴, 프로 선수들의 비밀", "keyword": "pre game routine anxiety control athletes", "img_keyword": "athlete focus", "sport": "심리", "series": "스포츠 심리학", "episode": 1},
-    {"title": "압박 상황에서 집중력 유지하는 멘탈 훈련법", "keyword": "focus under pressure mental training sports", "img_keyword": "mental training", "sport": "심리", "series": "스포츠 심리학", "episode": 2},
-    {"title": "운동 슬럼프 극복하는 심리학적 접근 3단계", "keyword": "sports slump recovery psychology steps", "img_keyword": "athlete motivation", "sport": "심리", "series": "스포츠 심리학", "episode": 3},
-    {"title": "이미지 트레이닝이 실제 운동 실력을 올리는 원리", "keyword": "mental imagery visualization sports performance", "img_keyword": "visualization meditation", "sport": "심리", "series": "스포츠 심리학", "episode": 4},
+    {"title": "경기 전 긴장되면 잘하는 선수, 망하는 선수... 차이가 뭘까요", "keyword": "pre game routine anxiety control athletes", "img_keyword": "athlete focus", "sport": "심리", "series": "스포츠 심리학", "episode": 1},
+    {"title": "압박 상황에서 집중력이 무너지는 사람들의 공통점", "keyword": "focus under pressure mental training sports", "img_keyword": "mental training", "sport": "심리", "series": "스포츠 심리학", "episode": 2},
+    {"title": "열심히 하는데 실력이 안 늘 때... 슬럼프의 진짜 원인", "keyword": "sports slump recovery psychology steps", "img_keyword": "athlete motivation", "sport": "심리", "series": "스포츠 심리학", "episode": 3},
+    {"title": "머릿속으로 연습해도 실력이 는다는 게 사실일까요?", "keyword": "mental imagery visualization sports performance", "img_keyword": "visualization meditation", "sport": "심리", "series": "스포츠 심리학", "episode": 4},
     # 체력
-    {"title": "VO2max 높이는 인터벌 훈련 방법과 강도 설정", "keyword": "VO2max interval training intensity", "img_keyword": "interval running", "sport": "체력", "series": "체력 과학", "episode": 1},
-    {"title": "젖산 역치 높이는 훈련으로 지구력 올리기", "keyword": "lactate threshold training endurance", "img_keyword": "endurance running", "sport": "체력", "series": "체력 과학", "episode": 2},
-    {"title": "HIIT 운동 효과 극대화하는 휴식 시간 설정법", "keyword": "HIIT rest interval optimization fat loss", "img_keyword": "HIIT workout", "sport": "체력", "series": "유산소 과학", "episode": 1},
-    {"title": "심박수 구간별 운동 강도 설정하는 방법", "keyword": "heart rate zone exercise intensity training", "img_keyword": "heart rate monitor", "sport": "체력", "series": "체력 과학", "episode": 3},
+    {"title": "숨이 빨리 차는 사람들이 모르는 폐활량 vs 심폐기능의 차이", "keyword": "VO2max interval training intensity", "img_keyword": "interval running", "sport": "체력", "series": "체력 과학", "episode": 1},
+    {"title": "마라톤 선수들이 절대 안 지치는 이유... 젖산의 오해와 진실", "keyword": "lactate threshold training endurance", "img_keyword": "endurance running", "sport": "체력", "series": "체력 과학", "episode": 2},
+    {"title": "HIIT 30분 했는데 왜 살이 안 빠질까... 휴식 시간이 문제였습니다", "keyword": "HIIT rest interval optimization fat loss", "img_keyword": "HIIT workout", "sport": "체력", "series": "유산소 과학", "episode": 1},
+    {"title": "심박수 보고 운동하면 왜 살이 더 잘 빠질까", "keyword": "heart rate zone exercise intensity training", "img_keyword": "heart rate monitor", "sport": "체력", "series": "체력 과학", "episode": 3},
     # 유연성
-    {"title": "운동 전 동적 스트레칭 루틴, 부상 예방 효과", "keyword": "dynamic stretching warm up injury prevention", "img_keyword": "dynamic stretching", "sport": "유연성", "series": "유연성 과학", "episode": 1},
-    {"title": "고관절 유연성 높이는 스트레칭 5가지", "keyword": "hip flexor mobility stretching exercises", "img_keyword": "hip stretching", "sport": "유연성", "series": "가동성 혁명", "episode": 1},
-    {"title": "폼롤러로 근막 이완하는 올바른 방법과 주의사항", "keyword": "foam rolling myofascial release technique", "img_keyword": "foam roller", "sport": "유연성", "series": "회복 과학", "episode": 1},
-    {"title": "흉추 가동성 높이면 어깨 통증이 사라지는 이유", "keyword": "thoracic spine mobility shoulder pain", "img_keyword": "spine mobility", "sport": "유연성", "series": "가동성 혁명", "episode": 2},
+    {"title": "운동 전 스트레칭이 오히려 부상을 유발한다는 게 사실일까요", "keyword": "dynamic stretching warm up injury prevention", "img_keyword": "dynamic stretching", "sport": "유연성", "series": "유연성 과학", "episode": 1},
+    {"title": "고관절이 굳으면 허리 무릎 어깨까지 망가지는 이유", "keyword": "hip flexor mobility stretching exercises", "img_keyword": "hip stretching", "sport": "유연성", "series": "가동성 혁명", "episode": 1},
+    {"title": "폼롤러 잘못 쓰면 오히려 근육이 더 굳습니다", "keyword": "foam rolling myofascial release technique", "img_keyword": "foam roller", "sport": "유연성", "series": "회복 과학", "episode": 1},
+    {"title": "어깨 통증 있는 사람들이 등을 먼저 풀어야 하는 이유", "keyword": "thoracic spine mobility shoulder pain", "img_keyword": "spine mobility", "sport": "유연성", "series": "가동성 혁명", "episode": 2},
     # 생리학
-    {"title": "운동할 때 근육에서 실제로 일어나는 일", "keyword": "muscle physiology exercise ATP energy", "img_keyword": "muscle exercise", "sport": "생리학", "series": "운동 생리학", "episode": 1},
-    {"title": "유산소 운동 중 지방이 타는 정확한 원리", "keyword": "fat oxidation aerobic exercise physiology", "img_keyword": "aerobic exercise", "sport": "생리학", "series": "운동 생리학", "episode": 2},
-    {"title": "수면 중 성장호르몬이 근육을 키우는 메커니즘", "keyword": "growth hormone sleep muscle recovery", "img_keyword": "sleep recovery", "sport": "생리학", "series": "운동 생리학", "episode": 3},
-    {"title": "운동 후 통증(DOMS)이 생기는 진짜 이유와 해결법", "keyword": "DOMS delayed onset muscle soreness cause", "img_keyword": "muscle soreness", "sport": "생리학", "series": "운동 생리학", "episode": 4},
-    {"title": "심장이 운동에 적응하는 방식, 운동성 심비대", "keyword": "cardiac adaptation exercise athlete heart", "img_keyword": "heart cardio", "sport": "생리학", "series": "운동 생리학", "episode": 5},
-    {"title": "코르티솔이 높으면 근육이 빠지는 이유", "keyword": "cortisol muscle loss stress hormone", "img_keyword": "stress cortisol", "sport": "생리학", "series": "운동 생리학", "episode": 6},
+    {"title": "운동할 때 근육에서 실제로 일어나는 일... 교과서엔 없는 이야기", "keyword": "muscle physiology exercise ATP energy", "img_keyword": "muscle exercise", "sport": "생리학", "series": "운동 생리학", "episode": 1},
+    {"title": "유산소 운동 30분 해도 지방이 안 타는 사람들의 공통점", "keyword": "fat oxidation aerobic exercise physiology", "img_keyword": "aerobic exercise", "sport": "생리학", "series": "운동 생리학", "episode": 2},
+    {"title": "잠자는 동안 근육이 큰다는 게 진짜입니까?", "keyword": "growth hormone sleep muscle recovery", "img_keyword": "sleep recovery", "sport": "생리학", "series": "운동 생리학", "episode": 3},
+    {"title": "운동 후 근육통이 심할수록 성장이 빠르다는 믿음의 진실", "keyword": "DOMS delayed onset muscle soreness cause", "img_keyword": "muscle soreness", "sport": "생리학", "series": "운동 생리학", "episode": 4},
+    {"title": "운동선수의 심장이 일반인보다 50% 더 큰 이유", "keyword": "cardiac adaptation exercise athlete heart", "img_keyword": "heart cardio", "sport": "생리학", "series": "운동 생리학", "episode": 5},
+    {"title": "스트레스를 많이 받으면 왜 살이 찌고 근육이 빠질까", "keyword": "cortisol muscle loss stress hormone", "img_keyword": "stress cortisol", "sport": "생리학", "series": "운동 생리학", "episode": 6},
     # 물리치료
-    {"title": "어깨 통증 있을 때 물리치료사가 먼저 확인하는 것", "keyword": "shoulder pain physical therapy assessment", "img_keyword": "shoulder physical therapy", "sport": "물리치료", "series": "물리치료 가이드", "episode": 1},
-    {"title": "무릎 통증 자가 진단, 병원 가야 할 신호", "keyword": "knee pain self diagnosis when to see doctor", "img_keyword": "knee pain", "sport": "물리치료", "series": "물리치료 가이드", "episode": 2},
-    {"title": "테니스 엘보 치료, 집에서 할 수 있는 운동", "keyword": "tennis elbow treatment home exercise", "img_keyword": "tennis elbow", "sport": "물리치료", "series": "물리치료 가이드", "episode": 3},
-    {"title": "족저근막염 아침 통증 줄이는 스트레칭 루틴", "keyword": "plantar fasciitis morning stretching routine", "img_keyword": "plantar fasciitis foot", "sport": "물리치료", "series": "물리치료 가이드", "episode": 4},
-    {"title": "거북목 교정 운동, 하루 5분으로 효과 보기", "keyword": "forward head posture correction exercise", "img_keyword": "neck posture", "sport": "물리치료", "series": "물리치료 가이드", "episode": 5},
+    {"title": "어깨가 아프다고 하면 물리치료사가 왜 목부터 만져볼까요", "keyword": "shoulder pain physical therapy assessment", "img_keyword": "shoulder physical therapy", "sport": "물리치료", "series": "물리치료 가이드", "episode": 1},
+    {"title": "무릎 통증... 병원 가야 할 신호 vs 집에서 해결 가능한 신호", "keyword": "knee pain self diagnosis when to see doctor", "img_keyword": "knee pain", "sport": "물리치료", "series": "물리치료 가이드", "episode": 2},
+    {"title": "테니스 안 치는데 테니스 엘보가 생겼다면... 이것 때문입니다", "keyword": "tennis elbow treatment home exercise", "img_keyword": "tennis elbow", "sport": "물리치료", "series": "물리치료 가이드", "episode": 3},
+    {"title": "아침마다 발바닥이 찌릿한 사람들이 놓치고 있는 것", "keyword": "plantar fasciitis morning stretching routine", "img_keyword": "plantar fasciitis foot", "sport": "물리치료", "series": "물리치료 가이드", "episode": 4},
+    {"title": "거북목 교정 운동... 하루 5분으로 정말 효과가 있을까요", "keyword": "forward head posture correction exercise", "img_keyword": "neck posture", "sport": "물리치료", "series": "물리치료 가이드", "episode": 5},
     # 역학
-    {"title": "달리기 자세 분석, 무릎에 가해지는 충격 줄이기", "keyword": "running biomechanics knee impact reduction", "img_keyword": "running form", "sport": "역학", "series": "스포츠 역학", "episode": 1},
-    {"title": "스쿼트할 때 무릎이 안쪽으로 무너지는 원인", "keyword": "squat knee valgus cause biomechanics", "img_keyword": "squat form", "sport": "역학", "series": "스포츠 역학", "episode": 2},
-    {"title": "데드리프트 허리 부상 막는 척추 중립 자세", "keyword": "deadlift spine neutral position injury prevention", "img_keyword": "deadlift", "sport": "역학", "series": "스포츠 역학", "episode": 3},
-    {"title": "점프 착지 자세가 전방십자인대 부상을 결정한다", "keyword": "landing mechanics ACL injury prevention", "img_keyword": "jump landing", "sport": "역학", "series": "스포츠 역학", "episode": 4},
+    {"title": "달리기할 때 무릎이 아픈 사람들이 공통적으로 틀린 자세", "keyword": "running biomechanics knee impact reduction", "img_keyword": "running form", "sport": "역학", "series": "스포츠 역학", "episode": 1},
+    {"title": "스쿼트할 때 무릎이 안쪽으로 무너지는 이유... 무릎 문제가 아닙니다", "keyword": "squat knee valgus cause biomechanics", "img_keyword": "squat form", "sport": "역학", "series": "스포츠 역학", "episode": 2},
+    {"title": "데드리프트로 허리 다치는 사람들이 몰랐던 척추 중립의 진실", "keyword": "deadlift spine neutral position injury prevention", "img_keyword": "deadlift", "sport": "역학", "series": "스포츠 역학", "episode": 3},
+    {"title": "착지하는 0.1초가 무릎 십자인대를 결정합니다", "keyword": "landing mechanics ACL injury prevention", "img_keyword": "jump landing", "sport": "역학", "series": "스포츠 역학", "episode": 4},
     # 해부학
-    {"title": "무릎 관절 구조, 왜 이렇게 자주 다칠까", "keyword": "knee joint anatomy structure injury", "img_keyword": "knee joint", "sport": "해부학", "series": "스포츠 해부학", "episode": 1},
-    {"title": "어깨 관절 360도 움직임이 가능한 이유와 약점", "keyword": "shoulder joint anatomy mobility instability", "img_keyword": "shoulder joint", "sport": "해부학", "series": "스포츠 해부학", "episode": 2},
-    {"title": "발의 아치 구조가 달리기에 미치는 영향", "keyword": "foot arch structure running performance", "img_keyword": "foot arch", "sport": "해부학", "series": "스포츠 해부학", "episode": 3},
-    {"title": "척추 디스크 구조와 압력이 가해지는 자세", "keyword": "spinal disc anatomy pressure posture", "img_keyword": "spine disc", "sport": "해부학", "series": "스포츠 해부학", "episode": 4},
+    {"title": "무릎이 왜 이렇게 자주 다칠까... 구조를 보면 당연합니다", "keyword": "knee joint anatomy structure injury", "img_keyword": "knee joint", "sport": "해부학", "series": "스포츠 해부학", "episode": 1},
+    {"title": "어깨가 360도 돌아가는 건 축복이자 저주입니다", "keyword": "shoulder joint anatomy mobility instability", "img_keyword": "shoulder joint", "sport": "해부학", "series": "스포츠 해부학", "episode": 2},
+    {"title": "발 아치가 무너지면 무릎 허리 목까지 망가지는 연결고리", "keyword": "foot arch structure running performance", "img_keyword": "foot arch", "sport": "해부학", "series": "스포츠 해부학", "episode": 3},
+    {"title": "앉을 때 자세 하나가 허리 디스크 압력을 3배 높입니다", "keyword": "spinal disc anatomy pressure posture", "img_keyword": "spine disc", "sport": "해부학", "series": "스포츠 해부학", "episode": 4},
     # 신체균형
-    {"title": "골반 틀어짐이 허리·무릎 통증을 만드는 연결고리", "keyword": "pelvic tilt imbalance lower back knee pain", "img_keyword": "pelvic posture", "sport": "신체균형", "series": "체형 교정", "episode": 1},
-    {"title": "한쪽 어깨가 낮은 이유, 척추측만증 자가 체크법", "keyword": "shoulder uneven scoliosis self check", "img_keyword": "scoliosis posture", "sport": "신체균형", "series": "체형 교정", "episode": 2},
-    {"title": "평발이 운동 능력에 미치는 영향과 교정 방법", "keyword": "flat feet sports performance correction", "img_keyword": "flat feet", "sport": "신체균형", "series": "체형 교정", "episode": 3},
-    {"title": "X자 다리 교정 운동, 중둔근부터 강화해야 하는 이유", "keyword": "knock knees correction gluteus medius", "img_keyword": "knock knees legs", "sport": "신체균형", "series": "체형 교정", "episode": 4},
+    {"title": "거울 앞에 서면 한쪽 어깨가 낮은 이유... 방치하면 생기는 일", "keyword": "pelvic tilt imbalance lower back knee pain", "img_keyword": "pelvic posture", "sport": "신체균형", "series": "체형 교정", "episode": 1},
+    {"title": "척추측만증... 집에서 5분이면 자가 진단 가능합니다", "keyword": "shoulder uneven scoliosis self check", "img_keyword": "scoliosis posture", "sport": "신체균형", "series": "체형 교정", "episode": 2},
+    {"title": "평발인 사람이 운동할 때 반드시 알아야 하는 것들", "keyword": "flat feet sports performance correction", "img_keyword": "flat feet", "sport": "신체균형", "series": "체형 교정", "episode": 3},
+    {"title": "X자 다리 때문에 무릎이 아픈데 스쿼트만 하고 있다면...", "keyword": "knock knees correction gluteus medius", "img_keyword": "knock knees legs", "sport": "신체균형", "series": "체형 교정", "episode": 4},
     # 스포츠의학
-    {"title": "성장판 손상 없이 청소년이 안전하게 운동하는 방법", "keyword": "youth athlete growth plate safe training", "img_keyword": "youth sports training", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 1},
-    {"title": "열사병 위험 신호, 여름 운동 시 주의사항", "keyword": "heat stroke warning signs summer exercise", "img_keyword": "heat stroke summer", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 2},
-    {"title": "운동 중 갑자기 쥐가 나는 이유와 예방법", "keyword": "exercise cramp cause prevention electrolyte", "img_keyword": "muscle cramp", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 3},
-    {"title": "과훈련 증후군 자가 체크, 지금 쉬어야 할 신호", "keyword": "overtraining syndrome self check recovery", "img_keyword": "overtraining fatigue", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 4},
+    {"title": "성장기 아이가 운동 많이 하면 키가 안 큰다는 게 사실일까요", "keyword": "youth athlete growth plate safe training", "img_keyword": "youth sports training", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 1},
+    {"title": "여름 운동 중 갑자기 쓰러지기 전에 반드시 나타나는 신호들", "keyword": "heat stroke warning signs summer exercise", "img_keyword": "heat stroke summer", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 2},
+    {"title": "운동 중 갑자기 쥐가 나는 이유... 물 부족이 아닙니다", "keyword": "exercise cramp cause prevention electrolyte", "img_keyword": "muscle cramp", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 3},
+    {"title": "열심히 운동하는데 왜 몸이 더 안 좋아질까... 과훈련의 징후들", "keyword": "overtraining syndrome self check recovery", "img_keyword": "overtraining fatigue", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 4},
     # 공통
-    {"title": "수면 7시간이 근육 성장과 체력에 미치는 영향", "keyword": "sleep 7 hours muscle growth performance", "img_keyword": "sleep recovery", "sport": "공통", "series": "회복 과학", "episode": 1},
-    {"title": "나이 들수록 근육이 빠지는 이유와 막는 방법", "keyword": "sarcopenia aging muscle loss prevention", "img_keyword": "aging fitness", "sport": "공통", "series": "시니어 스포츠", "episode": 1},
-    {"title": "아이 운동 시작 나이, 종목별 적합한 시기", "keyword": "youth sports age appropriate training", "img_keyword": "kids sports", "sport": "공통", "series": "스포츠 발달", "episode": 1},
-    {"title": "운동 초보자가 첫 달에 반드시 지켜야 할 원칙", "keyword": "beginner exercise first month principles", "img_keyword": "beginner workout", "sport": "공통", "series": "운동 입문", "episode": 1},
-    {"title": "체중 감량과 근육 증가를 동시에 하는 방법", "keyword": "body recomposition fat loss muscle gain", "img_keyword": "body recomposition", "sport": "공통", "series": "운동 입문", "episode": 2},
+    {"title": "7시간 자면 근육이 더 잘 큰다는 게 진짜입니까?", "keyword": "sleep 7 hours muscle growth performance", "img_keyword": "sleep recovery", "sport": "공통", "series": "회복 과학", "episode": 1},
+    {"title": "나이 들면서 근육이 빠지는 건 막을 수 없을까요", "keyword": "sarcopenia aging muscle loss prevention", "img_keyword": "aging fitness", "sport": "공통", "series": "시니어 스포츠", "episode": 1},
+    {"title": "아이 운동 시작 나이... 너무 일찍 시작하면 생기는 일", "keyword": "youth sports age appropriate training", "img_keyword": "kids sports", "sport": "공통", "series": "스포츠 발달", "episode": 1},
+    {"title": "운동 처음 시작했다가 한 달 만에 포기하는 사람들의 공통점", "keyword": "beginner exercise first month principles", "img_keyword": "beginner workout", "sport": "공통", "series": "운동 입문", "episode": 1},
+    {"title": "다이어트와 근육 증가를 동시에 한다는 게 가능한 일일까요", "keyword": "body recomposition fat loss muscle gain", "img_keyword": "body recomposition", "sport": "공통", "series": "운동 입문", "episode": 2},
     # 가동성 사슬
-    {"title": "드리블 속도 올리는 발목 가동성이 무릎 부상을 막는 이유", "keyword": "soccer ankle mobility knee injury prevention", "img_keyword": "ankle mobility", "sport": "축구", "series": "가동성 사슬", "episode": 1},
-    {"title": "골반 불균형이 요추 안정화 운동 효과를 반감시키는 이유", "keyword": "pelvic tilt lumbar stabilization biomechanics", "img_keyword": "pelvic balance", "sport": "신체균형", "series": "가동성 사슬", "episode": 2},
-    {"title": "흉추 가동성 부족이 벤치프레스 시 어깨 충돌을 만드는 과정", "keyword": "thoracic mobility shoulder impingement bench press", "img_keyword": "bench press shoulder", "sport": "유연성", "series": "가동성 사슬", "episode": 3},
-    {"title": "고관절 회전 제한이 야구 투수 구속 저하를 일으키는 해부학적 경로", "keyword": "hip rotation baseball pitching velocity anatomy", "img_keyword": "hip rotation pitcher", "sport": "야구", "series": "가동성 사슬", "episode": 4},
-    {"title": "발 아치 무너짐이 상체 밸런스까지 무너뜨리는 상행성 사슬 원리", "keyword": "foot arch collapse upper body balance chain", "img_keyword": "foot arch balance", "sport": "해부학", "series": "가동성 사슬", "episode": 5},
+    {"title": "발목이 굳으면 무릎까지 망가지는 이유... 연결고리를 아세요?", "keyword": "soccer ankle mobility knee injury prevention", "img_keyword": "ankle mobility", "sport": "축구", "series": "가동성 사슬", "episode": 1},
+    {"title": "골반이 틀어지면 허리 운동이 왜 소용없는지 아시나요", "keyword": "pelvic tilt lumbar stabilization biomechanics", "img_keyword": "pelvic balance", "sport": "신체균형", "series": "가동성 사슬", "episode": 2},
+    {"title": "벤치프레스할 때 어깨가 아픈 이유... 등이 굳어있기 때문입니다", "keyword": "thoracic mobility shoulder impingement bench press", "img_keyword": "bench press shoulder", "sport": "유연성", "series": "가동성 사슬", "episode": 3},
+    {"title": "고관절이 막힌 투수들이 구속을 잃는 해부학적 이유", "keyword": "hip rotation baseball pitching velocity anatomy", "img_keyword": "hip rotation pitcher", "sport": "야구", "series": "가동성 사슬", "episode": 4},
+    {"title": "발 아치가 무너지면 상체 밸런스까지 무너지는 도미노 원리", "keyword": "foot arch collapse upper body balance chain", "img_keyword": "foot arch balance", "sport": "해부학", "series": "가동성 사슬", "episode": 5},
     # 에너지 과학
-    {"title": "크레아틴 인산 시스템과 젖산 역치의 상호작용, HIIT 훈련의 본질", "keyword": "ATP-PC system lactate threshold HIIT physiology", "img_keyword": "HIIT training", "sport": "생리학", "series": "에너지 과학", "episode": 1},
-    {"title": "탄수화물 로딩과 글리코겐 고갈, 경기 전 식단이 VO2max에 미치는 영향", "keyword": "carbohydrate loading glycogen VO2max performance", "img_keyword": "carbohydrate loading", "sport": "영양", "series": "에너지 과학", "episode": 2},
-    {"title": "DOMS와 성장호르몬, 수면 7시간이 단백질 합성을 결정하는 법", "keyword": "DOMS growth hormone sleep muscle protein synthesis", "img_keyword": "muscle recovery sleep", "sport": "생리학", "series": "에너지 과학", "episode": 3},
-    {"title": "지방 연소 효율을 극대화하는 유산소 심박수 구간 설정의 과학", "keyword": "fat oxidation aerobic heart rate zone science", "img_keyword": "fat burning cardio", "sport": "체력", "series": "에너지 과학", "episode": 4},
-    {"title": "코르티솔 농도가 운동 슬럼프와 근손실에 미치는 파괴적인 영향", "keyword": "cortisol muscle loss exercise slump physiology", "img_keyword": "stress hormone", "sport": "생리학", "series": "에너지 과학", "episode": 5},
+    {"title": "HIIT 할 때 왜 처음 1분이 제일 힘든지 아세요?", "keyword": "ATP-PC system lactate threshold HIIT physiology", "img_keyword": "HIIT training", "sport": "생리학", "series": "에너지 과학", "episode": 1},
+    {"title": "경기 전날 밥을 많이 먹으면 정말 더 잘 뛸 수 있을까요", "keyword": "carbohydrate loading glycogen VO2max performance", "img_keyword": "carbohydrate loading", "sport": "영양", "series": "에너지 과학", "episode": 2},
+    {"title": "근육통이 심할수록 잠을 더 자야 하는 과학적 이유", "keyword": "DOMS growth hormone sleep muscle protein synthesis", "img_keyword": "muscle recovery sleep", "sport": "생리학", "series": "에너지 과학", "episode": 3},
+    {"title": "지방이 잘 타는 심박수가 따로 있다는 게 사실일까요", "keyword": "fat oxidation aerobic heart rate zone science", "img_keyword": "fat burning cardio", "sport": "체력", "series": "에너지 과학", "episode": 4},
+    {"title": "스트레스받으면 운동해도 소용없다는 말이 사실인 이유", "keyword": "cortisol muscle loss exercise slump physiology", "img_keyword": "stress hormone", "sport": "생리학", "series": "에너지 과학", "episode": 5},
     # 부상 잔혹사
-    {"title": "왜 전력 질주 중에만 터질까, 햄스트링 편심성 수축과 달리기 역학", "keyword": "hamstring eccentric contraction running biomechanics", "img_keyword": "hamstring running", "sport": "재활", "series": "부상 잔혹사", "episode": 1},
-    {"title": "전방십자인대 부상을 결정하는 점프 착지 자세와 중둔근 활성화", "keyword": "ACL injury landing mechanics gluteus medius", "img_keyword": "ACL knee injury", "sport": "역학", "series": "부상 잔혹사", "episode": 2},
-    {"title": "족저근막염 아침 통증이 아킬레스건 가동성과 연결되는 해부학적 이유", "keyword": "plantar fasciitis achilles tendinopathy connection", "img_keyword": "plantar fasciitis", "sport": "물리치료", "series": "부상 잔혹사", "episode": 3},
-    {"title": "테니스 엘보 치료의 핵심은 손목이 아닌 견갑골 안정화다", "keyword": "tennis elbow scapular stability physical therapy", "img_keyword": "tennis elbow", "sport": "물리치료", "series": "부상 잔혹사", "episode": 4},
-    {"title": "허리 디스크 재활 중 절대로 피해야 할 3가지 움직임", "keyword": "lumbar disc rehabilitation avoid movements", "img_keyword": "lumbar disc", "sport": "재활", "series": "부상 잔혹사", "episode": 5},
+    {"title": "왜 달리기 중에만 허벅지 뒤가 터질까... 충격적인 진실", "keyword": "hamstring eccentric contraction running biomechanics", "img_keyword": "hamstring running", "sport": "재활", "series": "부상 잔혹사", "episode": 1},
+    {"title": "점프 착지 0.1초가 무릎 십자인대를 끊는 메커니즘", "keyword": "ACL injury landing mechanics gluteus medius", "img_keyword": "ACL knee injury", "sport": "역학", "series": "부상 잔혹사", "episode": 2},
+    {"title": "족저근막염 아침 통증... 발바닥이 아니라 종아리가 원인입니다", "keyword": "plantar fasciitis achilles tendinopathy connection", "img_keyword": "plantar fasciitis", "sport": "물리치료", "series": "부상 잔혹사", "episode": 3},
+    {"title": "테니스 엘보 치료... 손목이 아니라 어깨를 봐야 하는 이유", "keyword": "tennis elbow scapular stability physical therapy", "img_keyword": "tennis elbow", "sport": "물리치료", "series": "부상 잔혹사", "episode": 4},
+    {"title": "허리 디스크 재활 중 절대로 하면 안 되는 운동들", "keyword": "lumbar disc rehabilitation avoid movements", "img_keyword": "lumbar disc", "sport": "재활", "series": "부상 잔혹사", "episode": 5},
     # 오피스 애슬리트
-    {"title": "하루 8시간 거북목 습관이 투수의 회전근개 부상을 유발하는 경로", "keyword": "forward head posture rotator cuff injury pitcher", "img_keyword": "neck posture office", "sport": "신체균형", "series": "오피스 애슬리트", "episode": 1},
-    {"title": "복횡근이 비활성화된 직장인이 스쿼트 시 허리를 다치는 진짜 이유", "keyword": "transverse abdominis core squat back pain", "img_keyword": "core squat", "sport": "근육학", "series": "오피스 애슬리트", "episode": 2},
-    {"title": "장요근 단축이 엉덩이 근육 성장을 방해하는 상호 억제 기전", "keyword": "psoas muscle gluteal amnesia reciprocal inhibition", "img_keyword": "hip flexor psoas", "sport": "근육학", "series": "오피스 애슬리트", "episode": 3},
-    {"title": "의자에 앉아 있는 시간이 햄스트링 유연성을 파괴하는 생리학적 과정", "keyword": "sitting posture hamstring flexibility physiology", "img_keyword": "sitting hamstring", "sport": "유연성", "series": "오피스 애슬리트", "episode": 4},
+    {"title": "하루 8시간 앉아있으면 운동선수도 부상 위험이 높아지는 이유", "keyword": "forward head posture rotator cuff injury pitcher", "img_keyword": "neck posture office", "sport": "신체균형", "series": "오피스 애슬리트", "episode": 1},
+    {"title": "하루 종일 앉아있는 직장인이 스쿼트하면 허리를 다치는 이유", "keyword": "transverse abdominis core squat back pain", "img_keyword": "core squat", "sport": "근육학", "series": "오피스 애슬리트", "episode": 2},
+    {"title": "의자에 오래 앉으면 엉덩이 근육이 까먹어버린다는 게 사실입니다", "keyword": "psoas muscle gluteal amnesia reciprocal inhibition", "img_keyword": "hip flexor psoas", "sport": "근육학", "series": "오피스 애슬리트", "episode": 3},
+    {"title": "하루 8시간 앉아있으면 햄스트링이 단단해지는 진짜 이유", "keyword": "sitting posture hamstring flexibility physiology", "img_keyword": "sitting hamstring", "sport": "유연성", "series": "오피스 애슬리트", "episode": 4},
     # 엘리트 마인드
-    {"title": "압박 상황에서 집중력을 유지하는 초점 주의 훈련과 뇌파 변화", "keyword": "focus under pressure attentional focus brain waves", "img_keyword": "athlete concentration", "sport": "심리", "series": "엘리트 마인드", "episode": 1},
-    {"title": "이미지 트레이닝이 실제 근신경계를 활성화하는 거울 뉴런의 원리", "keyword": "mental imagery mirror neurons neuromuscular activation", "img_keyword": "mental visualization", "sport": "심리", "series": "엘리트 마인드", "episode": 2},
-    {"title": "경기 전 긴장감을 흥분으로 전환하는 인지 재구성 방법", "keyword": "pre-game anxiety cognitive reappraisal sports", "img_keyword": "athlete pregame", "sport": "심리", "series": "엘리트 마인드", "episode": 3},
-    {"title": "슬럼프를 탈피하는 3단계 심리학적 루틴, 통제 가능한 요소에 집중하라", "keyword": "sports slump recovery 3 steps psychology", "img_keyword": "sports motivation", "sport": "심리", "series": "엘리트 마인드", "episode": 4},
-    {"title": "운동 강도와 도파민 수용체의 상관관계, 오버트레이닝을 막는 멘탈 가이드", "keyword": "exercise intensity dopamine overtraining mental", "img_keyword": "overtraining fatigue", "sport": "스포츠의학", "series": "엘리트 마인드", "episode": 5},
+    {"title": "압박 상황에서 집중력이 올라가는 사람과 무너지는 사람의 차이", "keyword": "focus under pressure attentional focus brain waves", "img_keyword": "athlete concentration", "sport": "심리", "series": "엘리트 마인드", "episode": 1},
+    {"title": "머릿속으로만 연습해도 근육이 반응한다는 게 사실일까요", "keyword": "mental imagery mirror neurons neuromuscular activation", "img_keyword": "mental visualization", "sport": "심리", "series": "엘리트 마인드", "episode": 2},
+    {"title": "경기 전 긴장감... 없애려 하면 더 떨리는 이유가 있습니다", "keyword": "pre-game anxiety cognitive reappraisal sports", "img_keyword": "athlete pregame", "sport": "심리", "series": "엘리트 마인드", "episode": 3},
+    {"title": "슬럼프에서 빠져나오지 못하는 사람들이 공통적으로 하는 실수", "keyword": "sports slump recovery 3 steps psychology", "img_keyword": "sports motivation", "sport": "심리", "series": "엘리트 마인드", "episode": 4},
+    {"title": "운동 중독자들이 놓치는 치명적 신호... 도파민이 당신을 배신할 때", "keyword": "exercise intensity dopamine overtraining mental", "img_keyword": "overtraining fatigue", "sport": "스포츠의학", "series": "엘리트 마인드", "episode": 5},
     # 통증 케어
-    {"title": "어깨 통증의 80%는 이 근육 때문이에요, 전거근 약화 자가 진단법", "keyword": "shoulder pain serratus anterior weakness", "img_keyword": "shoulder pain relief", "sport": "물리치료", "series": "통증 케어", "episode": 1},
-    {"title": "무릎 앞쪽이 계단 내려갈 때 아프다면, 슬개건염 원인과 해결법", "keyword": "knee pain stairs patellar tendinitis", "img_keyword": "knee pain", "sport": "물리치료", "series": "통증 케어", "episode": 2},
-    {"title": "발목을 자주 삐는 사람들의 공통점, 고유감각 훈련으로 해결하기", "keyword": "ankle sprain proprioception training", "img_keyword": "ankle stability", "sport": "물리치료", "series": "통증 케어", "episode": 3},
-    {"title": "목 디스크 없이도 팔이 저린 이유, 흉곽출구증후군 자가 체크", "keyword": "thoracic outlet syndrome arm numbness", "img_keyword": "neck shoulder pain", "sport": "물리치료", "series": "통증 케어", "episode": 4},
-    {"title": "허리 통증 있는 사람이 절대 하면 안 되는 스트레칭 3가지", "keyword": "lower back pain stretching avoid", "img_keyword": "lower back pain", "sport": "물리치료", "series": "통증 케어", "episode": 5},
+    {"title": "물리치료사들이 절대 먼저 말 안 해주는 어깨 통증의 진짜 원인", "keyword": "shoulder pain serratus anterior weakness", "img_keyword": "shoulder pain relief", "sport": "물리치료", "series": "통증 케어", "episode": 1},
+    {"title": "계단 내려갈 때 무릎 앞쪽이 찌릿하다면... 이것을 확인하세요", "keyword": "knee pain stairs patellar tendinitis", "img_keyword": "knee pain", "sport": "물리치료", "series": "통증 케어", "episode": 2},
+    {"title": "발목을 자주 삐는 사람들이 공통적으로 훈련하지 않는 감각", "keyword": "ankle sprain proprioception training", "img_keyword": "ankle stability", "sport": "물리치료", "series": "통증 케어", "episode": 3},
+    {"title": "목 디스크 없는데 팔이 저리다면... 이 증후군을 아시나요", "keyword": "thoracic outlet syndrome arm numbness", "img_keyword": "neck shoulder pain", "sport": "물리치료", "series": "통증 케어", "episode": 4},
+    {"title": "허리 아픈 사람이 하면 오히려 더 나빠지는 스트레칭들", "keyword": "lower back pain stretching avoid", "img_keyword": "lower back pain", "sport": "물리치료", "series": "통증 케어", "episode": 5},
     # 사무직 자세
-    {"title": "하루 8시간 앉아있는 사람의 고관절이 굳는 이유와 해결법", "keyword": "hip flexor tightness sitting office worker", "img_keyword": "office posture hip", "sport": "신체균형", "series": "사무직 자세", "episode": 1},
-    {"title": "모니터 위치가 목 통증을 만드는 방법, 올바른 데스크 셋업 가이드", "keyword": "monitor height neck pain desk setup ergonomics", "img_keyword": "desk ergonomics monitor", "sport": "신체균형", "series": "사무직 자세", "episode": 2},
-    {"title": "의자에 앉는 자세 하나로 허리 통증 50% 줄이는 방법", "keyword": "sitting posture lower back pain office chair", "img_keyword": "sitting posture office", "sport": "신체균형", "series": "사무직 자세", "episode": 3},
-    {"title": "재택근무자의 목 어깨 통증, 5분 루틴으로 해결하는 스트레칭", "keyword": "work from home neck shoulder stretch routine", "img_keyword": "neck stretch office", "sport": "신체균형", "series": "사무직 자세", "episode": 4},
-    {"title": "손목 통증 없이 타이핑하는 방법, 키보드 자세와 손목 강화 운동", "keyword": "wrist pain typing keyboard ergonomics", "img_keyword": "wrist pain keyboard", "sport": "물리치료", "series": "사무직 자세", "episode": 5},
+    {"title": "하루 8시간 앉아있는 사람의 고관절이 굳는 이유와 결과", "keyword": "hip flexor tightness sitting office worker", "img_keyword": "office posture hip", "sport": "신체균형", "series": "사무직 자세", "episode": 1},
+    {"title": "모니터 위치 하나가 목 통증을 만든다는 걸 아는 사람이 없습니다", "keyword": "monitor height neck pain desk setup ergonomics", "img_keyword": "desk ergonomics monitor", "sport": "신체균형", "series": "사무직 자세", "episode": 2},
+    {"title": "의자에 앉는 자세 하나로 허리 통증 50%가 줄어드는 이유", "keyword": "sitting posture lower back pain office chair", "img_keyword": "sitting posture office", "sport": "신체균형", "series": "사무직 자세", "episode": 3},
+    {"title": "재택근무 이후 목 어깨가 더 나빠진 사람들의 공통된 실수", "keyword": "work from home neck shoulder stretch routine", "img_keyword": "neck stretch office", "sport": "신체균형", "series": "사무직 자세", "episode": 4},
+    {"title": "하루 종일 타이핑해도 손목이 안 아픈 사람들이 하는 것", "keyword": "wrist pain typing keyboard ergonomics", "img_keyword": "wrist pain keyboard", "sport": "물리치료", "series": "사무직 자세", "episode": 5},
     # 코어 강화
-    {"title": "코어가 약하면 왜 허리가 아플까, 복횡근과 다열근의 역할", "keyword": "core weakness back pain transverse abdominis multifidus", "img_keyword": "core strength back", "sport": "근육학", "series": "코어 강화", "episode": 1},
-    {"title": "플랭크를 해도 코어가 안 잡히는 이유, 호흡부터 바꿔야 한다", "keyword": "plank core activation breathing technique", "img_keyword": "plank exercise core", "sport": "근육학", "series": "코어 강화", "episode": 2},
-    {"title": "배가 나온 사람의 코어 훈련, 일반인을 위한 단계별 접근법", "keyword": "belly fat core training beginner progression", "img_keyword": "core workout beginner", "sport": "근육학", "series": "코어 강화", "episode": 3},
-    {"title": "데드버그 운동이 허리 재활에 최고인 이유, 올바른 자세와 단계별 난이도", "keyword": "dead bug exercise lumbar rehabilitation core", "img_keyword": "dead bug core exercise", "sport": "재활", "series": "코어 강화", "episode": 4},
-    {"title": "코어 강화 없이 스쿼트 하면 생기는 일, 요통과 무릎 통증의 연결고리", "keyword": "core stability squat lower back knee pain", "img_keyword": "squat core stability", "sport": "근육학", "series": "코어 강화", "episode": 5},
+    {"title": "플랭크를 매일 해도 허리가 아픈 이유... 호흡이 문제였습니다", "keyword": "core weakness back pain transverse abdominis multifidus", "img_keyword": "core strength back", "sport": "근육학", "series": "코어 강화", "episode": 1},
+    {"title": "코어 운동 열심히 해도 효과 없는 사람들이 놓친 것", "keyword": "plank core activation breathing technique", "img_keyword": "plank exercise core", "sport": "근육학", "series": "코어 강화", "episode": 2},
+    {"title": "뱃살 있는 사람이 코어 운동을 어디서부터 시작해야 할까요", "keyword": "belly fat core training beginner progression", "img_keyword": "core workout beginner", "sport": "근육학", "series": "코어 강화", "episode": 3},
+    {"title": "허리 재활에 데드버그가 좋다는 이유... 해본 사람은 압니다", "keyword": "dead bug exercise lumbar rehabilitation core", "img_keyword": "dead bug core exercise", "sport": "재활", "series": "코어 강화", "episode": 4},
+    {"title": "코어 없이 스쿼트 하면 생기는 일들... 경험담이 있습니다", "keyword": "core stability squat lower back knee pain", "img_keyword": "squat core stability", "sport": "근육학", "series": "코어 강화", "episode": 5},
     # 밸런스 소도구
-    {"title": "밸런스 패드 하나로 발목 무릎 고관절을 동시에 강화하는 방법", "keyword": "balance pad ankle knee hip stability training", "img_keyword": "balance pad training", "sport": "체력", "series": "밸런스 소도구", "episode": 1},
-    {"title": "폼롤러 제대로 쓰는 법, 부위별 올바른 사용법과 피해야 할 부위", "keyword": "foam roller technique correct usage avoid areas", "img_keyword": "foam roller technique", "sport": "유연성", "series": "밸런스 소도구", "episode": 2},
-    {"title": "보수볼 운동이 코어와 밸런스에 효과적인 과학적 이유", "keyword": "bosu ball core balance science effectiveness", "img_keyword": "bosu ball exercise", "sport": "체력", "series": "밸런스 소도구", "episode": 3},
-    {"title": "짐볼로 할 수 있는 허리 강화 운동 5가지, 재활부터 근력까지", "keyword": "stability ball back strengthening exercise rehabilitation", "img_keyword": "stability ball back exercise", "sport": "재활", "series": "밸런스 소도구", "episode": 4},
-    {"title": "슬라이딩 디스크 운동으로 코어와 하체를 동시에 잡는 루틴", "keyword": "sliding disc core lower body exercise routine", "img_keyword": "sliding disc exercise", "sport": "체력", "series": "밸런스 소도구", "episode": 5},
+    {"title": "밸런스 패드 위에서 10초를 못 서면... 지금 당장 시작해야 합니다", "keyword": "balance pad ankle knee hip stability training", "img_keyword": "balance pad training", "sport": "체력", "series": "밸런스 소도구", "episode": 1},
+    {"title": "폼롤러 아무 데나 굴리면 안 되는 이유... 이 부위는 절대 금지", "keyword": "foam roller technique correct usage avoid areas", "img_keyword": "foam roller technique", "sport": "유연성", "series": "밸런스 소도구", "episode": 2},
+    {"title": "보수볼 운동이 단순히 균형 잡기가 아닌 이유", "keyword": "bosu ball core balance science effectiveness", "img_keyword": "bosu ball exercise", "sport": "체력", "series": "밸런스 소도구", "episode": 3},
+    {"title": "짐볼 하나로 허리 재활부터 근력까지 되는 운동 5가지", "keyword": "stability ball back strengthening exercise rehabilitation", "img_keyword": "stability ball back exercise", "sport": "재활", "series": "밸런스 소도구", "episode": 4},
+    {"title": "슬라이딩 디스크로 코어와 하체를 동시에 잡는 루틴", "keyword": "sliding disc core lower body exercise routine", "img_keyword": "sliding disc exercise", "sport": "체력", "series": "밸런스 소도구", "episode": 5},
     # 관절 보호
-    {"title": "무릎 보호대 고르는 기준, 통증 부위별 올바른 선택법", "keyword": "knee brace selection pain type guide", "img_keyword": "knee brace support", "sport": "스포츠의학", "series": "관절 보호", "episode": 1},
-    {"title": "발목 보호대가 필요한 사람과 오히려 독이 되는 사람", "keyword": "ankle brace when to use avoid muscle weakness", "img_keyword": "ankle brace support", "sport": "스포츠의학", "series": "관절 보호", "episode": 2},
-    {"title": "손목 보호대 착용법과 손목 강화 운동을 같이 해야 하는 이유", "keyword": "wrist support brace strengthening exercise", "img_keyword": "wrist support exercise", "sport": "스포츠의학", "series": "관절 보호", "episode": 3},
-    {"title": "테이핑과 보호대의 차이, 상황별 올바른 선택 가이드", "keyword": "taping vs brace difference when to use sports", "img_keyword": "sports taping", "sport": "스포츠의학", "series": "관절 보호", "episode": 4},
+    {"title": "무릎 보호대... 잘못 고르면 오히려 근육이 약해집니다", "keyword": "knee brace selection pain type guide", "img_keyword": "knee brace support", "sport": "스포츠의학", "series": "관절 보호", "episode": 1},
+    {"title": "발목 보호대가 오히려 독이 되는 사람이 있습니다", "keyword": "ankle brace when to use avoid muscle weakness", "img_keyword": "ankle brace support", "sport": "스포츠의학", "series": "관절 보호", "episode": 2},
+    {"title": "손목 보호대만 차면 손목이 더 약해지는 이유", "keyword": "wrist support brace strengthening exercise", "img_keyword": "wrist support exercise", "sport": "스포츠의학", "series": "관절 보호", "episode": 3},
+    {"title": "테이핑 vs 보호대... 상황에 따라 다르게 써야 하는 이유", "keyword": "taping vs brace difference when to use sports", "img_keyword": "sports taping", "sport": "스포츠의학", "series": "관절 보호", "episode": 4},
     # 홈트 솔루션
-    {"title": "운동 기구 없이 집에서 할 수 있는 전신 근력 루틴 30분", "keyword": "home workout no equipment full body strength routine", "img_keyword": "home workout", "sport": "공통", "series": "홈트 솔루션", "episode": 1},
-    {"title": "요가 매트 하나로 할 수 있는 허리 통증 완화 루틴", "keyword": "yoga mat lower back pain relief routine", "img_keyword": "yoga mat back exercise", "sport": "재활", "series": "홈트 솔루션", "episode": 2},
-    {"title": "저항 밴드로 상체 근력을 키우는 6가지 운동, 어깨부터 등까지", "keyword": "resistance band upper body shoulder back exercise", "img_keyword": "resistance band exercise", "sport": "근육학", "series": "홈트 솔루션", "episode": 3},
-    {"title": "아침 10분 루틴으로 하루 종일 자세가 달라지는 이유", "keyword": "morning routine posture improvement daily habit", "img_keyword": "morning stretch routine", "sport": "신체균형", "series": "홈트 솔루션", "episode": 4},
-    {"title": "폼롤러 마사지볼로 퇴근 후 몸을 회복하는 15분 루틴", "keyword": "foam roller massage ball recovery evening routine", "img_keyword": "foam roller recovery", "sport": "유연성", "series": "홈트 솔루션", "episode": 5},
+    {"title": "기구 없이 집에서 30분... 헬스장보다 효과 있는 루틴이 있습니다", "keyword": "home workout no equipment full body strength routine", "img_keyword": "home workout", "sport": "공통", "series": "홈트 솔루션", "episode": 1},
+    {"title": "요가 매트 하나로 허리 통증을 잡은 사람들의 루틴", "keyword": "yoga mat lower back pain relief routine", "img_keyword": "yoga mat back exercise", "sport": "재활", "series": "홈트 솔루션", "episode": 2},
+    {"title": "밴드 하나로 어깨부터 등까지... 헬스장 가기 싫을 때 쓰는 루틴", "keyword": "resistance band upper body shoulder back exercise", "img_keyword": "resistance band exercise", "sport": "근육학", "series": "홈트 솔루션", "episode": 3},
+    {"title": "아침 10분이 하루 종일 자세를 바꾸는 이유", "keyword": "morning routine posture improvement daily habit", "img_keyword": "morning stretch routine", "sport": "신체균형", "series": "홈트 솔루션", "episode": 4},
+    {"title": "퇴근 후 15분... 굳어있는 몸을 푸는 가장 효율적인 방법", "keyword": "foam roller massage ball recovery evening routine", "img_keyword": "foam roller recovery", "sport": "유연성", "series": "홈트 솔루션", "episode": 5},
     # 체형 교정 심화
-    {"title": "O자 다리를 만드는 진짜 원인, 고관절 외회전 근육부터 잡아야 한다", "keyword": "bow legs hip external rotation correction cause", "img_keyword": "bow legs correction", "sport": "신체균형", "series": "체형 교정 심화", "episode": 1},
-    {"title": "새우등 교정, 흉추를 펴기 전에 이 근육부터 풀어야 하는 이유", "keyword": "kyphosis correction thoracic spine pectoral stretch", "img_keyword": "posture correction back", "sport": "신체균형", "series": "체형 교정 심화", "episode": 2},
-    {"title": "짝다리 짚는 습관이 골반과 척추에 미치는 영향", "keyword": "weight shifting habit pelvic imbalance spine", "img_keyword": "posture balance standing", "sport": "신체균형", "series": "체형 교정 심화", "episode": 3},
-    {"title": "발 모양이 체형을 결정한다, 회내족과 회외족 교정 방법", "keyword": "overpronation supination foot correction posture", "img_keyword": "foot pronation correction", "sport": "신체균형", "series": "체형 교정 심화", "episode": 4},
-    {"title": "골반 전방경사 교정 루틴, 장요근과 복근을 동시에 잡는 방법", "keyword": "anterior pelvic tilt correction psoas abdominal", "img_keyword": "pelvic tilt exercise", "sport": "신체균형", "series": "체형 교정 심화", "episode": 5},
+    {"title": "O자 다리를 만드는 진짜 원인... 다리가 아니라 엉덩이입니다", "keyword": "bow legs hip external rotation correction cause", "img_keyword": "bow legs correction", "sport": "신체균형", "series": "체형 교정 심화", "episode": 1},
+    {"title": "새우등 교정... 등을 펴려고 하면 오히려 더 나빠지는 이유", "keyword": "kyphosis correction thoracic spine pectoral stretch", "img_keyword": "posture correction back", "sport": "신체균형", "series": "체형 교정 심화", "episode": 2},
+    {"title": "짝다리 짚는 습관... 10년 후 몸에 어떤 일이 생길까요", "keyword": "weight shifting habit pelvic imbalance spine", "img_keyword": "posture balance standing", "sport": "신체균형", "series": "체형 교정 심화", "episode": 3},
+    {"title": "발 모양이 온몸의 체형을 결정한다는 게 사실입니까?", "keyword": "overpronation supination foot correction posture", "img_keyword": "foot pronation correction", "sport": "신체균형", "series": "체형 교정 심화", "episode": 4},
+    {"title": "골반이 앞으로 기울어진 사람들이 배가 나오는 진짜 이유", "keyword": "anterior pelvic tilt correction psoas abdominal", "img_keyword": "pelvic tilt exercise", "sport": "신체균형", "series": "체형 교정 심화", "episode": 5},
 ]
 
 USED_TOPICS_FILE = "used_topics.json"
@@ -344,34 +344,40 @@ def generate_post():
         "어려운 스포츠 과학 지식을 누구나 이해할 수 있게 전달하는 게 특기예요.\n"
         "한국어만 사용하세요. 외국 문자 절대 금지.\n\n"
         + series_info
-        + "글쓰기 방식:\n"
-        "실제 현장에서 본 사례나 독자가 겪었을 법한 상황으로 자연스럽게 시작하세요.\n"
-        "과학적 팩트는 반드시 담되, 딱딱한 교과서 문체 말고 대화하듯 풀어내세요.\n"
-        "어려운 개념은 일상적인 비유로 설명하세요. 독자가 '아, 그런 거구나!' 하고 느끼게.\n"
-        "독자가 읽다가 '이거 완전 내 얘기잖아'라고 느끼는 순간을 만들어주세요.\n"
-        "전문 용어는 쉬운 말로 먼저 설명하고 괄호에 전문 용어를 넣으세요.\n"
-        "친근한 존댓말로 쓰세요. ~이에요, ~거든요, ~잖아요 스타일.\n\n"
-        "문단 작성 규칙 (구글 SEO 필수):\n"
-        "각 문단은 반드시 4~6문장 이상을 하나의 덩어리로 묶어서 작성하세요.\n"
-        "한두 문장 쓰고 줄바꿈 금지. 하나의 소주제를 충분히 설명한 후에만 줄바꿈하세요.\n"
-        "소제목은 반드시 [이모지 소제목 이모지] 형식으로만 표시하세요.\n"
-        "본문 중간에는 이모지 사용을 최소화하고 내용의 깊이에 집중하세요.\n\n"
-        "반드시 포함할 요소:\n"
+        + "## 제목 활용 방법\n"
+        "주어진 제목은 독자의 궁금증을 자극하는 후킹 문장입니다.\n"
+        "글 내용은 반드시 이 제목의 궁금증을 완벽하게 해소해주어야 해요.\n"
+        "제목에서 던진 질문이나 주장을 글 안에서 명확히 답해주세요.\n\n"
+        "## 글쓰기 핵심 원칙\n"
+        "1. 현장 사례로 시작하세요. 실제 트레이너가 겪은 에피소드로 자연스럽게 끌어들이세요.\n"
+        "2. '나도 몰랐던 사실'을 밝혀주는 구성으로 쓰세요. 독자가 '어, 이거 나도 오해했는데'라고 느끼게.\n"
+        "3. 전문 지식은 반드시 일상 비유로 풀어주세요. 예: '근막은 몸을 감싸는 비닐랩 같은 것'\n"
+        "4. 각 소제목 아래는 배경 → 과학적 설명 → 실제 사례 → 해결책 순으로 전개하세요.\n"
+        "5. 마지막에 독자가 내일 당장 해볼 수 있는 구체적인 행동 하나를 제시하세요.\n\n"
+        "## 문단 작성 규칙\n"
+        "각 문단은 4~6문장 이상 하나의 덩어리로 묶어 작성하세요.\n"
+        "한두 문장 쓰고 줄바꿈 금지.\n\n"
+        "## 소제목 규칙\n"
+        "소제목은 [이모지 소제목내용] 형식, 이모지는 앞에만 1개.\n"
+        "소제목에 반드시 구체적 수치나 데이터 포함.\n"
+        "예시 (좋음): [🦴 골반이 1도 틀어지면 허리 압력이 3배 증가합니다]\n"
+        "예시 (나쁨): [🦴 골반의 과학 🦴]\n\n"
+        "## 반드시 포함할 요소\n"
         "핵심 키워드: ##키워드## 형식으로 글의 핵심 개념 하나를 크게 던지고 풀어쓰세요.\n"
-        "소제목: [이모지 소제목 이모지] 형식으로 앞뒤 이모지 필수. 최소 4개 이상.\n"
+        "소제목: 위 규칙대로 최소 4개 이상.\n"
         "훈련 표: [TABLE_START]와 [TABLE_END] 사이에 작성.\n"
         "형식: 훈련명|세트|횟수|휴식|작용 근육|효과\n"
         "[TABLE_START]\n"
         "훈련명|세트|횟수|휴식|작용 근육|효과\n"
         "예시|3|12회|60초|대퇴사두근|하체 강화\n"
         "[TABLE_END]\n"
-        "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄.\n\n"
-        "분량은 4000자에서 6000자. 깊이 있게 충분히 써주세요.\n"
-        "AI가 쓴 티 나는 나열식 표현 금지.\n\n"
+        "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄 (수치 포함).\n\n"
+        "분량: 4000자~6000자. 깊이 있게 충분히 써주세요.\n"
+        "AI 티 나는 나열식 표현 금지. 친근한 존댓말 필수.\n\n"
         "카테고리: " + topic["sport"] + "\n"
-        "주제: " + topic["title"] + "\n\n"
+        "주제 제목: " + topic["title"] + "\n\n"
         "출력 형식:\n"
-        "제목: (독자 궁금증을 자극하는 제목)\n"
+        "제목: (주어진 주제 제목을 더욱 흡입력 있게 다듬은 제목)\n"
         "---\n"
         "(본문)"
     )
@@ -608,15 +614,12 @@ def body_to_html(body, images, topic):
     for i, para in enumerate(paragraphs):
         if not para.strip():
             continue
-
         if para.strip() == "[TABLE_PLACEHOLDER]":
             html += table_html
             continue
-
         if para.strip() == "[SUMMARY_PLACEHOLDER]":
             html += summary_html
             continue
-
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
             html += (
@@ -626,7 +629,6 @@ def body_to_html(body, images, topic):
                 + heading + "</h2>\n"
             )
             continue
-
         if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
             html += (
                 '<div style="display:flex;align-items:flex-start;margin:10px 0;padding:12px 16px;'
@@ -637,10 +639,8 @@ def body_to_html(body, images, topic):
                 + para.strip()[2:].strip() + '</span></div>\n'
             )
             continue
-
         para_count += 1
         processed = keyword_pattern.sub(replace_keyword, para.strip())
-
         if processed != para.strip():
             html += '<div style="margin:28px 0 12px 0;">' + processed + '</div>\n'
         elif para_count % 4 == 0 and len(para.strip()) > 30:
@@ -655,7 +655,6 @@ def body_to_html(body, images, topic):
                 '<p style="margin:0 0 20px 0;line-height:2.0;font-size:16px;color:#333;text-align:justify;">'
                 + para.strip() + '</p>\n'
             )
-
         if i >= mid and not image2_inserted and len(images) >= 2:
             html += make_image_html(images[1], margin_top="20px")
             image2_inserted = True
@@ -664,7 +663,6 @@ def body_to_html(body, images, topic):
         html += make_image_html(images[2], margin_top="20px")
 
     html += get_series_nav_html(topic)
-
     return html
 
 
@@ -723,7 +721,6 @@ def request_google_indexing(post_url):
 
 def send_telegram(title, post_url, topic):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        print("[텔레그램] 설정값 없음 - 건너뜀")
         return
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
     message = sport_emoji + " 새 포스팅\n\n📌 " + title + "\n\n🔗 " + post_url
@@ -743,7 +740,6 @@ def send_telegram(title, post_url, topic):
 
 def send_facebook(title, post_url, topic):
     if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
-        print("[페이스북] 설정값 없음 - 건너뜀")
         return
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
     message = sport_emoji + " " + title + "\n\n자세히 읽기 👉 " + post_url
