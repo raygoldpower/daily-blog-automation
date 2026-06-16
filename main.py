@@ -17,172 +17,144 @@ FACEBOOK_ACCESS_TOKEN = os.environ.get("FACEBOOK_ACCESS_TOKEN", "")
 BLOG_ID = "4393162034375416055"
 
 SPORT_EMOJI = {
-    "축구": "⚽", "농구": "🏀", "야구": "⚾", "공통": "🏆",
-    "근육학": "💪", "재활": "🩺", "영양": "🥗", "심리": "🧠",
-    "체력": "🔥", "유연성": "🤸", "생리학": "🫀", "물리치료": "🏥",
-    "역학": "⚙️", "해부학": "🦴", "신체균형": "⚖️", "스포츠의학": "🩻",
+    "Soccer": "⚽", "Basketball": "🏀", "Baseball": "⚾", "General": "🏆",
+    "Muscle Science": "💪", "Rehab": "🩺", "Nutrition": "🥗", "Sports Psychology": "🧠",
+    "Conditioning": "🔥", "Mobility": "🤸", "Physiology": "🫀", "Physical Therapy": "🏥",
+    "Biomechanics": "⚙️", "Anatomy": "🦴", "Body Balance": "⚖️", "Sports Medicine": "🩻",
 }
 
 TOPICS = [
-    # 축구
-    {"title": "발목이 굳으면 드리블 속도가 떨어지는 진짜 이유... 아무도 말 안 해줍니다", "keyword": "soccer dribbling ankle mobility", "img_keyword": "soccer dribbling", "sport": "축구", "series": "드리블 마스터", "episode": 1},
-    {"title": "100m 달리기 선수도 못 따라오는 축구 선수들의 순간 가속 비밀", "keyword": "soccer acceleration sprint training", "img_keyword": "soccer sprint", "sport": "축구", "series": "스피드 혁명", "episode": 1},
-    {"title": "슛을 아무리 세게 차도 골이 안 들어간다면... 고관절을 확인하세요", "keyword": "soccer shooting hip rotation power", "img_keyword": "soccer shooting", "sport": "축구", "series": "슈팅 마스터", "episode": 1},
-    {"title": "후반 30분에도 스프린트하는 선수들이 숨기고 있는 체력 훈련법", "keyword": "soccer endurance 90 minutes stamina", "img_keyword": "soccer endurance", "sport": "축구", "series": "체력 마스터", "episode": 1},
-    {"title": "축구하다 무릎 다치는 선수들이 공통적으로 빠뜨리는 훈련 한 가지", "keyword": "soccer knee injury prevention squat", "img_keyword": "knee injury soccer", "sport": "축구", "series": "부상 예방", "episode": 1},
-    # 농구
-    {"title": "점프력은 타고나는 게 아닙니다... 3개월 만에 10cm 높인 훈련법", "keyword": "basketball jump plyometric training", "img_keyword": "basketball jump", "sport": "농구", "series": "점프력 혁명", "episode": 1},
-    {"title": "농구 드리블이 늘지 않는 이유는 손이 아니라 뇌에 있었습니다", "keyword": "basketball dribbling brain hand coordination", "img_keyword": "basketball dribbling", "sport": "농구", "series": "핸들링 마스터", "episode": 1},
-    {"title": "프로선수들이 숨기고 싶어하는 3점슛 성공률의 비밀", "keyword": "basketball three point wrist snap shooting", "img_keyword": "basketball shooting", "sport": "농구", "series": "슈팅 마스터", "episode": 1},
-    # 야구
-    {"title": "배트 스피드가 안 나온다면... 상체가 아니라 하체를 먼저 보세요", "keyword": "baseball bat speed hip rotation", "img_keyword": "baseball batting", "sport": "야구", "series": "타격의 과학", "episode": 1},
-    {"title": "투수 어깨가 망가지기 전에 반드시 나타나는 신호 4가지", "keyword": "baseball pitcher rotator cuff injury prevention", "img_keyword": "baseball pitcher shoulder", "sport": "야구", "series": "투구의 과학", "episode": 1},
-    # 근육학
-    {"title": "스쿼트만 해도 허벅지 앞이 안 커진다면... 이 변형 동작을 모르는 겁니다", "keyword": "quadriceps squat variation muscle building", "img_keyword": "quadriceps squat", "sport": "근육학", "series": "근육 해부학", "episode": 1},
-    {"title": "전력 질주 중에 왜 허벅지 뒤만 터질까... 아무도 말 안 해준 이유", "keyword": "hamstring eccentric training injury prevention", "img_keyword": "hamstring exercise", "sport": "근육학", "series": "근육 해부학", "episode": 2},
-    {"title": "허리 통증의 진짜 원인은 허리가 아닙니다... 이 근육을 아세요?", "keyword": "transverse abdominis core activation back pain", "img_keyword": "core training", "sport": "근육학", "series": "코어 과학", "episode": 1},
-    {"title": "어깨 운동 열심히 했는데 한쪽만 커지는 이유", "keyword": "deltoid three heads shoulder training", "img_keyword": "shoulder deltoid workout", "sport": "근육학", "series": "상체 해부학", "episode": 1},
-    {"title": "발목을 자주 삐는 사람들이 공통적으로 약한 근육이 있습니다", "keyword": "calf muscle ankle stability injury prevention", "img_keyword": "calf muscle", "sport": "근육학", "series": "하체 해부학", "episode": 1},
-    {"title": "헬스장에서 아무리 열심히 해도 근육이 안 크는 진짜 이유", "keyword": "muscle protein synthesis hypertrophy", "img_keyword": "muscle growth", "sport": "근육학", "series": "근육 성장 과학", "episode": 1},
-    {"title": "어깨 통증의 80%는 이 근육 때문입니다... 처음 들어보셨죠?", "keyword": "serratus anterior weakness shoulder pain", "img_keyword": "shoulder pain", "sport": "근육학", "series": "상체 해부학", "episode": 2},
-    {"title": "무릎이 아픈데 엉덩이 운동을 하라고요? 이유가 있습니다", "keyword": "gluteus medius knee pain pelvic balance", "img_keyword": "gluteus medius hip", "sport": "근육학", "series": "하체 해부학", "episode": 2},
-    # 재활
-    {"title": "무릎 연골이 닳기 전에 반드시 해야 할 운동... 병원에서 안 알려줍니다", "keyword": "patellar tendinitis rehabilitation exercise", "img_keyword": "knee rehabilitation", "sport": "재활", "series": "부상 재활", "episode": 1},
-    {"title": "허리 디스크 진단받은 후 절대 하면 안 되는 운동 3가지", "keyword": "lumbar disc stabilization exercise", "img_keyword": "lower back pain", "sport": "재활", "series": "부상 재활", "episode": 2},
-    {"title": "발목 삐끗한 후 바로 냉찜질했다면... 잘못된 겁니다", "keyword": "ankle sprain rehabilitation return to sport", "img_keyword": "ankle sprain", "sport": "재활", "series": "부상 재활", "episode": 3},
-    {"title": "어깨 충돌 증후군... 병원 가기 전 집에서 먼저 해볼 수 있는 것들", "keyword": "shoulder impingement home rehabilitation", "img_keyword": "shoulder impingement", "sport": "재활", "series": "부상 재활", "episode": 4},
-    {"title": "아킬레스건이 아플 때 스트레칭하면 안 된다는 걸 아는 사람이 없습니다", "keyword": "achilles tendinopathy exercise avoid", "img_keyword": "achilles tendon", "sport": "재활", "series": "부상 재활", "episode": 5},
-    # 영양
-    {"title": "운동 전에 뭘 먹느냐가 운동 효과를 50% 이상 바꿉니다", "keyword": "pre workout meal carbohydrate timing", "img_keyword": "pre workout meal", "sport": "영양", "series": "스포츠 영양학", "episode": 1},
-    {"title": "탄수화물을 끊었더니 오히려 운동 실력이 떨어진 이유", "keyword": "carbohydrate glycogen sports performance", "img_keyword": "carbohydrate food", "sport": "영양", "series": "스포츠 영양학", "episode": 2},
-    {"title": "크레아틴 먹는 사람들이 가장 많이 하는 실수", "keyword": "creatine dosage timing supplement", "img_keyword": "creatine supplement", "sport": "영양", "series": "보충제 과학", "episode": 1},
-    {"title": "운동 중 물만 마시면 오히려 쥐가 나는 이유", "keyword": "hydration during exercise timing amount", "img_keyword": "hydration water sports", "sport": "영양", "series": "스포츠 영양학", "episode": 3},
-    {"title": "단백질 얼마나 먹어야 할까... 헬스 유튜버들이 다 틀린 이유", "keyword": "protein daily intake calculation body weight", "img_keyword": "protein food", "sport": "영양", "series": "스포츠 영양학", "episode": 4},
-    {"title": "운동 후 닭가슴살만 먹으면 오히려 회복이 느린 이유", "keyword": "post workout recovery nutrition combination", "img_keyword": "post workout nutrition", "sport": "영양", "series": "스포츠 영양학", "episode": 5},
-    # 심리
-    {"title": "경기 전 긴장되면 잘하는 선수, 망하는 선수... 차이가 뭘까요", "keyword": "pre game routine anxiety control athletes", "img_keyword": "athlete focus", "sport": "심리", "series": "스포츠 심리학", "episode": 1},
-    {"title": "압박 상황에서 집중력이 무너지는 사람들의 공통점", "keyword": "focus under pressure mental training sports", "img_keyword": "mental training", "sport": "심리", "series": "스포츠 심리학", "episode": 2},
-    {"title": "열심히 하는데 실력이 안 늘 때... 슬럼프의 진짜 원인", "keyword": "sports slump recovery psychology steps", "img_keyword": "athlete motivation", "sport": "심리", "series": "스포츠 심리학", "episode": 3},
-    {"title": "머릿속으로 연습해도 실력이 는다는 게 사실일까요?", "keyword": "mental imagery visualization sports performance", "img_keyword": "visualization meditation", "sport": "심리", "series": "스포츠 심리학", "episode": 4},
-    # 체력
-    {"title": "숨이 빨리 차는 사람들이 모르는 폐활량 vs 심폐기능의 차이", "keyword": "VO2max interval training intensity", "img_keyword": "interval running", "sport": "체력", "series": "체력 과학", "episode": 1},
-    {"title": "마라톤 선수들이 절대 안 지치는 이유... 젖산의 오해와 진실", "keyword": "lactate threshold training endurance", "img_keyword": "endurance running", "sport": "체력", "series": "체력 과학", "episode": 2},
-    {"title": "HIIT 30분 했는데 왜 살이 안 빠질까... 휴식 시간이 문제였습니다", "keyword": "HIIT rest interval optimization fat loss", "img_keyword": "HIIT workout", "sport": "체력", "series": "유산소 과학", "episode": 1},
-    {"title": "심박수 보고 운동하면 왜 살이 더 잘 빠질까", "keyword": "heart rate zone exercise intensity training", "img_keyword": "heart rate monitor", "sport": "체력", "series": "체력 과학", "episode": 3},
-    # 유연성
-    {"title": "운동 전 스트레칭이 오히려 부상을 유발한다는 게 사실일까요", "keyword": "dynamic stretching warm up injury prevention", "img_keyword": "dynamic stretching", "sport": "유연성", "series": "유연성 과학", "episode": 1},
-    {"title": "고관절이 굳으면 허리 무릎 어깨까지 망가지는 이유", "keyword": "hip flexor mobility stretching exercises", "img_keyword": "hip stretching", "sport": "유연성", "series": "가동성 혁명", "episode": 1},
-    {"title": "폼롤러 잘못 쓰면 오히려 근육이 더 굳습니다", "keyword": "foam rolling myofascial release technique", "img_keyword": "foam roller", "sport": "유연성", "series": "회복 과학", "episode": 1},
-    {"title": "어깨 통증 있는 사람들이 등을 먼저 풀어야 하는 이유", "keyword": "thoracic spine mobility shoulder pain", "img_keyword": "spine mobility", "sport": "유연성", "series": "가동성 혁명", "episode": 2},
-    # 생리학
-    {"title": "운동할 때 근육에서 실제로 일어나는 일... 교과서엔 없는 이야기", "keyword": "muscle physiology exercise ATP energy", "img_keyword": "muscle exercise", "sport": "생리학", "series": "운동 생리학", "episode": 1},
-    {"title": "유산소 운동 30분 해도 지방이 안 타는 사람들의 공통점", "keyword": "fat oxidation aerobic exercise physiology", "img_keyword": "aerobic exercise", "sport": "생리학", "series": "운동 생리학", "episode": 2},
-    {"title": "잠자는 동안 근육이 큰다는 게 진짜입니까?", "keyword": "growth hormone sleep muscle recovery", "img_keyword": "sleep recovery", "sport": "생리학", "series": "운동 생리학", "episode": 3},
-    {"title": "운동 후 근육통이 심할수록 성장이 빠르다는 믿음의 진실", "keyword": "DOMS delayed onset muscle soreness cause", "img_keyword": "muscle soreness", "sport": "생리학", "series": "운동 생리학", "episode": 4},
-    {"title": "운동선수의 심장이 일반인보다 50% 더 큰 이유", "keyword": "cardiac adaptation exercise athlete heart", "img_keyword": "heart cardio", "sport": "생리학", "series": "운동 생리학", "episode": 5},
-    {"title": "스트레스를 많이 받으면 왜 살이 찌고 근육이 빠질까", "keyword": "cortisol muscle loss stress hormone", "img_keyword": "stress cortisol", "sport": "생리학", "series": "운동 생리학", "episode": 6},
-    # 물리치료
-    {"title": "어깨가 아프다고 하면 물리치료사가 왜 목부터 만져볼까요", "keyword": "shoulder pain physical therapy assessment", "img_keyword": "shoulder physical therapy", "sport": "물리치료", "series": "물리치료 가이드", "episode": 1},
-    {"title": "무릎 통증... 병원 가야 할 신호 vs 집에서 해결 가능한 신호", "keyword": "knee pain self diagnosis when to see doctor", "img_keyword": "knee pain", "sport": "물리치료", "series": "물리치료 가이드", "episode": 2},
-    {"title": "테니스 안 치는데 테니스 엘보가 생겼다면... 이것 때문입니다", "keyword": "tennis elbow treatment home exercise", "img_keyword": "tennis elbow", "sport": "물리치료", "series": "물리치료 가이드", "episode": 3},
-    {"title": "아침마다 발바닥이 찌릿한 사람들이 놓치고 있는 것", "keyword": "plantar fasciitis morning stretching routine", "img_keyword": "plantar fasciitis foot", "sport": "물리치료", "series": "물리치료 가이드", "episode": 4},
-    {"title": "거북목 교정 운동... 하루 5분으로 정말 효과가 있을까요", "keyword": "forward head posture correction exercise", "img_keyword": "neck posture", "sport": "물리치료", "series": "물리치료 가이드", "episode": 5},
-    # 역학
-    {"title": "달리기할 때 무릎이 아픈 사람들이 공통적으로 틀린 자세", "keyword": "running biomechanics knee impact reduction", "img_keyword": "running form", "sport": "역학", "series": "스포츠 역학", "episode": 1},
-    {"title": "스쿼트할 때 무릎이 안쪽으로 무너지는 이유... 무릎 문제가 아닙니다", "keyword": "squat knee valgus cause biomechanics", "img_keyword": "squat form", "sport": "역학", "series": "스포츠 역학", "episode": 2},
-    {"title": "데드리프트로 허리 다치는 사람들이 몰랐던 척추 중립의 진실", "keyword": "deadlift spine neutral position injury prevention", "img_keyword": "deadlift", "sport": "역학", "series": "스포츠 역학", "episode": 3},
-    {"title": "착지하는 0.1초가 무릎 십자인대를 결정합니다", "keyword": "landing mechanics ACL injury prevention", "img_keyword": "jump landing", "sport": "역학", "series": "스포츠 역학", "episode": 4},
-    # 해부학
-    {"title": "무릎이 왜 이렇게 자주 다칠까... 구조를 보면 당연합니다", "keyword": "knee joint anatomy structure injury", "img_keyword": "knee joint", "sport": "해부학", "series": "스포츠 해부학", "episode": 1},
-    {"title": "어깨가 360도 돌아가는 건 축복이자 저주입니다", "keyword": "shoulder joint anatomy mobility instability", "img_keyword": "shoulder joint", "sport": "해부학", "series": "스포츠 해부학", "episode": 2},
-    {"title": "발 아치가 무너지면 무릎 허리 목까지 망가지는 연결고리", "keyword": "foot arch structure running performance", "img_keyword": "foot arch", "sport": "해부학", "series": "스포츠 해부학", "episode": 3},
-    {"title": "앉을 때 자세 하나가 허리 디스크 압력을 3배 높입니다", "keyword": "spinal disc anatomy pressure posture", "img_keyword": "spine disc", "sport": "해부학", "series": "스포츠 해부학", "episode": 4},
-    # 신체균형
-    {"title": "거울 앞에 서면 한쪽 어깨가 낮은 이유... 방치하면 생기는 일", "keyword": "pelvic tilt imbalance lower back knee pain", "img_keyword": "pelvic posture", "sport": "신체균형", "series": "체형 교정", "episode": 1},
-    {"title": "척추측만증... 집에서 5분이면 자가 진단 가능합니다", "keyword": "shoulder uneven scoliosis self check", "img_keyword": "scoliosis posture", "sport": "신체균형", "series": "체형 교정", "episode": 2},
-    {"title": "평발인 사람이 운동할 때 반드시 알아야 하는 것들", "keyword": "flat feet sports performance correction", "img_keyword": "flat feet", "sport": "신체균형", "series": "체형 교정", "episode": 3},
-    {"title": "X자 다리 때문에 무릎이 아픈데 스쿼트만 하고 있다면...", "keyword": "knock knees correction gluteus medius", "img_keyword": "knock knees legs", "sport": "신체균형", "series": "체형 교정", "episode": 4},
-    # 스포츠의학
-    {"title": "성장기 아이가 운동 많이 하면 키가 안 큰다는 게 사실일까요", "keyword": "youth athlete growth plate safe training", "img_keyword": "youth sports training", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 1},
-    {"title": "여름 운동 중 갑자기 쓰러지기 전에 반드시 나타나는 신호들", "keyword": "heat stroke warning signs summer exercise", "img_keyword": "heat stroke summer", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 2},
-    {"title": "운동 중 갑자기 쥐가 나는 이유... 물 부족이 아닙니다", "keyword": "exercise cramp cause prevention electrolyte", "img_keyword": "muscle cramp", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 3},
-    {"title": "열심히 운동하는데 왜 몸이 더 안 좋아질까... 과훈련의 징후들", "keyword": "overtraining syndrome self check recovery", "img_keyword": "overtraining fatigue", "sport": "스포츠의학", "series": "스포츠의학 가이드", "episode": 4},
-    # 공통
-    {"title": "7시간 자면 근육이 더 잘 큰다는 게 진짜입니까?", "keyword": "sleep 7 hours muscle growth performance", "img_keyword": "sleep recovery", "sport": "공통", "series": "회복 과학", "episode": 1},
-    {"title": "나이 들면서 근육이 빠지는 건 막을 수 없을까요", "keyword": "sarcopenia aging muscle loss prevention", "img_keyword": "aging fitness", "sport": "공통", "series": "시니어 스포츠", "episode": 1},
-    {"title": "아이 운동 시작 나이... 너무 일찍 시작하면 생기는 일", "keyword": "youth sports age appropriate training", "img_keyword": "kids sports", "sport": "공통", "series": "스포츠 발달", "episode": 1},
-    {"title": "운동 처음 시작했다가 한 달 만에 포기하는 사람들의 공통점", "keyword": "beginner exercise first month principles", "img_keyword": "beginner workout", "sport": "공통", "series": "운동 입문", "episode": 1},
-    {"title": "다이어트와 근육 증가를 동시에 한다는 게 가능한 일일까요", "keyword": "body recomposition fat loss muscle gain", "img_keyword": "body recomposition", "sport": "공통", "series": "운동 입문", "episode": 2},
-    # 가동성 사슬
-    {"title": "발목이 굳으면 무릎까지 망가지는 이유... 연결고리를 아세요?", "keyword": "soccer ankle mobility knee injury prevention", "img_keyword": "ankle mobility", "sport": "축구", "series": "가동성 사슬", "episode": 1},
-    {"title": "골반이 틀어지면 허리 운동이 왜 소용없는지 아시나요", "keyword": "pelvic tilt lumbar stabilization biomechanics", "img_keyword": "pelvic balance", "sport": "신체균형", "series": "가동성 사슬", "episode": 2},
-    {"title": "벤치프레스할 때 어깨가 아픈 이유... 등이 굳어있기 때문입니다", "keyword": "thoracic mobility shoulder impingement bench press", "img_keyword": "bench press shoulder", "sport": "유연성", "series": "가동성 사슬", "episode": 3},
-    {"title": "고관절이 막힌 투수들이 구속을 잃는 해부학적 이유", "keyword": "hip rotation baseball pitching velocity anatomy", "img_keyword": "hip rotation pitcher", "sport": "야구", "series": "가동성 사슬", "episode": 4},
-    {"title": "발 아치가 무너지면 상체 밸런스까지 무너지는 도미노 원리", "keyword": "foot arch collapse upper body balance chain", "img_keyword": "foot arch balance", "sport": "해부학", "series": "가동성 사슬", "episode": 5},
-    # 에너지 과학
-    {"title": "HIIT 할 때 왜 처음 1분이 제일 힘든지 아세요?", "keyword": "ATP-PC system lactate threshold HIIT physiology", "img_keyword": "HIIT training", "sport": "생리학", "series": "에너지 과학", "episode": 1},
-    {"title": "경기 전날 밥을 많이 먹으면 정말 더 잘 뛸 수 있을까요", "keyword": "carbohydrate loading glycogen VO2max performance", "img_keyword": "carbohydrate loading", "sport": "영양", "series": "에너지 과학", "episode": 2},
-    {"title": "근육통이 심할수록 잠을 더 자야 하는 과학적 이유", "keyword": "DOMS growth hormone sleep muscle protein synthesis", "img_keyword": "muscle recovery sleep", "sport": "생리학", "series": "에너지 과학", "episode": 3},
-    {"title": "지방이 잘 타는 심박수가 따로 있다는 게 사실일까요", "keyword": "fat oxidation aerobic heart rate zone science", "img_keyword": "fat burning cardio", "sport": "체력", "series": "에너지 과학", "episode": 4},
-    {"title": "스트레스받으면 운동해도 소용없다는 말이 사실인 이유", "keyword": "cortisol muscle loss exercise slump physiology", "img_keyword": "stress hormone", "sport": "생리학", "series": "에너지 과학", "episode": 5},
-    # 부상 잔혹사
-    {"title": "왜 달리기 중에만 허벅지 뒤가 터질까... 충격적인 진실", "keyword": "hamstring eccentric contraction running biomechanics", "img_keyword": "hamstring running", "sport": "재활", "series": "부상 잔혹사", "episode": 1},
-    {"title": "점프 착지 0.1초가 무릎 십자인대를 끊는 메커니즘", "keyword": "ACL injury landing mechanics gluteus medius", "img_keyword": "ACL knee injury", "sport": "역학", "series": "부상 잔혹사", "episode": 2},
-    {"title": "족저근막염 아침 통증... 발바닥이 아니라 종아리가 원인입니다", "keyword": "plantar fasciitis achilles tendinopathy connection", "img_keyword": "plantar fasciitis", "sport": "물리치료", "series": "부상 잔혹사", "episode": 3},
-    {"title": "테니스 엘보 치료... 손목이 아니라 어깨를 봐야 하는 이유", "keyword": "tennis elbow scapular stability physical therapy", "img_keyword": "tennis elbow", "sport": "물리치료", "series": "부상 잔혹사", "episode": 4},
-    {"title": "허리 디스크 재활 중 절대로 하면 안 되는 운동들", "keyword": "lumbar disc rehabilitation avoid movements", "img_keyword": "lumbar disc", "sport": "재활", "series": "부상 잔혹사", "episode": 5},
-    # 오피스 애슬리트
-    {"title": "하루 8시간 앉아있으면 운동선수도 부상 위험이 높아지는 이유", "keyword": "forward head posture rotator cuff injury pitcher", "img_keyword": "neck posture office", "sport": "신체균형", "series": "오피스 애슬리트", "episode": 1},
-    {"title": "하루 종일 앉아있는 직장인이 스쿼트하면 허리를 다치는 이유", "keyword": "transverse abdominis core squat back pain", "img_keyword": "core squat", "sport": "근육학", "series": "오피스 애슬리트", "episode": 2},
-    {"title": "의자에 오래 앉으면 엉덩이 근육이 까먹어버린다는 게 사실입니다", "keyword": "psoas muscle gluteal amnesia reciprocal inhibition", "img_keyword": "hip flexor psoas", "sport": "근육학", "series": "오피스 애슬리트", "episode": 3},
-    {"title": "하루 8시간 앉아있으면 햄스트링이 단단해지는 진짜 이유", "keyword": "sitting posture hamstring flexibility physiology", "img_keyword": "sitting hamstring", "sport": "유연성", "series": "오피스 애슬리트", "episode": 4},
-    # 엘리트 마인드
-    {"title": "압박 상황에서 집중력이 올라가는 사람과 무너지는 사람의 차이", "keyword": "focus under pressure attentional focus brain waves", "img_keyword": "athlete concentration", "sport": "심리", "series": "엘리트 마인드", "episode": 1},
-    {"title": "머릿속으로만 연습해도 근육이 반응한다는 게 사실일까요", "keyword": "mental imagery mirror neurons neuromuscular activation", "img_keyword": "mental visualization", "sport": "심리", "series": "엘리트 마인드", "episode": 2},
-    {"title": "경기 전 긴장감... 없애려 하면 더 떨리는 이유가 있습니다", "keyword": "pre-game anxiety cognitive reappraisal sports", "img_keyword": "athlete pregame", "sport": "심리", "series": "엘리트 마인드", "episode": 3},
-    {"title": "슬럼프에서 빠져나오지 못하는 사람들이 공통적으로 하는 실수", "keyword": "sports slump recovery 3 steps psychology", "img_keyword": "sports motivation", "sport": "심리", "series": "엘리트 마인드", "episode": 4},
-    {"title": "운동 중독자들이 놓치는 치명적 신호... 도파민이 당신을 배신할 때", "keyword": "exercise intensity dopamine overtraining mental", "img_keyword": "overtraining fatigue", "sport": "스포츠의학", "series": "엘리트 마인드", "episode": 5},
-    # 통증 케어
-    {"title": "물리치료사들이 절대 먼저 말 안 해주는 어깨 통증의 진짜 원인", "keyword": "shoulder pain serratus anterior weakness", "img_keyword": "shoulder pain relief", "sport": "물리치료", "series": "통증 케어", "episode": 1},
-    {"title": "계단 내려갈 때 무릎 앞쪽이 찌릿하다면... 이것을 확인하세요", "keyword": "knee pain stairs patellar tendinitis", "img_keyword": "knee pain", "sport": "물리치료", "series": "통증 케어", "episode": 2},
-    {"title": "발목을 자주 삐는 사람들이 공통적으로 훈련하지 않는 감각", "keyword": "ankle sprain proprioception training", "img_keyword": "ankle stability", "sport": "물리치료", "series": "통증 케어", "episode": 3},
-    {"title": "목 디스크 없는데 팔이 저리다면... 이 증후군을 아시나요", "keyword": "thoracic outlet syndrome arm numbness", "img_keyword": "neck shoulder pain", "sport": "물리치료", "series": "통증 케어", "episode": 4},
-    {"title": "허리 아픈 사람이 하면 오히려 더 나빠지는 스트레칭들", "keyword": "lower back pain stretching avoid", "img_keyword": "lower back pain", "sport": "물리치료", "series": "통증 케어", "episode": 5},
-    # 사무직 자세
-    {"title": "하루 8시간 앉아있는 사람의 고관절이 굳는 이유와 결과", "keyword": "hip flexor tightness sitting office worker", "img_keyword": "office posture hip", "sport": "신체균형", "series": "사무직 자세", "episode": 1},
-    {"title": "모니터 위치 하나가 목 통증을 만든다는 걸 아는 사람이 없습니다", "keyword": "monitor height neck pain desk setup ergonomics", "img_keyword": "desk ergonomics monitor", "sport": "신체균형", "series": "사무직 자세", "episode": 2},
-    {"title": "의자에 앉는 자세 하나로 허리 통증 50%가 줄어드는 이유", "keyword": "sitting posture lower back pain office chair", "img_keyword": "sitting posture office", "sport": "신체균형", "series": "사무직 자세", "episode": 3},
-    {"title": "재택근무 이후 목 어깨가 더 나빠진 사람들의 공통된 실수", "keyword": "work from home neck shoulder stretch routine", "img_keyword": "neck stretch office", "sport": "신체균형", "series": "사무직 자세", "episode": 4},
-    {"title": "하루 종일 타이핑해도 손목이 안 아픈 사람들이 하는 것", "keyword": "wrist pain typing keyboard ergonomics", "img_keyword": "wrist pain keyboard", "sport": "물리치료", "series": "사무직 자세", "episode": 5},
-    # 코어 강화
-    {"title": "플랭크를 매일 해도 허리가 아픈 이유... 호흡이 문제였습니다", "keyword": "core weakness back pain transverse abdominis multifidus", "img_keyword": "core strength back", "sport": "근육학", "series": "코어 강화", "episode": 1},
-    {"title": "코어 운동 열심히 해도 효과 없는 사람들이 놓친 것", "keyword": "plank core activation breathing technique", "img_keyword": "plank exercise core", "sport": "근육학", "series": "코어 강화", "episode": 2},
-    {"title": "뱃살 있는 사람이 코어 운동을 어디서부터 시작해야 할까요", "keyword": "belly fat core training beginner progression", "img_keyword": "core workout beginner", "sport": "근육학", "series": "코어 강화", "episode": 3},
-    {"title": "허리 재활에 데드버그가 좋다는 이유... 해본 사람은 압니다", "keyword": "dead bug exercise lumbar rehabilitation core", "img_keyword": "dead bug core exercise", "sport": "재활", "series": "코어 강화", "episode": 4},
-    {"title": "코어 없이 스쿼트 하면 생기는 일들... 경험담이 있습니다", "keyword": "core stability squat lower back knee pain", "img_keyword": "squat core stability", "sport": "근육학", "series": "코어 강화", "episode": 5},
-    # 밸런스 소도구
-    {"title": "밸런스 패드 위에서 10초를 못 서면... 지금 당장 시작해야 합니다", "keyword": "balance pad ankle knee hip stability training", "img_keyword": "balance pad training", "sport": "체력", "series": "밸런스 소도구", "episode": 1},
-    {"title": "폼롤러 아무 데나 굴리면 안 되는 이유... 이 부위는 절대 금지", "keyword": "foam roller technique correct usage avoid areas", "img_keyword": "foam roller technique", "sport": "유연성", "series": "밸런스 소도구", "episode": 2},
-    {"title": "보수볼 운동이 단순히 균형 잡기가 아닌 이유", "keyword": "bosu ball core balance science effectiveness", "img_keyword": "bosu ball exercise", "sport": "체력", "series": "밸런스 소도구", "episode": 3},
-    {"title": "짐볼 하나로 허리 재활부터 근력까지 되는 운동 5가지", "keyword": "stability ball back strengthening exercise rehabilitation", "img_keyword": "stability ball back exercise", "sport": "재활", "series": "밸런스 소도구", "episode": 4},
-    {"title": "슬라이딩 디스크로 코어와 하체를 동시에 잡는 루틴", "keyword": "sliding disc core lower body exercise routine", "img_keyword": "sliding disc exercise", "sport": "체력", "series": "밸런스 소도구", "episode": 5},
-    # 관절 보호
-    {"title": "무릎 보호대... 잘못 고르면 오히려 근육이 약해집니다", "keyword": "knee brace selection pain type guide", "img_keyword": "knee brace support", "sport": "스포츠의학", "series": "관절 보호", "episode": 1},
-    {"title": "발목 보호대가 오히려 독이 되는 사람이 있습니다", "keyword": "ankle brace when to use avoid muscle weakness", "img_keyword": "ankle brace support", "sport": "스포츠의학", "series": "관절 보호", "episode": 2},
-    {"title": "손목 보호대만 차면 손목이 더 약해지는 이유", "keyword": "wrist support brace strengthening exercise", "img_keyword": "wrist support exercise", "sport": "스포츠의학", "series": "관절 보호", "episode": 3},
-    {"title": "테이핑 vs 보호대... 상황에 따라 다르게 써야 하는 이유", "keyword": "taping vs brace difference when to use sports", "img_keyword": "sports taping", "sport": "스포츠의학", "series": "관절 보호", "episode": 4},
-    # 홈트 솔루션
-    {"title": "기구 없이 집에서 30분... 헬스장보다 효과 있는 루틴이 있습니다", "keyword": "home workout no equipment full body strength routine", "img_keyword": "home workout", "sport": "공통", "series": "홈트 솔루션", "episode": 1},
-    {"title": "요가 매트 하나로 허리 통증을 잡은 사람들의 루틴", "keyword": "yoga mat lower back pain relief routine", "img_keyword": "yoga mat back exercise", "sport": "재활", "series": "홈트 솔루션", "episode": 2},
-    {"title": "밴드 하나로 어깨부터 등까지... 헬스장 가기 싫을 때 쓰는 루틴", "keyword": "resistance band upper body shoulder back exercise", "img_keyword": "resistance band exercise", "sport": "근육학", "series": "홈트 솔루션", "episode": 3},
-    {"title": "아침 10분이 하루 종일 자세를 바꾸는 이유", "keyword": "morning routine posture improvement daily habit", "img_keyword": "morning stretch routine", "sport": "신체균형", "series": "홈트 솔루션", "episode": 4},
-    {"title": "퇴근 후 15분... 굳어있는 몸을 푸는 가장 효율적인 방법", "keyword": "foam roller massage ball recovery evening routine", "img_keyword": "foam roller recovery", "sport": "유연성", "series": "홈트 솔루션", "episode": 5},
-    # 체형 교정 심화
-    {"title": "O자 다리를 만드는 진짜 원인... 다리가 아니라 엉덩이입니다", "keyword": "bow legs hip external rotation correction cause", "img_keyword": "bow legs correction", "sport": "신체균형", "series": "체형 교정 심화", "episode": 1},
-    {"title": "새우등 교정... 등을 펴려고 하면 오히려 더 나빠지는 이유", "keyword": "kyphosis correction thoracic spine pectoral stretch", "img_keyword": "posture correction back", "sport": "신체균형", "series": "체형 교정 심화", "episode": 2},
-    {"title": "짝다리 짚는 습관... 10년 후 몸에 어떤 일이 생길까요", "keyword": "weight shifting habit pelvic imbalance spine", "img_keyword": "posture balance standing", "sport": "신체균형", "series": "체형 교정 심화", "episode": 3},
-    {"title": "발 모양이 온몸의 체형을 결정한다는 게 사실입니까?", "keyword": "overpronation supination foot correction posture", "img_keyword": "foot pronation correction", "sport": "신체균형", "series": "체형 교정 심화", "episode": 4},
-    {"title": "골반이 앞으로 기울어진 사람들이 배가 나오는 진짜 이유", "keyword": "anterior pelvic tilt correction psoas abdominal", "img_keyword": "pelvic tilt exercise", "sport": "신체균형", "series": "체형 교정 심화", "episode": 5},
+    {"title": "Tight Ankles Are Quietly Killing Your Dribbling Speed... Nobody Tells You This", "keyword": "soccer dribbling ankle mobility", "img_keyword": "soccer dribbling", "sport": "Soccer", "series": "Dribble Mastery", "episode": 1},
+    {"title": "The Acceleration Secret That Even Sprinters Can't Match in Soccer", "keyword": "soccer acceleration sprint training", "img_keyword": "soccer sprint", "sport": "Soccer", "series": "Speed Revolution", "episode": 1},
+    {"title": "Hitting the Ball as Hard as You Can But Still No Goals? Check Your Hips", "keyword": "soccer shooting hip rotation power", "img_keyword": "soccer shooting", "sport": "Soccer", "series": "Shooting Mastery", "episode": 1},
+    {"title": "The Hidden Endurance Training Behind Players Who Sprint in the 90th Minute", "keyword": "soccer endurance 90 minutes stamina", "img_keyword": "soccer endurance", "sport": "Soccer", "series": "Stamina Mastery", "episode": 1},
+    {"title": "Players Who Blow Out Their Knees on the Field All Miss This One Drill", "keyword": "soccer knee injury prevention squat", "img_keyword": "knee injury soccer", "sport": "Soccer", "series": "Injury Prevention", "episode": 1},
+    {"title": "Vertical Jump Isn't Genetic... How I Added 10cm in 3 Months", "keyword": "basketball jump plyometric training", "img_keyword": "basketball jump", "sport": "Basketball", "series": "Jump Revolution", "episode": 1},
+    {"title": "Your Dribbling Isn't Stuck Because of Your Hands... It's Your Brain", "keyword": "basketball dribbling brain hand coordination", "img_keyword": "basketball dribbling", "sport": "Basketball", "series": "Handling Mastery", "episode": 1},
+    {"title": "The Three-Point Secret Pro Players Don't Want You to Know", "keyword": "basketball three point wrist snap shooting", "img_keyword": "basketball shooting", "sport": "Basketball", "series": "Shooting Mastery", "episode": 1},
+    {"title": "If Your Bat Speed Won't Improve, Stop Looking at Your Arms", "keyword": "baseball bat speed hip rotation", "img_keyword": "baseball batting", "sport": "Baseball", "series": "Science of Hitting", "episode": 1},
+    {"title": "4 Warning Signs a Pitcher's Shoulder Is About to Break Down", "keyword": "baseball pitcher rotator cuff injury prevention", "img_keyword": "baseball pitcher shoulder", "sport": "Baseball", "series": "Science of Pitching", "episode": 1},
+    {"title": "Squats Alone Won't Grow Your Quads If You're Missing This Variation", "keyword": "quadriceps squat variation muscle building", "img_keyword": "quadriceps squat", "sport": "Muscle Science", "series": "Muscle Anatomy", "episode": 1},
+    {"title": "Why Only Your Hamstrings Tear During Sprints... Nobody Explains This", "keyword": "hamstring eccentric training injury prevention", "img_keyword": "hamstring exercise", "sport": "Muscle Science", "series": "Muscle Anatomy", "episode": 2},
+    {"title": "Your Lower Back Pain Isn't Coming From Your Back... Meet This Muscle", "keyword": "transverse abdominis core activation back pain", "img_keyword": "core training", "sport": "Muscle Science", "series": "Core Science", "episode": 1},
+    {"title": "You've Been Training Shoulders for Years and One Side Still Won't Grow", "keyword": "deltoid three heads shoulder training", "img_keyword": "shoulder deltoid workout", "sport": "Muscle Science", "series": "Upper Body Anatomy", "episode": 1},
+    {"title": "People Who Keep Spraining Their Ankles All Share One Weak Muscle", "keyword": "calf muscle ankle stability injury prevention", "img_keyword": "calf muscle", "sport": "Muscle Science", "series": "Lower Body Anatomy", "episode": 1},
+    {"title": "The Real Reason Your Muscles Won't Grow No Matter How Hard You Train", "keyword": "muscle protein synthesis hypertrophy", "img_keyword": "muscle growth", "sport": "Muscle Science", "series": "Muscle Growth Science", "episode": 1},
+    {"title": "80% of Shoulder Pain Comes From This Muscle... You've Never Heard of It", "keyword": "serratus anterior weakness shoulder pain", "img_keyword": "shoulder pain", "sport": "Muscle Science", "series": "Upper Body Anatomy", "episode": 2},
+    {"title": "Your Knee Hurts, So a Trainer Tells You to Work Your Glutes? Here's Why", "keyword": "gluteus medius knee pain pelvic balance", "img_keyword": "gluteus medius hip", "sport": "Muscle Science", "series": "Lower Body Anatomy", "episode": 2},
+    {"title": "The Exercise You Must Do Before Your Knee Cartilage Wears Out", "keyword": "patellar tendinitis rehabilitation exercise", "img_keyword": "knee rehabilitation", "sport": "Rehab", "series": "Injury Rehab", "episode": 1},
+    {"title": "3 Exercises You Should Never Do After a Herniated Disc Diagnosis", "keyword": "lumbar disc stabilization exercise", "img_keyword": "lower back pain", "sport": "Rehab", "series": "Injury Rehab", "episode": 2},
+    {"title": "Iced Your Sprained Ankle Right Away? You Did It Wrong", "keyword": "ankle sprain rehabilitation return to sport", "img_keyword": "ankle sprain", "sport": "Rehab", "series": "Injury Rehab", "episode": 3},
+    {"title": "Shoulder Impingement... What to Try at Home Before the Doctor", "keyword": "shoulder impingement home rehabilitation", "img_keyword": "shoulder impingement", "sport": "Rehab", "series": "Injury Rehab", "episode": 4},
+    {"title": "If Your Achilles Hurts, Stretching It Is the Last Thing You Should Do", "keyword": "achilles tendinopathy exercise avoid", "img_keyword": "achilles tendon", "sport": "Rehab", "series": "Injury Rehab", "episode": 5},
+    {"title": "What You Eat Before Training Can Change Your Performance by 50%", "keyword": "pre workout meal carbohydrate timing", "img_keyword": "pre workout meal", "sport": "Nutrition", "series": "Sports Nutrition Science", "episode": 1},
+    {"title": "I Cut Carbs and My Performance Got Worse... Here's Why", "keyword": "carbohydrate glycogen sports performance", "img_keyword": "carbohydrate food", "sport": "Nutrition", "series": "Sports Nutrition Science", "episode": 2},
+    {"title": "The Biggest Mistake People Make When Taking Creatine", "keyword": "creatine dosage timing supplement", "img_keyword": "creatine supplement", "sport": "Nutrition", "series": "Supplement Science", "episode": 1},
+    {"title": "Drinking Only Water During Exercise Can Actually Cause Cramps", "keyword": "hydration during exercise timing amount", "img_keyword": "hydration water sports", "sport": "Nutrition", "series": "Sports Nutrition Science", "episode": 3},
+    {"title": "How Much Protein Do You Really Need? Most Fitness Influencers Get It Wrong", "keyword": "protein daily intake calculation body weight", "img_keyword": "protein food", "sport": "Nutrition", "series": "Sports Nutrition Science", "episode": 4},
+    {"title": "Eating Only Chicken Breast After a Workout Slows Down Your Recovery", "keyword": "post workout recovery nutrition combination", "img_keyword": "post workout nutrition", "sport": "Nutrition", "series": "Sports Nutrition Science", "episode": 5},
+    {"title": "Some Athletes Thrive Under Pressure, Others Collapse... What's the Difference?", "keyword": "pre game routine anxiety control athletes", "img_keyword": "athlete focus", "sport": "Sports Psychology", "series": "Sports Psychology", "episode": 1},
+    {"title": "What People Who Lose Focus Under Pressure All Have in Common", "keyword": "focus under pressure mental training sports", "img_keyword": "mental training", "sport": "Sports Psychology", "series": "Sports Psychology", "episode": 2},
+    {"title": "Working Hard But Not Improving? It Might Be a Slump, Not Lack of Effort", "keyword": "sports slump recovery psychology steps", "img_keyword": "athlete motivation", "sport": "Sports Psychology", "series": "Sports Psychology", "episode": 3},
+    {"title": "Can Mental Rehearsal Alone Actually Improve Your Performance?", "keyword": "mental imagery visualization sports performance", "img_keyword": "visualization meditation", "sport": "Sports Psychology", "series": "Sports Psychology", "episode": 4},
+    {"title": "Why You Get Out of Breath So Fast... Lung Capacity vs Cardio Fitness", "keyword": "VO2max interval training intensity", "img_keyword": "interval running", "sport": "Conditioning", "series": "Conditioning Science", "episode": 1},
+    {"title": "Why Marathon Runners Never Seem to Tire... The Truth About Lactate", "keyword": "lactate threshold training endurance", "img_keyword": "endurance running", "sport": "Conditioning", "series": "Conditioning Science", "episode": 2},
+    {"title": "30 Minutes of HIIT and Still Not Losing Weight? Your Rest Periods Are the Problem", "keyword": "HIIT rest interval optimization fat loss", "img_keyword": "HIIT workout", "sport": "Conditioning", "series": "Cardio Science", "episode": 1},
+    {"title": "Why Training With a Heart Rate Monitor Burns More Fat", "keyword": "heart rate zone exercise intensity training", "img_keyword": "heart rate monitor", "sport": "Conditioning", "series": "Conditioning Science", "episode": 3},
+    {"title": "Is Stretching Before a Workout Actually Causing Your Injuries?", "keyword": "dynamic stretching warm up injury prevention", "img_keyword": "dynamic stretching", "sport": "Mobility", "series": "Mobility Science", "episode": 1},
+    {"title": "Tight Hips Eventually Wreck Your Back, Knees, and Shoulders", "keyword": "hip flexor mobility stretching exercises", "img_keyword": "hip stretching", "sport": "Mobility", "series": "Mobility Revolution", "episode": 1},
+    {"title": "Using a Foam Roller Wrong Can Actually Make Your Muscles Tighter", "keyword": "foam rolling myofascial release technique", "img_keyword": "foam roller", "sport": "Mobility", "series": "Recovery Science", "episode": 1},
+    {"title": "If Your Shoulders Hurt, Your Upper Back Is Probably the Real Problem", "keyword": "thoracic spine mobility shoulder pain", "img_keyword": "spine mobility", "sport": "Mobility", "series": "Mobility Revolution", "episode": 2},
+    {"title": "What Actually Happens Inside Your Muscles When You Work Out", "keyword": "muscle physiology exercise ATP energy", "img_keyword": "muscle exercise", "sport": "Physiology", "series": "Exercise Physiology", "episode": 1},
+    {"title": "30 Minutes of Cardio and Still Not Burning Fat? Here's the Real Reason", "keyword": "fat oxidation aerobic exercise physiology", "img_keyword": "aerobic exercise", "sport": "Physiology", "series": "Exercise Physiology", "episode": 2},
+    {"title": "Is It True That Your Muscles Grow While You Sleep?", "keyword": "growth hormone sleep muscle recovery", "img_keyword": "sleep recovery", "sport": "Physiology", "series": "Exercise Physiology", "episode": 3},
+    {"title": "The Myth That More Soreness Means More Muscle Growth", "keyword": "DOMS delayed onset muscle soreness cause", "img_keyword": "muscle soreness", "sport": "Physiology", "series": "Exercise Physiology", "episode": 4},
+    {"title": "Why an Athlete's Heart Is 50% Bigger Than a Regular Person's", "keyword": "cardiac adaptation exercise athlete heart", "img_keyword": "heart cardio", "sport": "Physiology", "series": "Exercise Physiology", "episode": 5},
+    {"title": "Why High Stress Makes You Gain Fat and Lose Muscle at the Same Time", "keyword": "cortisol muscle loss stress hormone", "img_keyword": "stress cortisol", "sport": "Physiology", "series": "Exercise Physiology", "episode": 6},
+    {"title": "If Your Shoulder Hurts, Why Does a PT Check Your Neck First?", "keyword": "shoulder pain physical therapy assessment", "img_keyword": "shoulder physical therapy", "sport": "Physical Therapy", "series": "PT Guide", "episode": 1},
+    {"title": "Knee Pain: Signs That Mean See a Doctor vs Signs You Can Fix at Home", "keyword": "knee pain self diagnosis when to see doctor", "img_keyword": "knee pain", "sport": "Physical Therapy", "series": "PT Guide", "episode": 2},
+    {"title": "You Don't Even Play Tennis, So Why Do You Have Tennis Elbow?", "keyword": "tennis elbow treatment home exercise", "img_keyword": "tennis elbow", "sport": "Physical Therapy", "series": "PT Guide", "episode": 3},
+    {"title": "If Your Heels Hurt Every Morning, You're Missing This One Thing", "keyword": "plantar fasciitis morning stretching routine", "img_keyword": "plantar fasciitis foot", "sport": "Physical Therapy", "series": "PT Guide", "episode": 4},
+    {"title": "Can 5 Minutes a Day Really Fix Forward Head Posture?", "keyword": "forward head posture correction exercise", "img_keyword": "neck posture", "sport": "Physical Therapy", "series": "PT Guide", "episode": 5},
+    {"title": "If Your Knees Hurt When Running, You're Probably Making This Form Mistake", "keyword": "running biomechanics knee impact reduction", "img_keyword": "running form", "sport": "Biomechanics", "series": "Sports Biomechanics", "episode": 1},
+    {"title": "Your Knees Cave In During Squats... It's Not Actually Your Knees' Fault", "keyword": "squat knee valgus cause biomechanics", "img_keyword": "squat form", "sport": "Biomechanics", "series": "Sports Biomechanics", "episode": 2},
+    {"title": "People Who Hurt Their Back Deadlifting Never Understood Neutral Spine", "keyword": "deadlift spine neutral position injury prevention", "img_keyword": "deadlift", "sport": "Biomechanics", "series": "Sports Biomechanics", "episode": 3},
+    {"title": "0.1 Seconds of Landing Decides Whether Your ACL Tears", "keyword": "landing mechanics ACL injury prevention", "img_keyword": "jump landing", "sport": "Biomechanics", "series": "Sports Biomechanics", "episode": 4},
+    {"title": "Why Your Knees Get Injured So Often... It's Built Into the Structure", "keyword": "knee joint anatomy structure injury", "img_keyword": "knee joint", "sport": "Anatomy", "series": "Sports Anatomy", "episode": 1},
+    {"title": "Your Shoulder Can Rotate 360 Degrees... and That's Exactly the Problem", "keyword": "shoulder joint anatomy mobility instability", "img_keyword": "shoulder joint", "sport": "Anatomy", "series": "Sports Anatomy", "episode": 2},
+    {"title": "When Your Foot Arch Collapses, It Drags Down Your Knees, Back, and Neck Too", "keyword": "foot arch structure running performance", "img_keyword": "foot arch", "sport": "Anatomy", "series": "Sports Anatomy", "episode": 3},
+    {"title": "One Sitting Posture Can Triple the Pressure on Your Spinal Discs", "keyword": "spinal disc anatomy pressure posture", "img_keyword": "spine disc", "sport": "Anatomy", "series": "Sports Anatomy", "episode": 4},
+    {"title": "One Shoulder Lower Than the Other? Here's What Happens If You Ignore It", "keyword": "pelvic tilt imbalance lower back knee pain", "img_keyword": "pelvic posture", "sport": "Body Balance", "series": "Posture Correction", "episode": 1},
+    {"title": "Scoliosis: A 5-Minute Self-Check You Can Do at Home", "keyword": "shoulder uneven scoliosis self check", "img_keyword": "scoliosis posture", "sport": "Body Balance", "series": "Posture Correction", "episode": 2},
+    {"title": "What People With Flat Feet Need to Know Before They Train", "keyword": "flat feet sports performance correction", "img_keyword": "flat feet", "sport": "Body Balance", "series": "Posture Correction", "episode": 3},
+    {"title": "Your Knees Hurt Because of Knock Knees, But You're Just Squatting Anyway?", "keyword": "knock knees correction gluteus medius", "img_keyword": "knock knees legs", "sport": "Body Balance", "series": "Posture Correction", "episode": 4},
+    {"title": "Does Heavy Training in Youth Really Stunt a Child's Growth?", "keyword": "youth athlete growth plate safe training", "img_keyword": "youth sports training", "sport": "Sports Medicine", "series": "Sports Medicine Guide", "episode": 1},
+    {"title": "The Warning Signs Before You Collapse From Heat During Summer Workouts", "keyword": "heat stroke warning signs summer exercise", "img_keyword": "heat stroke summer", "sport": "Sports Medicine", "series": "Sports Medicine Guide", "episode": 2},
+    {"title": "Why Do You Suddenly Get Cramps During Exercise? It's Not Just Dehydration", "keyword": "exercise cramp cause prevention electrolyte", "img_keyword": "muscle cramp", "sport": "Sports Medicine", "series": "Sports Medicine Guide", "episode": 3},
+    {"title": "Training Hard but Feeling Worse? The Signs of Overtraining", "keyword": "overtraining syndrome self check recovery", "img_keyword": "overtraining fatigue", "sport": "Sports Medicine", "series": "Sports Medicine Guide", "episode": 4},
+    {"title": "Is It True That 7 Hours of Sleep Builds More Muscle?", "keyword": "sleep 7 hours muscle growth performance", "img_keyword": "sleep recovery", "sport": "General", "series": "Recovery Science", "episode": 1},
+    {"title": "Is Losing Muscle With Age Really Unavoidable?", "keyword": "sarcopenia aging muscle loss prevention", "img_keyword": "aging fitness", "sport": "General", "series": "Senior Fitness", "episode": 1},
+    {"title": "What Happens If Kids Start Serious Training Too Early?", "keyword": "youth sports age appropriate training", "img_keyword": "kids sports", "sport": "General", "series": "Youth Development", "episode": 1},
+    {"title": "What People Who Quit Working Out After One Month All Have in Common", "keyword": "beginner exercise first month principles", "img_keyword": "beginner workout", "sport": "General", "series": "Fitness Foundations", "episode": 1},
+    {"title": "Is It Actually Possible to Lose Fat and Gain Muscle at the Same Time?", "keyword": "body recomposition fat loss muscle gain", "img_keyword": "body recomposition", "sport": "General", "series": "Fitness Foundations", "episode": 2},
+    {"title": "Tight Ankles Eventually Wreck Your Knees Too... Here's the Chain Reaction", "keyword": "soccer ankle mobility knee injury prevention", "img_keyword": "ankle mobility", "sport": "Soccer", "series": "Mobility Chain", "episode": 1},
+    {"title": "Why Your Back Exercises Don't Work If Your Pelvis Is Tilted", "keyword": "pelvic tilt lumbar stabilization biomechanics", "img_keyword": "pelvic balance", "sport": "Body Balance", "series": "Mobility Chain", "episode": 2},
+    {"title": "Bench Press Shoulder Pain Comes From a Stiff Upper Back, Not the Shoulder", "keyword": "thoracic mobility shoulder impingement bench press", "img_keyword": "bench press shoulder", "sport": "Mobility", "series": "Mobility Chain", "episode": 3},
+    {"title": "Why Pitchers Lose Velocity When Their Hips Stop Rotating", "keyword": "hip rotation baseball pitching velocity anatomy", "img_keyword": "hip rotation pitcher", "sport": "Baseball", "series": "Mobility Chain", "episode": 4},
+    {"title": "How a Collapsed Foot Arch Throws Off Your Entire Upper Body Balance", "keyword": "foot arch collapse upper body balance chain", "img_keyword": "foot arch balance", "sport": "Anatomy", "series": "Mobility Chain", "episode": 5},
+    {"title": "Why the First Minute of HIIT Always Feels the Hardest", "keyword": "ATP-PC system lactate threshold HIIT physiology", "img_keyword": "HIIT training", "sport": "Physiology", "series": "Energy Science", "episode": 1},
+    {"title": "Can Eating More Carbs the Night Before Really Make You Run Faster?", "keyword": "carbohydrate loading glycogen VO2max performance", "img_keyword": "carbohydrate loading", "sport": "Nutrition", "series": "Energy Science", "episode": 2},
+    {"title": "The Worse the Soreness, the More Sleep You Actually Need", "keyword": "DOMS growth hormone sleep muscle protein synthesis", "img_keyword": "muscle recovery sleep", "sport": "Physiology", "series": "Energy Science", "episode": 3},
+    {"title": "Is There Really a Heart Rate Zone Where Fat Burns Best?", "keyword": "fat oxidation aerobic heart rate zone science", "img_keyword": "fat burning cardio", "sport": "Conditioning", "series": "Energy Science", "episode": 4},
+    {"title": "Why Working Out Doesn't Help When You're Already Stressed Out", "keyword": "cortisol muscle loss exercise slump physiology", "img_keyword": "stress hormone", "sport": "Physiology", "series": "Energy Science", "episode": 5},
+    {"title": "Why Your Hamstring Only Tears While Sprinting... The Shocking Truth", "keyword": "hamstring eccentric contraction running biomechanics", "img_keyword": "hamstring running", "sport": "Rehab", "series": "Injury Chronicles", "episode": 1},
+    {"title": "0.1 Seconds of Landing Mechanics That Tear Your ACL", "keyword": "ACL injury landing mechanics gluteus medius", "img_keyword": "ACL knee injury", "sport": "Biomechanics", "series": "Injury Chronicles", "episode": 2},
+    {"title": "Morning Heel Pain Isn't About Your Foot... It's Your Calf", "keyword": "plantar fasciitis achilles tendinopathy connection", "img_keyword": "plantar fasciitis", "sport": "Physical Therapy", "series": "Injury Chronicles", "episode": 3},
+    {"title": "Fixing Tennis Elbow Starts With Your Shoulder Blade, Not Your Wrist", "keyword": "tennis elbow scapular stability physical therapy", "img_keyword": "tennis elbow", "sport": "Physical Therapy", "series": "Injury Chronicles", "episode": 4},
+    {"title": "Movements You Should Never Do While Recovering From a Herniated Disc", "keyword": "lumbar disc rehabilitation avoid movements", "img_keyword": "lumbar disc", "sport": "Rehab", "series": "Injury Chronicles", "episode": 5},
+    {"title": "Sitting 8 Hours a Day Raises Injury Risk Even for Trained Athletes", "keyword": "forward head posture rotator cuff injury pitcher", "img_keyword": "neck posture office", "sport": "Body Balance", "series": "Office Athlete", "episode": 1},
+    {"title": "Why Office Workers Hurt Their Back Squatting After Sitting All Day", "keyword": "transverse abdominis core squat back pain", "img_keyword": "core squat", "sport": "Muscle Science", "series": "Office Athlete", "episode": 2},
+    {"title": "Sitting Too Long Can Make Your Glutes 'Forget' How to Work", "keyword": "psoas muscle gluteal amnesia reciprocal inhibition", "img_keyword": "hip flexor psoas", "sport": "Muscle Science", "series": "Office Athlete", "episode": 3},
+    {"title": "The Real Reason Sitting 8 Hours a Day Tightens Your Hamstrings", "keyword": "sitting posture hamstring flexibility physiology", "img_keyword": "sitting hamstring", "sport": "Mobility", "series": "Office Athlete", "episode": 4},
+    {"title": "What Separates Athletes Who Focus Better Under Pressure", "keyword": "focus under pressure attentional focus brain waves", "img_keyword": "athlete concentration", "sport": "Sports Psychology", "series": "Elite Mindset", "episode": 1},
+    {"title": "Can Just Visualizing Movement Actually Activate Your Muscles?", "keyword": "mental imagery mirror neurons neuromuscular activation", "img_keyword": "mental visualization", "sport": "Sports Psychology", "series": "Elite Mindset", "episode": 2},
+    {"title": "Trying to Calm Pre-Game Nerves Makes Them Worse... Here's Why", "keyword": "pre-game anxiety cognitive reappraisal sports", "img_keyword": "athlete pregame", "sport": "Sports Psychology", "series": "Elite Mindset", "episode": 3},
+    {"title": "The One Mistake That Keeps Athletes Stuck in a Slump", "keyword": "sports slump recovery 3 steps psychology", "img_keyword": "sports motivation", "sport": "Sports Psychology", "series": "Elite Mindset", "episode": 4},
+    {"title": "The Dangerous Signal Exercise Addicts Miss... When Dopamine Turns on You", "keyword": "exercise intensity dopamine overtraining mental", "img_keyword": "overtraining fatigue", "sport": "Sports Medicine", "series": "Elite Mindset", "episode": 5},
+    {"title": "What Physical Therapists Won't Tell You First About Shoulder Pain", "keyword": "shoulder pain serratus anterior weakness", "img_keyword": "shoulder pain relief", "sport": "Physical Therapy", "series": "Pain Care", "episode": 1},
+    {"title": "Sharp Pain in Front of Your Knee Going Down Stairs? Check This First", "keyword": "knee pain stairs patellar tendinitis", "img_keyword": "knee pain", "sport": "Physical Therapy", "series": "Pain Care", "episode": 2},
+    {"title": "People Who Keep Spraining Their Ankles Are All Missing This One Sense", "keyword": "ankle sprain proprioception training", "img_keyword": "ankle stability", "sport": "Physical Therapy", "series": "Pain Care", "episode": 3},
+    {"title": "Numb Arm but No Neck Disc Problem? You Might Have This Syndrome", "keyword": "thoracic outlet syndrome arm numbness", "img_keyword": "neck shoulder pain", "sport": "Physical Therapy", "series": "Pain Care", "episode": 4},
+    {"title": "Stretches That Actually Make Lower Back Pain Worse", "keyword": "lower back pain stretching avoid", "img_keyword": "lower back pain", "sport": "Physical Therapy", "series": "Pain Care", "episode": 5},
+    {"title": "Why Sitting 8 Hours a Day Tightens Your Hip Flexors... and What It Leads To", "keyword": "hip flexor tightness sitting office worker", "img_keyword": "office posture hip", "sport": "Body Balance", "series": "Desk Posture", "episode": 1},
+    {"title": "Nobody Realizes Monitor Height Alone Can Cause Neck Pain", "keyword": "monitor height neck pain desk setup ergonomics", "img_keyword": "desk ergonomics monitor", "sport": "Body Balance", "series": "Desk Posture", "episode": 2},
+    {"title": "One Sitting Adjustment That Cuts Lower Back Pain by Half", "keyword": "sitting posture lower back pain office chair", "img_keyword": "sitting posture office", "sport": "Body Balance", "series": "Desk Posture", "episode": 3},
+    {"title": "The Common Mistake Behind Worsening Neck and Shoulder Pain From WFH", "keyword": "work from home neck shoulder stretch routine", "img_keyword": "neck stretch office", "sport": "Body Balance", "series": "Desk Posture", "episode": 4},
+    {"title": "What People With Pain-Free Wrists Do Differently While Typing All Day", "keyword": "wrist pain typing keyboard ergonomics", "img_keyword": "wrist pain keyboard", "sport": "Physical Therapy", "series": "Desk Posture", "episode": 5},
+    {"title": "Planking Every Day but Still Have Back Pain? It's Your Breathing", "keyword": "core weakness back pain transverse abdominis multifidus", "img_keyword": "core strength back", "sport": "Muscle Science", "series": "Core Strength", "episode": 1},
+    {"title": "What People Who Get No Results From Core Workouts Are Missing", "keyword": "plank core activation breathing technique", "img_keyword": "plank exercise core", "sport": "Muscle Science", "series": "Core Strength", "episode": 2},
+    {"title": "Where Should Someone With Belly Fat Start With Core Training?", "keyword": "belly fat core training beginner progression", "img_keyword": "core workout beginner", "sport": "Muscle Science", "series": "Core Strength", "episode": 3},
+    {"title": "Why Dead Bugs Are One of the Best Exercises for Back Rehab", "keyword": "dead bug exercise lumbar rehabilitation core", "img_keyword": "dead bug core exercise", "sport": "Rehab", "series": "Core Strength", "episode": 4},
+    {"title": "What Happens to Your Back and Knees If You Squat Without Core Stability", "keyword": "core stability squat lower back knee pain", "img_keyword": "squat core stability", "sport": "Muscle Science", "series": "Core Strength", "episode": 5},
+    {"title": "Can't Stand on a Balance Pad for 10 Seconds? You Need This Now", "keyword": "balance pad ankle knee hip stability training", "img_keyword": "balance pad training", "sport": "Conditioning", "series": "Balance Tools", "episode": 1},
+    {"title": "There's One Spot You Should Never Roll With a Foam Roller", "keyword": "foam roller technique correct usage avoid areas", "img_keyword": "foam roller technique", "sport": "Mobility", "series": "Balance Tools", "episode": 2},
+    {"title": "Bosu Ball Training Isn't Just About Balance... Here's the Science", "keyword": "bosu ball core balance science effectiveness", "img_keyword": "bosu ball exercise", "sport": "Conditioning", "series": "Balance Tools", "episode": 3},
+    {"title": "5 Stability Ball Exercises That Go From Rehab to Real Strength", "keyword": "stability ball back strengthening exercise rehabilitation", "img_keyword": "stability ball back exercise", "sport": "Rehab", "series": "Balance Tools", "episode": 4},
+    {"title": "A Sliding Disc Routine That Hits Your Core and Lower Body Together", "keyword": "sliding disc core lower body exercise routine", "img_keyword": "sliding disc exercise", "sport": "Conditioning", "series": "Balance Tools", "episode": 5},
+    {"title": "Choosing the Wrong Knee Brace Can Weaken Your Muscles Over Time", "keyword": "knee brace selection pain type guide", "img_keyword": "knee brace support", "sport": "Sports Medicine", "series": "Joint Protection", "episode": 1},
+    {"title": "An Ankle Brace Can Actually Hurt Certain People... Are You One of Them?", "keyword": "ankle brace when to use avoid muscle weakness", "img_keyword": "ankle brace support", "sport": "Sports Medicine", "series": "Joint Protection", "episode": 2},
+    {"title": "Wearing a Wrist Brace Alone Can Make Your Wrist Weaker", "keyword": "wrist support brace strengthening exercise", "img_keyword": "wrist support exercise", "sport": "Sports Medicine", "series": "Joint Protection", "episode": 3},
+    {"title": "Taping vs Bracing... When You Should Actually Use Each", "keyword": "taping vs brace difference when to use sports", "img_keyword": "sports taping", "sport": "Sports Medicine", "series": "Joint Protection", "episode": 4},
+    {"title": "A 30-Minute No-Equipment Routine That Beats the Gym", "keyword": "home workout no equipment full body strength routine", "img_keyword": "home workout", "sport": "General", "series": "Home Workout Solutions", "episode": 1},
+    {"title": "How People Fixed Their Lower Back Pain With Just a Yoga Mat", "keyword": "yoga mat lower back pain relief routine", "img_keyword": "yoga mat back exercise", "sport": "Rehab", "series": "Home Workout Solutions", "episode": 2},
+    {"title": "6 Resistance Band Exercises for Shoulders and Back When You Skip the Gym", "keyword": "resistance band upper body shoulder back exercise", "img_keyword": "resistance band exercise", "sport": "Muscle Science", "series": "Home Workout Solutions", "episode": 3},
+    {"title": "Why 10 Minutes in the Morning Changes Your Posture for the Whole Day", "keyword": "morning routine posture improvement daily habit", "img_keyword": "morning stretch routine", "sport": "Body Balance", "series": "Home Workout Solutions", "episode": 4},
+    {"title": "A 15-Minute Evening Routine to Undo a Whole Day of Tightness", "keyword": "foam roller massage ball recovery evening routine", "img_keyword": "foam roller recovery", "sport": "Mobility", "series": "Home Workout Solutions", "episode": 5},
+    {"title": "The Real Cause of Bow Legs Isn't Your Legs... It's Your Glutes", "keyword": "bow legs hip external rotation correction cause", "img_keyword": "bow legs correction", "sport": "Body Balance", "series": "Advanced Posture Correction", "episode": 1},
+    {"title": "Trying to Force Your Back Straight Can Make Rounded Shoulders Worse", "keyword": "kyphosis correction thoracic spine pectoral stretch", "img_keyword": "posture correction back", "sport": "Body Balance", "series": "Advanced Posture Correction", "episode": 2},
+    {"title": "What Standing on One Leg for Years Does to Your Spine", "keyword": "weight shifting habit pelvic imbalance spine", "img_keyword": "posture balance standing", "sport": "Body Balance", "series": "Advanced Posture Correction", "episode": 3},
+    {"title": "Is It True That Your Foot Shape Determines Your Whole Posture?", "keyword": "overpronation supination foot correction posture", "img_keyword": "foot pronation correction", "sport": "Body Balance", "series": "Advanced Posture Correction", "episode": 4},
+    {"title": "Why an Anteriorly Tilted Pelvis Gives You a Permanent Belly Pooch", "keyword": "anterior pelvic tilt correction psoas abdominal", "img_keyword": "pelvic tilt exercise", "sport": "Body Balance", "series": "Advanced Posture Correction", "episode": 5},
 ]
 
 USED_TOPICS_FILE = "used_topics.json"
@@ -205,9 +177,9 @@ def save_series_link(series, episode, title, url):
     try:
         with open(SERIES_LINKS_FILE, "w") as f:
             json.dump(links, f, ensure_ascii=False)
-        print("[시리즈링크] 저장 완료: " + series + " " + str(episode) + "편")
+        print("[Series Link] Saved: " + series + " episode " + str(episode))
     except Exception as e:
-        print("[시리즈링크] 저장 실패: " + str(e))
+        print("[Series Link] Save failed: " + str(e))
 
 
 def get_series_nav_html(topic):
@@ -225,7 +197,7 @@ def get_series_nav_html(topic):
         prev_html = (
             '<a href="' + prev["url"] + '" style="display:flex;align-items:center;'
             'text-decoration:none;color:#1565c0;font-size:14px;font-weight:600;">'
-            '◀ 이전편: ' + prev["title"] + '</a>'
+            '◀ Previous: ' + prev["title"] + '</a>'
         )
     next_ep = str(episode + 1)
     if next_ep in series_data:
@@ -233,7 +205,7 @@ def get_series_nav_html(topic):
         next_html = (
             '<a href="' + nxt["url"] + '" style="display:flex;align-items:center;'
             'text-decoration:none;color:#1565c0;font-size:14px;font-weight:600;">'
-            '다음편: ' + nxt["title"] + ' ▶</a>'
+            'Next: ' + nxt["title"] + ' ▶</a>'
         )
     if not prev_html and not next_html:
         return ""
@@ -241,7 +213,7 @@ def get_series_nav_html(topic):
         '<div style="background:#f0f4ff;border:2px solid #1565c0;border-radius:12px;'
         'padding:20px 24px;margin:40px 0;">'
         '<p style="font-weight:700;font-size:15px;color:#1565c0;margin-bottom:14px;">'
-        '📚 ' + series + ' 시리즈 더 보기</p>'
+        '📚 More in the ' + series + ' series</p>'
         '<div style="display:flex;flex-direction:column;gap:10px;">'
     )
     if prev_html:
@@ -269,14 +241,14 @@ def save_used_topic(title):
         with open(USED_TOPICS_FILE, "w") as f:
             json.dump(used, f, ensure_ascii=False)
     except Exception as e:
-        print("[중복방지] 저장 실패: " + str(e))
+        print("[Dedup] Save failed: " + str(e))
 
 
 def pick_topic():
     used = load_used_topics()
     available = [t for t in TOPICS if t["title"] not in used]
     if not available:
-        print("[중복방지] 모든 주제 사용 완료, 초기화합니다.")
+        print("[Dedup] All topics used, resetting.")
         available = TOPICS
         try:
             with open(USED_TOPICS_FILE, "w") as f:
@@ -289,7 +261,7 @@ def pick_topic():
 
 
 def get_access_token():
-    print("[인증] Google Access Token 발급 중...")
+    print("[Auth] Requesting Google Access Token...")
     response = requests.post(
         "https://oauth2.googleapis.com/token",
         data={
@@ -301,13 +273,13 @@ def get_access_token():
         timeout=10
     )
     if response.status_code != 200:
-        raise Exception("토큰 발급 실패: " + response.text)
-    print("[인증] 완료!")
+        raise Exception("Token request failed: " + response.text)
+    print("[Auth] Done!")
     return response.json()["access_token"]
 
 
 def generate_with_claude(prompt):
-    print("[AI] Claude 사용 중...")
+    print("[AI] Calling Claude...")
     response = requests.post(
         "https://api.anthropic.com/v1/messages",
         headers={
@@ -323,63 +295,62 @@ def generate_with_claude(prompt):
         timeout=300
     )
     if response.status_code != 200:
-        raise Exception("Claude 오류: " + str(response.status_code) + " " + response.text[:200])
+        raise Exception("Claude error: " + str(response.status_code) + " " + response.text[:200])
     return response.json()["content"][0]["text"]
 
 
 def generate_post():
     topic = pick_topic()
-    print("[글 생성] 주제: " + topic["title"])
+    print("[Generate] Topic: " + topic["title"])
 
     series_info = ""
     if topic["episode"] > 1:
         series_info = (
-            "이 글은 " + topic["series"] + " 시리즈 " + str(topic["episode"]) + "편입니다. "
-            + "이전 편보다 심화된 내용을 다루세요.\n\n"
+            "This article is episode " + str(topic["episode"]) + " of the '" + topic["series"] + "' series. "
+            + "Make it more advanced than the previous episode.\n\n"
         )
 
     prompt = (
-        "당신은 10년 경력의 스포츠 트레이너이자 블로거예요.\n"
-        "운동 현장에서 직접 보고 경험한 것들을 글로 풀어내는 스타일이고,\n"
-        "어려운 스포츠 과학 지식을 누구나 이해할 수 있게 전달하는 게 특기예요.\n"
-        "한국어만 사용하세요. 외국 문자 절대 금지.\n\n"
+        "You are a sports trainer and blogger with 10 years of hands-on experience.\n"
+        "You explain complex sports science in a way anyone can understand,\n"
+        "drawing on real stories from the gym floor and the field.\n"
+        "Write only in English. Do not use any other language.\n\n"
         + series_info
-        + "## 제목 활용 방법\n"
-        "주어진 제목은 독자의 궁금증을 자극하는 후킹 문장입니다.\n"
-        "글 내용은 반드시 이 제목의 궁금증을 완벽하게 해소해주어야 해요.\n"
-        "제목에서 던진 질문이나 주장을 글 안에서 명확히 답해주세요.\n\n"
-        "## 글쓰기 핵심 원칙\n"
-        "1. 현장 사례로 시작하세요. 실제 트레이너가 겪은 에피소드로 자연스럽게 끌어들이세요.\n"
-        "2. '나도 몰랐던 사실'을 밝혀주는 구성으로 쓰세요. 독자가 '어, 이거 나도 오해했는데'라고 느끼게.\n"
-        "3. 전문 지식은 반드시 일상 비유로 풀어주세요. 예: '근막은 몸을 감싸는 비닐랩 같은 것'\n"
-        "4. 각 소제목 아래는 배경 → 과학적 설명 → 실제 사례 → 해결책 순으로 전개하세요.\n"
-        "5. 마지막에 독자가 내일 당장 해볼 수 있는 구체적인 행동 하나를 제시하세요.\n\n"
-        "## 문단 작성 규칙\n"
-        "각 문단은 4~6문장 이상 하나의 덩어리로 묶어 작성하세요.\n"
-        "한두 문장 쓰고 줄바꿈 금지.\n\n"
-        "## 소제목 규칙\n"
-        "소제목은 [이모지 소제목내용] 형식, 이모지는 앞에만 1개.\n"
-        "소제목에 반드시 구체적 수치나 데이터 포함.\n"
-        "예시 (좋음): [🦴 골반이 1도 틀어지면 허리 압력이 3배 증가합니다]\n"
-        "예시 (나쁨): [🦴 골반의 과학 🦴]\n\n"
-        "## 반드시 포함할 요소\n"
-        "핵심 키워드: ##키워드## 형식으로 글의 핵심 개념 하나를 크게 던지고 풀어쓰세요.\n"
-        "소제목: 위 규칙대로 최소 4개 이상.\n"
-        "훈련 표: [TABLE_START]와 [TABLE_END] 사이에 작성.\n"
-        "형식: 훈련명|세트|횟수|휴식|작용 근육|효과\n"
+        + "## How to use the title\n"
+        "The given title is a hook designed to spark curiosity.\n"
+        "Your article must fully deliver on that hook - answer the question or claim in the title clearly within the body.\n\n"
+        "## Core writing principles\n"
+        "1. Open with a real scene from the gym or clinic - a story, not a definition.\n"
+        "2. Structure it as a reveal: something the reader (or you) believed was wrong, and what's actually true.\n"
+        "3. Explain technical concepts with everyday analogies. Example: 'Fascia is like the plastic wrap around your muscles.'\n"
+        "4. For each subheading, follow this order: setup, then the science, then a real example, then what to do about it.\n"
+        "5. End with one specific, concrete action the reader can try tomorrow.\n\n"
+        "## Paragraph rules\n"
+        "Each paragraph must be a dense block of 4-6+ sentences on one sub-idea.\n"
+        "Never write one or two sentences and break the line. Only break paragraphs between sub-ideas.\n\n"
+        "## Subheading rules\n"
+        "Subheadings must use the format [emoji Subheading text], with exactly ONE emoji at the front only.\n"
+        "Every subheading must include a specific number or data point.\n"
+        "Good example: [\xf0\x9f\xa6\xb4 A 1-Degree Pelvic Tilt Triples the Pressure on Your Lower Back]\n"
+        "Bad example: [\xf0\x9f\xa6\xb4 The Science of the Pelvis \xf0\x9f\xa6\xb4] (two emojis, no number)\n\n"
+        "## Required elements\n"
+        "Key concept: wrap one core concept in ##keyword## format and unpack it.\n"
+        "Subheadings: at least 4, following the rules above.\n"
+        "Training table: place between [TABLE_START] and [TABLE_END].\n"
+        "Format: Exercise|Sets|Reps|Rest|Muscles Worked|Benefit\n"
         "[TABLE_START]\n"
-        "훈련명|세트|횟수|휴식|작용 근육|효과\n"
-        "예시|3|12회|60초|대퇴사두근|하체 강화\n"
+        "Exercise|Sets|Reps|Rest|Muscles Worked|Benefit\n"
+        "Example|3|12 reps|60 sec|Quadriceps|Lower body strength\n"
         "[TABLE_END]\n"
-        "핵심 요약: [SUMMARY_START]와 [SUMMARY_END] 사이에 3줄 (수치 포함).\n\n"
-        "분량: 4000자~6000자. 깊이 있게 충분히 써주세요.\n"
-        "AI 티 나는 나열식 표현 금지. 친근한 존댓말 필수.\n\n"
-        "카테고리: " + topic["sport"] + "\n"
-        "주제 제목: " + topic["title"] + "\n\n"
-        "출력 형식:\n"
-        "제목: (주어진 주제 제목을 더욱 흡입력 있게 다듬은 제목)\n"
+        "Summary: 3 lines with numbers, between [SUMMARY_START] and [SUMMARY_END].\n\n"
+        "Length: 4000-6000 characters. Go deep, don't pad with filler.\n"
+        "Avoid generic AI-sounding phrasing. Friendly but knowledgeable tone - like a trainer talking to a client.\n\n"
+        "Category: " + topic["sport"] + "\n"
+        "Topic title: " + topic["title"] + "\n\n"
+        "Output format:\n"
+        "Title: (a sharpened, even more compelling version of the topic title)\n"
         "---\n"
-        "(본문)"
+        "(article body)"
     )
 
     full_text = generate_with_claude(prompt)
@@ -390,8 +361,8 @@ def generate_post():
     separator_found = False
 
     for line in lines:
-        if line.startswith("제목:"):
-            title = line.replace("제목:", "").strip()
+        if line.startswith("Title:"):
+            title = line.replace("Title:", "").strip()
         elif line.strip() == "---":
             separator_found = True
         elif separator_found:
@@ -403,8 +374,8 @@ def generate_post():
     if not body:
         body = full_text
 
-    print("[완료] 제목: " + title)
-    print("[완료] 글자수: " + str(len(body)) + "자")
+    print("[Done] Title: " + title)
+    print("[Done] Length: " + str(len(body)) + " chars")
     return {"title": title, "body": body, "topic": topic}
 
 
@@ -436,7 +407,7 @@ def get_images_unsplash(keyword, count=3):
             random.shuffle(images)
             return images[:count]
     except Exception as e:
-        print("[Unsplash 오류] " + str(e))
+        print("[Unsplash error] " + str(e))
     return []
 
 
@@ -463,7 +434,7 @@ def get_images_pexels(keyword, count=3):
                 })
             return images
     except Exception as e:
-        print("[Pexels 오류] " + str(e))
+        print("[Pexels error] " + str(e))
     return []
 
 
@@ -496,25 +467,25 @@ def get_images_pixabay(keyword, count=3):
                 })
             return images
     except Exception as e:
-        print("[Pixabay 오류] " + str(e))
+        print("[Pixabay error] " + str(e))
     return []
 
 
 def get_images(keyword, count=3):
-    print("[이미지 검색] 키워드: " + keyword)
+    print("[Image search] keyword: " + keyword)
     images = get_images_unsplash(keyword, count)
     if images:
-        print("[이미지] Unsplash " + str(len(images)) + "장")
+        print("[Image] Unsplash " + str(len(images)) + " photos")
         return images
     images = get_images_pexels(keyword, count)
     if images:
-        print("[이미지] Pexels " + str(len(images)) + "장")
+        print("[Image] Pexels " + str(len(images)) + " photos")
         return images
     images = get_images_pixabay(keyword, count)
     if images:
-        print("[이미지] Pixabay " + str(len(images)) + "장")
+        print("[Image] Pixabay " + str(len(images)) + " photos")
         return images
-    print("[이미지] 모든 소스 실패")
+    print("[Image] All sources failed")
     return []
 
 
@@ -541,7 +512,7 @@ def make_table_html(table_text):
 def make_summary_html(summary_text):
     lines = [l.strip() for l in summary_text.strip().split("\n") if l.strip()]
     html = '<div style="background:#e8f4fd;border-left:5px solid #1565c0;border-radius:8px;padding:20px 24px;margin:28px 0;">'
-    html += '<p style="font-weight:700;font-size:17px;color:#1565c0;margin-bottom:12px;">📌 핵심 요약</p>'
+    html += '<p style="font-weight:700;font-size:17px;color:#1565c0;margin-bottom:12px;">📌 Key Takeaways</p>'
     for line in lines:
         html += '<p style="margin:6px 0;font-size:15px;color:#333;">✅ ' + line + "</p>"
     html += "</div>\n"
@@ -565,7 +536,7 @@ def body_to_html(body, images, topic):
         series_badge = (
             '<div style="display:inline-block;background:#1565c0;color:#fff;'
             'font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:20px;font-weight:600;">'
-            + sport_emoji + " " + topic["series"] + " " + str(topic["episode"]) + "편</div>\n"
+            + sport_emoji + " " + topic["series"] + " - Part " + str(topic["episode"]) + "</div>\n"
         )
 
     html = series_badge
@@ -589,10 +560,10 @@ def body_to_html(body, images, topic):
     headings = [h for h in headings if h not in ["TABLE_PLACEHOLDER", "SUMMARY_PLACEHOLDER"]]
     if headings:
         toc = '<div style="background:#f8f9ff;border:1px solid #dde3f0;border-radius:10px;padding:20px 24px;margin:24px 0;">'
-        toc += '<p style="font-weight:700;font-size:15px;color:#1565c0;margin-bottom:12px;">📋 목차</p>'
+        toc += '<p style="font-weight:700;font-size:15px;color:#1565c0;margin-bottom:12px;">📋 Table of Contents</p>'
         toc += '<ol style="margin:0;padding-left:20px;">'
         for h in headings:
-            clean_h = re.sub(r'^[^\w가-힣]+', '', h).strip()
+            clean_h = re.sub(r'^[^\w]+', '', h).strip()
             toc += '<li style="margin:6px 0;font-size:15px;color:#444;line-height:1.6;">' + clean_h + '</li>'
         toc += '</ol></div>\n'
         html += toc
@@ -670,7 +641,7 @@ def request_google_indexing(post_url):
     import json as json_lib, time, base64
     service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON", "")
     if not service_account_json:
-        print("[색인] GOOGLE_SERVICE_ACCOUNT_JSON 없음 - 건너뜀")
+        print("[Indexing] GOOGLE_SERVICE_ACCOUNT_JSON not set - skipping")
         return
     try:
         sa_info = json_lib.loads(service_account_json)
@@ -702,7 +673,7 @@ def request_google_indexing(post_url):
             timeout=10
         )
         if token_response.status_code != 200:
-            print("[색인] 토큰 발급 실패: " + token_response.text[:200])
+            print("[Indexing] Token request failed: " + token_response.text[:200])
             return
         access_token = token_response.json().get("access_token", "")
         index_response = requests.post(
@@ -712,18 +683,18 @@ def request_google_indexing(post_url):
             timeout=10
         )
         if index_response.status_code == 200:
-            print("[색인] 구글 색인 요청 완료! ✅ " + post_url)
+            print("[Indexing] Request sent successfully! ✅ " + post_url)
         else:
-            print("[색인] 색인 요청 실패: " + index_response.text[:200])
+            print("[Indexing] Request failed: " + index_response.text[:200])
     except Exception as e:
-        print("[색인 오류] " + str(e))
+        print("[Indexing error] " + str(e))
 
 
 def send_telegram(title, post_url, topic):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         return
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
-    message = sport_emoji + " 새 포스팅\n\n📌 " + title + "\n\n🔗 " + post_url
+    message = sport_emoji + " New post\n\n📌 " + title + "\n\n🔗 " + post_url
     try:
         response = requests.post(
             "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
@@ -731,18 +702,18 @@ def send_telegram(title, post_url, topic):
             timeout=10
         )
         if response.status_code == 200:
-            print("[텔레그램] 공유 성공!")
+            print("[Telegram] Sent!")
         else:
-            print("[텔레그램] 실패: " + response.text[:200])
+            print("[Telegram] Failed: " + response.text[:200])
     except Exception as e:
-        print("[텔레그램 오류] " + str(e))
+        print("[Telegram error] " + str(e))
 
 
 def send_facebook(title, post_url, topic):
     if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
         return
     sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
-    message = sport_emoji + " " + title + "\n\n자세히 읽기 👉 " + post_url
+    message = sport_emoji + " " + title + "\n\nRead more 👉 " + post_url
     try:
         response = requests.post(
             "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
@@ -750,15 +721,15 @@ def send_facebook(title, post_url, topic):
             timeout=10
         )
         if response.status_code == 200:
-            print("[페이스북] 공유 성공!")
+            print("[Facebook] Shared!")
         else:
-            print("[페이스북] 실패: " + response.text[:200])
+            print("[Facebook] Failed: " + response.text[:200])
     except Exception as e:
-        print("[페이스북 오류] " + str(e))
+        print("[Facebook error] " + str(e))
 
 
 def post_to_blogger(post_data, images, retry=2):
-    print("\n[Blogger] 포스팅 시작...")
+    print("\n[Blogger] Starting post...")
     topic = post_data["topic"]
     labels = [topic["sport"], topic["series"]]
 
@@ -778,14 +749,14 @@ def post_to_blogger(post_data, images, retry=2):
                 "labels": labels,
                 "status": "LIVE"
             }
-            print("[시도 " + str(attempt) + "] 제목: " + post_data["title"])
+            print("[Attempt " + str(attempt) + "] Title: " + post_data["title"])
             response = requests.post(url, headers=headers, json=payload, timeout=30)
-            print("[응답] 상태코드: " + str(response.status_code))
+            print("[Response] Status code: " + str(response.status_code))
             if response.status_code == 200:
                 result = response.json()
                 post_url = result.get("url", "")
-                print("\n발행 완료!")
-                print("   링크: " + post_url)
+                print("\nPublished!")
+                print("   URL: " + post_url)
                 save_series_link(
                     topic.get("series", ""),
                     topic.get("episode", 1),
@@ -797,28 +768,28 @@ def post_to_blogger(post_data, images, retry=2):
                 send_facebook(post_data["title"], post_url, topic)
                 return True
             else:
-                print("실패: " + response.text[:300])
+                print("Failed: " + response.text[:300])
                 if attempt <= retry:
-                    print("[재시도] " + str(attempt) + "번째 재시도 중...")
+                    print("[Retry] attempt " + str(attempt) + "...")
         except Exception as e:
-            print("[오류] " + str(e))
+            print("[Error] " + str(e))
             if attempt <= retry:
-                print("[재시도] " + str(attempt) + "번째 재시도 중...")
+                print("[Retry] attempt " + str(attempt) + "...")
     return False
 
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("AutoBlog Sports Publisher - Claude Edition")
-    print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    print("AutoBlog Sports Publisher - Claude Edition (English)")
+    print("Run time: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
     try:
         post = generate_post()
         images = get_images(post["topic"].get("img_keyword", post["topic"]["keyword"]), count=3)
         post_to_blogger(post, images)
-        print("\n모든 작업 완료!")
+        print("\nAll done!")
     except Exception as e:
-        print("\n오류 발생: " + str(e))
+        print("\nError: " + str(e))
         import traceback
         traceback.print_exc()
         exit(1)
