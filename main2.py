@@ -7,7 +7,6 @@ import json
 import re
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
 GOOGLE_REFRESH_TOKEN = os.environ.get("GOOGLE_REFRESH_TOKEN", "")
@@ -31,38 +30,15 @@ CATEGORY_EMOJI = {
 }
 
 USED_TITLES_FILE = "used_titles2.json"
+USED_IMAGES_FILE = "used_images2.json"
 
 # 네이버 뉴스 섹션ID 정확한 매핑
-# 101=경제, 102=사회, 104=세계, 105=IT/과학, 106=연예, 107=스포츠
 NAVER_SECTION_MAP = {
     "사회이슈": "102",
     "경제": "101",
     "연예": "106",
     "스포츠": "107",
     "IT과학": "105",
-}
-
-CATEGORY_IMAGE_KEYWORDS = {
-    "사회이슈": [
-        "city street Korea", "bridge river sunset",
-        "crowd walking street blur", "newspaper coffee table", "urban night lights",
-    ],
-    "경제": [
-        "city buildings skyline dusk", "office desk morning coffee",
-        "graph chart paper desk", "coins stack blurred background", "busy street people walking",
-    ],
-    "연예": [
-        "stage spotlight empty", "microphone stand concert hall",
-        "dark auditorium lights", "music notes blur background", "curtain stage theater",
-    ],
-    "스포츠": [
-        "stadium lights empty seats", "running track morning",
-        "sports field grass sunlight", "finish line ribbon", "crowd cheering blur",
-    ],
-    "IT과학": [
-        "computer screen code dark", "server room lights",
-        "smartphone technology abstract", "digital circuit board", "laptop coffee workspace",
-    ],
 }
 
 
@@ -88,23 +64,98 @@ def save_used_title(title):
 
 def is_duplicate(title):
     used = load_used_titles()
-    for t in used:
-        if title[:10] in t or t[:10] in title:
-            return True
-    return False
+    return any(title[:10] in t or t[:10] in title for t in used)
+
+
+def load_used_images():
+    try:
+        with open(USED_IMAGES_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        return []
+
+
+def save_used_image(url):
+    used = load_used_images()
+    if url not in used:
+        used.append(url)
+    if len(used) > 100:
+        used = used[-100:]
+    try:
+        with open(USED_IMAGES_FILE, "w") as f:
+            json.dump(used, f, ensure_ascii=False)
+    except Exception:
+        pass
+
+
+# ──────────────────────────────────────────────
+# ✅ 핵심 1: 네이버 뉴스 기사 원문 크롤링
+#    → 실제 내용 + 대표 이미지 추출
+# ──────────────────────────────────────────────
+def crawl_naver_article(article_url):
+    """네이버 뉴스 기사 원문 크롤링 — 본문 + 대표 이미지"""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Referer": "https://news.naver.com",
+        "Accept-Language": "ko-KR,ko;q=0.9",
+    }
+    result = {"image_url": "", "image_source": "", "body": "", "publisher": ""}
+    try:
+        response = requests.get(article_url, headers=headers, timeout=10)
+        if response.status_code != 200:
+            return result
+        html = response.text
+
+        # 대표 이미지 추출 (og:image 우선)
+        og_image = re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']', html)
+        if not og_image:
+            og_image = re.search(r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']', html)
+        if og_image:
+            img_url = og_image.group(1).strip()
+            if img_url and img_url.startswith("http"):
+                result["image_url"] = img_url
+
+        # 언론사명 추출
+        publisher = re.search(r'<meta[^>]+property=["\']og:site_name["\'][^>]+content=["\']([^"\']+)["\']', html)
+        if not publisher:
+            publisher = re.search(r'class="[^"]*press[^"]*"[^>]*>([^<]+)<', html)
+        if publisher:
+            result["publisher"] = publisher.group(1).strip()
+
+        # 기사 본문 추출 (네이버 뉴스 구조)
+        body_patterns = [
+            r'<article[^>]*class="[^"]*go_trans[^"]*"[^>]*>(.*?)</article>',
+            r'<div[^>]*id="dic_area"[^>]*>(.*?)</div>',
+            r'<div[^>]*class="[^"]*article_body[^"]*"[^>]*>(.*?)</div>',
+        ]
+        for pattern in body_patterns:
+            body_match = re.search(pattern, html, re.DOTALL)
+            if body_match:
+                body_html = body_match.group(1)
+                # HTML 태그 제거, 이미지 태그만 남기기
+                body_text = re.sub(r'<(?!img)[^>]+>', ' ', body_html)
+                body_text = re.sub(r'\s+', ' ', body_text).strip()
+                body_text = body_text[:2000]  # 최대 2000자
+                result["body"] = body_text
+                break
+
+        print("[크롤링] 이미지: " + (result["image_url"][:60] if result["image_url"] else "없음"))
+        print("[크롤링] 본문: " + str(len(result["body"])) + "자")
+        return result
+
+    except Exception as e:
+        print("[크롤링 오류] " + str(e))
+        return result
 
 
 def get_naver_top_news():
-    """네이버 분야별 많이 본 뉴스 수집 — 정확한 섹션ID 사용"""
+    """네이버 분야별 많이 본 뉴스 수집 + 기사 URL 함께 수집"""
     print("[네이버 많이 본 뉴스] 수집 시작...")
-
     today_str = datetime.now().strftime("%Y%m%d")
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "ko-KR,ko;q=0.9",
     }
-
     all_results = []
 
     for category, section_id in NAVER_SECTION_MAP.items():
@@ -117,40 +168,35 @@ def get_naver_top_news():
             if response.status_code == 200:
                 html = response.text
 
-                # 여러 패턴으로 제목 추출 시도
-                titles = re.findall(
-                    r'class="[^"]*rankingnews[^"]*tit[^"]*"[^>]*>[^<]*<a[^>]*>([^<]+)<', html
+                # 제목 + URL 동시 추출
+                links = re.findall(
+                    r'<a[^>]+href="(https://n\.news\.naver\.com/[^"]+)"[^>]*>\s*([^<]{8,80})\s*</a>',
+                    html
                 )
-                if not titles:
-                    titles = re.findall(
-                        r'<a[^>]+href="https://n\.news\.naver\.com[^"]*"[^>]*>\s*([^<]{8,80})\s*<', html
-                    )
-                if not titles:
-                    # data-rank 속성 기반 패턴
-                    titles = re.findall(
-                        r'data-rank="\d+"[^>]*>[^<]*<a[^>]*>([^<]{8,80})<', html
-                    )
 
-                # 중복/짧은 제목 제거
-                seen = set()
-                for title in titles:
+                seen_titles = set()
+                for link_url, title in links:
                     title = title.strip()
-                    if len(title) > 7 and title not in seen:
-                        seen.add(title)
-                        all_results.append({"category": category, "title": title})
-                        print("[" + category + "(" + section_id + ")] " + title[:50])
+                    if len(title) > 7 and title not in seen_titles:
+                        seen_titles.add(title)
+                        all_results.append({
+                            "category": category,
+                            "title": title,
+                            "url": link_url
+                        })
+                        print("[" + category + "] " + title[:45])
                         if len([r for r in all_results if r["category"] == category]) >= 5:
                             break
 
         except Exception as e:
-            print("[랭킹 오류] " + category + "(" + section_id + "): " + str(e))
+            print("[랭킹 오류] " + category + ": " + str(e))
 
-    print("[네이버 많이 본 뉴스] 총 " + str(len(all_results)) + "개 수집")
+    print("[수집 완료] 총 " + str(len(all_results)) + "개")
     return all_results
 
 
-def get_naver_news_detail(keyword, category):
-    """특정 키워드 상세 뉴스 수집"""
+def get_naver_news_with_url(keyword, category):
+    """네이버 검색 API로 관련 기사 URL 포함 수집"""
     if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
         return []
     try:
@@ -173,31 +219,31 @@ def get_naver_news_detail(keyword, category):
                 desc = (item.get("description", "")
                         .replace("<b>", "").replace("</b>", "")
                         .replace("&amp;", "&"))
-                if title:
-                    results.append(title + ": " + desc)
-            print("[네이버 상세] " + str(len(results)) + "개")
+                original_url = item.get("originallink", "") or item.get("link", "")
+                naver_url = item.get("link", "")
+                results.append({
+                    "title": title,
+                    "desc": desc,
+                    "url": naver_url if "news.naver.com" in naver_url else original_url,
+                    "original_url": original_url
+                })
             return results
     except Exception as e:
-        print("[네이버 상세 오류] " + str(e))
+        print("[네이버 검색 오류] " + str(e))
     return []
 
 
 def get_google_trends():
     """구글 실시간 트렌드 수집"""
-    print("[구글 트렌드] 수집 시도...")
     try:
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        }
         response = requests.get(
             "https://trends.google.com/trends/trendingsearches/daily/rss?geo=KR",
-            headers=headers,
+            headers={"User-Agent": "Mozilla/5.0"},
             timeout=10
         )
         if response.status_code == 200:
             titles = re.findall(r'<title><!\[CDATA\[([^\]]+)\]\]></title>', response.text)
             titles = [t for t in titles if t != "Google Trends" and len(t) > 1]
-            print("[구글 트렌드] " + str(len(titles)) + "개: " + str(titles[:5]))
             return titles[:10]
     except Exception as e:
         print("[구글 트렌드 오류] " + str(e))
@@ -205,22 +251,14 @@ def get_google_trends():
 
 
 def select_best_topic(ranking_news, trending_keywords):
-    """가장 핫한 이슈 1개 선택"""
     used = load_used_titles()
-
-    # 중복 제거
-    filtered = []
-    for item in ranking_news:
-        title = item["title"]
-        is_dup = any(title[:8] in u or u[:8] in title for u in used)
-        if not is_dup:
-            filtered.append(item)
-
+    filtered = [
+        item for item in ranking_news
+        if not any(item["title"][:8] in u or u[:8] in item["title"] for u in used)
+    ]
     if not filtered:
-        print("[경고] 모든 랭킹 뉴스 중복 — 초기화")
         filtered = ranking_news
 
-    # 트렌드 키워드와 겹치는 뉴스 우선
     if trending_keywords:
         for item in filtered:
             for keyword in trending_keywords:
@@ -228,7 +266,6 @@ def select_best_topic(ranking_news, trending_keywords):
                     print("[선택] 트렌드 매칭: " + item["title"][:40])
                     return item
 
-    # 상위 5개 중 랜덤 선택
     top = filtered[:5] if len(filtered) >= 5 else filtered
     selected = random.choice(top)
     print("[선택] 랭킹 뉴스 선택: " + selected["title"][:40])
@@ -243,52 +280,35 @@ def call_gemini(prompt, max_tokens=8000):
         "https://generativelanguage.googleapis.com/v1beta/models/"
         "gemini-2.5-flash:generateContent?key=" + GEMINI_API_KEY
     )
-
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "maxOutputTokens": max_tokens,
-            "temperature": 0.85,
-            "topP": 0.95,
-        }
+        "generationConfig": {"maxOutputTokens": max_tokens, "temperature": 0.85, "topP": 0.95}
     }
 
     for attempt in range(3):
         try:
             response = requests.post(url, json=payload, timeout=120)
             print("[Gemini] 응답 상태코드: " + str(response.status_code))
-
             if response.status_code == 200:
                 data = response.json()
                 candidates = data.get("candidates", [])
                 if candidates:
                     parts = candidates[0].get("content", {}).get("parts", [])
-                    result = "".join(part.get("text", "") for part in parts)
-                    return result
-                else:
-                    raise Exception("Gemini 응답에 candidates 없음: " + str(data))
-
-            elif response.status_code == 429:
-                wait = 60 * (attempt + 1)
-                print("[429] " + str(wait) + "초 대기 후 재시도...")
-                time.sleep(wait)
-
-            elif response.status_code == 503:
+                    return "".join(part.get("text", "") for part in parts)
+                raise Exception("candidates 없음")
+            elif response.status_code in [429, 503]:
                 wait = 30 * (attempt + 1)
-                print("[503] " + str(wait) + "초 대기 후 재시도...")
+                print("[" + str(response.status_code) + "] " + str(wait) + "초 대기...")
                 time.sleep(wait)
-
             else:
-                raise Exception("Gemini 오류: " + str(response.status_code) + " " + response.text[:200])
-
+                raise Exception("Gemini 오류: " + str(response.status_code))
         except Exception as e:
             print("[Gemini 오류] attempt " + str(attempt + 1) + ": " + str(e))
             if attempt < 2:
                 time.sleep(20)
             else:
                 raise
-
-    raise Exception("Gemini 오류: 최대 재시도 횟수 초과")
+    raise Exception("Gemini 최대 재시도 초과")
 
 
 def generate_post():
@@ -299,67 +319,80 @@ def generate_post():
     trending_keywords = get_google_trends()
 
     if not ranking_news:
-        print("[경고] 랭킹 뉴스 수집 실패 — 기본값으로 진행")
-        selected = {"category": "사회이슈", "title": "오늘의 핫이슈"}
-    else:
-        selected = select_best_topic(ranking_news, trending_keywords)
+        print("[경고] 랭킹 뉴스 수집 실패")
+        return None
 
+    selected = select_best_topic(ranking_news, trending_keywords)
     category = selected["category"]
     hot_title = selected["title"]
+    hot_url = selected.get("url", "")
 
     print("\n[선택된 이슈] " + hot_title + " (" + category + ")")
 
-    detail_news = get_naver_news_detail(hot_title[:15], category)
-    news_context = "=== 오늘(" + TODAY + ") 네이버 많이 본 뉴스 ===\n"
-    news_context += "핵심 이슈: " + hot_title + "\n\n"
-    if detail_news:
-        news_context += "=== 관련 상세 뉴스 ===\n"
-        for i, news in enumerate(detail_news[:5]):
-            news_context += str(i + 1) + ". " + news + "\n"
+    # ✅ 핵심: 기사 원문 크롤링
+    article_data = {"image_url": "", "image_source": "", "body": "", "publisher": ""}
+    related_articles = get_naver_news_with_url(hot_title[:15], category)
 
+    # 원문 기사 크롤링 시도 (랭킹 URL 우선, 검색 결과 보조)
+    crawl_targets = []
+    if hot_url:
+        crawl_targets.append({"url": hot_url, "publisher": ""})
+    for art in related_articles[:3]:
+        if art["url"]:
+            crawl_targets.append({"url": art["url"], "publisher": ""})
+
+    used_images = load_used_images()
+    for target in crawl_targets:
+        crawled = crawl_naver_article(target["url"])
+        if crawled["image_url"] and crawled["image_url"] not in used_images:
+            article_data = crawled
+            save_used_image(crawled["image_url"])
+            print("[이미지 확보] " + crawled["image_url"][:60])
+            break
+        elif crawled["body"] and not article_data["body"]:
+            article_data["body"] = crawled["body"]
+            article_data["publisher"] = crawled["publisher"]
+
+    # 뉴스 컨텍스트 구성 (실제 기사 내용 포함)
+    news_context = "=== 오늘(" + TODAY + ") 네이버 많이 본 뉴스 ===\n"
+    news_context += "핵심 이슈 제목: " + hot_title + "\n"
+    if article_data["body"]:
+        news_context += "\n=== 기사 원문 내용 ===\n" + article_data["body"] + "\n"
+    if related_articles:
+        news_context += "\n=== 관련 기사 ===\n"
+        for i, art in enumerate(related_articles[:4]):
+            news_context += str(i+1) + ". " + art["title"] + ": " + art["desc"][:100] + "\n"
+
+    # Gemini 칼럼 작성 (실제 기사 내용 기반)
     prompt = (
         "당신은 날카로운 시각을 가진 시사 해설 칼럼니스트입니다.\n"
-        "사건을 '전달'하는 것이 아니라, 사건의 이면과 의미를 독자에게 '해석'해주는 사람입니다.\n"
-        "오늘 네이버에서 실제로 가장 많이 본 뉴스를 기반으로 글을 씁니다.\n"
-        "한국어만 사용하세요. 외국 문자 절대 금지.\n\n"
-
-        "오늘 네이버 많이 본 뉴스:\n"
-        + news_context + "\n\n"
-
-        "✅ 글쓰기 핵심 원칙:\n"
-        "1. 첫 문장은 독자에게 던지는 날카로운 질문 또는 역설적 사실로 시작.\n"
-        "2. 팩트는 3줄 이내로 압축. 나머지는 해석과 의미로 채우세요.\n"
-        "3. '대부분 언론이 다루지 않는 이면'을 반드시 한 섹션 포함.\n"
-        "4. 독자의 일상과 연결되는 지점을 반드시 한 섹션 포함.\n"
+        "아래 실제 기사 원문 내용을 반드시 기반으로 글을 쓰세요.\n"
+        "원문에 없는 내용을 상상해서 쓰지 마세요. 팩트는 원문 기준으로만.\n"
+        "한국어만 사용하세요.\n\n"
+        "실제 기사 내용:\n" + news_context + "\n\n"
+        "✅ 글쓰기 원칙:\n"
+        "1. 첫 문장은 날카로운 질문 또는 역설적 사실로 시작.\n"
+        "2. 팩트는 원문 기반으로만 정확하게. 추측 금지.\n"
+        "3. '대부분 언론이 다루지 않는 이면'을 한 섹션 포함.\n"
+        "4. 독자 일상과 연결되는 지점 한 섹션 포함.\n"
         "5. 마지막은 독자에게 생각거리를 던지는 질문으로 마무리.\n"
-        "6. 절대 금지: '알아보겠습니다', '살펴보겠습니다', AI 나열식 표현.\n"
-        "7. 반드시 존댓말 사용.\n\n"
-
-        "글 구조 (반드시 이 순서로):\n\n"
-        "1. 훅 (2~3줄) — 독자를 멈추는 날카로운 질문 또는 역설적 사실\n\n"
-        "2. ##핵심키워드## — 이슈의 본질을 한 단어나 짧은 구로 던지고 3~4문장 압축 설명\n\n"
-        "3. 소제목 구조 (4개 필수)\n"
-        "   [📌 핵심 팩트 — 수치·날짜 포함]\n"
+        "6. 절대 금지: '알아보겠습니다', '살펴보겠습니다', AI 나열식.\n"
+        "7. 반드시 존댓말.\n\n"
+        "글 구조:\n"
+        "1. 훅 (2~3줄)\n"
+        "2. ##핵심키워드##\n"
+        "3. [📌 핵심 팩트 — 수치·날짜 포함]\n"
         "   [🔍 왜 지금 이 이슈가 터졌는가]\n"
         "   [💡 대부분이 모르는 이면]\n"
-        "   [🙋 나와 무슨 상관인가 — 독자 일상 연결]\n\n"
-        "4. 마무리 질문 (2~3줄) — 생각거리 던지며 끝\n\n"
-        "5. 핵심 요약\n"
-        "[SUMMARY_START]\n"
-        "핵심1 (구체적 수치나 팩트)\n"
-        "핵심2 (이면 또는 구조적 원인)\n"
-        "핵심3 (독자 삶과의 연결)\n"
-        "[SUMMARY_END]\n\n"
-
-        "분량: 3000자 이상 4000자 이하. 반드시 완성된 글 출력.\n\n"
+        "   [🙋 나와 무슨 상관인가]\n"
+        "4. 마무리 질문 (2~3줄)\n"
+        "5. [SUMMARY_START]\n핵심1\n핵심2\n핵심3\n[SUMMARY_END]\n\n"
+        "분량: 3000자 이상. 반드시 완성된 글.\n"
         "카테고리: " + category + "\n\n"
-        "출력 형식:\n"
-        "제목: (실제 이슈의 핵심 팩트 + 해석적 시각 포함. 날짜·카테고리명 금지)\n"
-        "---\n"
-        "(본문)"
+        "출력:\n제목: (핵심 팩트 + 해석적 시각. 날짜·카테고리명 금지)\n---\n(본문)"
     )
 
-    print("[AI] Gemini 칼럼 작성 중...")
+    print("[AI] Gemini 칼럼 작성 중 (실제 기사 기반)...")
     full_text = call_gemini(prompt, max_tokens=8000)
 
     lines = full_text.strip().split("\n")
@@ -378,105 +411,46 @@ def generate_post():
             body_lines.append(line)
 
     body = "\n".join(body_lines).strip()
-
-    if not title and body_lines:
-        for bl in body_lines[:5]:
-            if bl.strip() and len(bl.strip()) > 5 and not bl.startswith("["):
-                title = bl.strip()[:60]
-                break
-
     if not title:
-        title = hot_title[:40] + "... 지금 이슈"
-
+        title = hot_title[:40] + " — 지금 이슈"
     if not body:
         body = full_text
 
     if is_duplicate(title):
-        print("[중복 감지] 발행 건너뜀: " + title)
+        print("[중복] 발행 건너뜀: " + title)
         return None
 
     save_used_title(title)
     print("[완료] 제목: " + title)
     print("[완료] 글자수: " + str(len(body)) + "자")
-    return {"title": title, "body": body, "category": category}
+
+    return {
+        "title": title,
+        "body": body,
+        "category": category,
+        "article_image": article_data.get("image_url", ""),
+        "article_publisher": article_data.get("publisher", ""),
+        "article_url": hot_url,
+    }
 
 
-def get_images_unsplash(keyword, count=3):
-    if not UNSPLASH_ACCESS_KEY:
-        return []
-    try:
-        response = requests.get(
-            "https://api.unsplash.com/search/photos",
-            params={
-                "query": keyword,
-                "per_page": 10,
-                "page": random.randint(1, 5),
-                "orientation": "landscape",
-                "client_id": UNSPLASH_ACCESS_KEY
-            },
-            timeout=10
-        )
-        if response.status_code == 200:
-            images = []
-            for photo in response.json().get("results", []):
-                images.append({
-                    "url": photo["urls"]["regular"],
-                    "alt": photo.get("alt_description", keyword) or keyword,
-                    "author": photo["user"]["name"],
-                    "author_url": photo["user"]["links"]["html"],
-                    "source": "Unsplash"
-                })
-            random.shuffle(images)
-            return images[:count]
-    except Exception as e:
-        print("[Unsplash 오류] " + str(e))
-    return []
-
-
-def get_images_pexels(keyword, count=3):
-    pexels_key = os.environ.get("PEXELS_API_KEY", "")
-    if not pexels_key:
-        return []
-    try:
-        response = requests.get(
-            "https://api.pexels.com/v1/search",
-            headers={"Authorization": pexels_key},
-            params={"query": keyword, "per_page": count, "orientation": "landscape"},
-            timeout=10
-        )
-        if response.status_code == 200:
-            images = []
-            for photo in response.json().get("photos", []):
-                images.append({
-                    "url": photo["src"]["large"],
-                    "alt": photo.get("alt", keyword) or keyword,
-                    "author": photo["photographer"],
-                    "author_url": photo["photographer_url"],
-                    "source": "Pexels"
-                })
-            return images
-    except Exception as e:
-        print("[Pexels 오류] " + str(e))
-    return []
-
-
-def get_images(category, count=3):
-    keywords = CATEGORY_IMAGE_KEYWORDS.get(category, ["city street morning"])
-    keyword = random.choice(keywords)
-    print("[이미지 검색] 키워드: " + keyword)
-
-    images = get_images_unsplash(keyword, count)
-    if images:
-        print("[이미지] Unsplash " + str(len(images)) + "장")
-        return images
-
-    images = get_images_pexels(keyword, count)
-    if images:
-        print("[이미지] Pexels " + str(len(images)) + "장")
-        return images
-
-    print("[이미지] 모든 소스 실패")
-    return []
+# ──────────────────────────────────────────────
+# ✅ 핵심 2: 기사 원문 이미지 사용 + 저작권 방패
+#    출처 명시 = 보도 목적 인용 (합법적 사용)
+# ──────────────────────────────────────────────
+def make_article_image_html(image_url, publisher, article_url, issue_title):
+    """기사 원문 이미지 + 출처 명시 (저작권 방패)"""
+    if not image_url:
+        return ""
+    source_text = publisher if publisher else "언론사"
+    html = '<div style="text-align:center;margin:24px 0;">'
+    html += '<img src="' + image_url + '" alt="' + issue_title[:30] + '" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);"/>'
+    html += '<p style="font-size:12px;color:#999;margin-top:8px;">'
+    html += '© ' + source_text + ' | 보도 목적 인용 | '
+    if article_url:
+        html += '<a href="' + article_url + '" style="color:#999;" target="_blank" rel="noopener">원문 기사 보기</a>'
+    html += '</p></div>\n'
+    return html
 
 
 def make_summary_html(summary_text):
@@ -489,16 +463,13 @@ def make_summary_html(summary_text):
     return html
 
 
-def make_image_html(img, margin_top="0"):
-    source = img.get("source", "Unsplash")
-    html = '<div style="text-align:center;margin:30px 0;margin-top:' + margin_top + ';">'
-    html += '<img src="' + img["url"] + '" alt="' + img["alt"] + '" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.12);"/>'
-    html += '<p style="font-size:12px;color:#999;margin-top:8px;">Photo by <a href="' + img["author_url"] + '" style="color:#999;">' + img["author"] + '</a> on ' + source + '</p>'
-    html += "</div>\n"
-    return html
+def body_to_html(body, post_data):
+    category = post_data["category"]
+    article_image = post_data.get("article_image", "")
+    article_publisher = post_data.get("article_publisher", "")
+    article_url = post_data.get("article_url", "")
+    issue_title = post_data["title"]
 
-
-def body_to_html(body, images, category):
     emoji = CATEGORY_EMOJI.get(category, "📰")
 
     html = (
@@ -508,8 +479,19 @@ def body_to_html(body, images, category):
         '<div style="font-size:13px;color:#888;margin-bottom:20px;">📅 ' + TODAY + "</div>\n"
     )
 
-    if len(images) >= 1:
-        html += make_image_html(images[0])
+    # ✅ 기사 원문 이미지 (출처 명시)
+    if article_image:
+        html += make_article_image_html(article_image, article_publisher, article_url, issue_title)
+    
+    # 원본 기사 링크 박스
+    if article_url:
+        html += (
+            '<div style="background:#f5f5f5;border-left:4px solid #e65100;'
+            'padding:12px 16px;margin:16px 0;border-radius:0 8px 8px 0;">'
+            '<p style="margin:0;font-size:13px;color:#666;">📰 이 글은 실제 보도된 뉴스를 기반으로 작성된 시사 해설입니다. '
+            '<a href="' + article_url + '" target="_blank" rel="noopener" style="color:#e65100;font-weight:600;">원문 기사 보기 →</a></p>'
+            '</div>\n'
+        )
 
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
     keyword_pattern = re.compile(r'##(.+?)##')
@@ -544,15 +526,13 @@ def body_to_html(body, images, category):
     paragraphs = clean_body.split("\n")
     para_count = 0
 
-    for i, para in enumerate(paragraphs):
+    for para in paragraphs:
         if not para.strip():
             html += '<div style="margin:10px 0;"></div>\n'
             continue
-
         if para.strip() == "[SUMMARY_PLACEHOLDER]":
             html += summary_html
             continue
-
         if para.startswith("[") and "]" in para:
             heading = para.strip("[]").strip()
             html += (
@@ -562,7 +542,6 @@ def body_to_html(body, images, category):
                 + heading + "</h2>\n"
             )
             continue
-
         if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
             html += (
                 '<div style="display:flex;align-items:flex-start;margin:10px 0;padding:12px 16px;'
@@ -573,10 +552,8 @@ def body_to_html(body, images, category):
                 + para.strip()[2:].strip() + '</span></div>\n'
             )
             continue
-
         para_count += 1
         processed = keyword_pattern.sub(replace_keyword, para.strip())
-
         if processed != para.strip():
             html += processed
         elif para_count % 4 == 0 and len(para.strip()) > 30:
@@ -591,9 +568,6 @@ def body_to_html(body, images, category):
                 '<p style="margin:14px 0;line-height:1.9;font-size:16px;color:#333;">'
                 + para.strip() + '</p>\n'
             )
-
-    if len(images) >= 2:
-        html += make_image_html(images[1], margin_top="20px")
 
     return html
 
@@ -638,11 +612,7 @@ def send_facebook(title, post_url, category):
     try:
         requests.post(
             "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
-            data={
-                "message": message,
-                "link": post_url,
-                "access_token": FACEBOOK_ACCESS_TOKEN
-            },
+            data={"message": message, "link": post_url, "access_token": FACEBOOK_ACCESS_TOKEN},
             timeout=10
         )
         print("[페이스북] 공유 성공!")
@@ -650,7 +620,7 @@ def send_facebook(title, post_url, category):
         print("[페이스북 오류] " + str(e))
 
 
-def post_to_blogger(post_data, images, retry=2):
+def post_to_blogger(post_data, retry=2):
     print("\n[Blogger] insaplayer 포스팅 시작...")
     category = post_data["category"]
     labels = [category, "시사칼럼", "이슈해설", "많이본뉴스"]
@@ -658,12 +628,9 @@ def post_to_blogger(post_data, images, retry=2):
     for attempt in range(1, retry + 2):
         try:
             access_token = get_access_token()
-            body_html = body_to_html(post_data["body"], images, category)
+            body_html = body_to_html(post_data["body"], post_data)
             url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
-            headers = {
-                "Authorization": "Bearer " + access_token,
-                "Content-Type": "application/json"
-            }
+            headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
             payload = {
                 "kind": "blogger#post",
                 "title": post_data["title"],
@@ -692,7 +659,7 @@ def post_to_blogger(post_data, images, retry=2):
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("insaplayer - 네이버 많이 본 뉴스 기반 시사칼럼 v9")
+    print("insaplayer - 기사 원문 기반 시사칼럼 v10")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
 
@@ -703,10 +670,9 @@ if __name__ == "__main__":
     try:
         post = generate_post()
         if post is None:
-            print("[종료] 중복 감지로 발행 건너뜀")
+            print("[종료] 중복 또는 수집 실패")
             exit(0)
-        images = get_images(post["category"], count=3)
-        post_to_blogger(post, images)
+        post_to_blogger(post)
         print("\n모든 작업 완료!")
     except Exception as e:
         print("\n오류 발생: " + str(e))
