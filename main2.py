@@ -23,35 +23,45 @@ TODAY = datetime.now().strftime("%Y년 %m월 %d일")
 TODAY_EN = datetime.now().strftime("%Y-%m-%d")
 
 CATEGORY_EMOJI = {
-    "자동차": "🚗",
-    "연예": "🎭",
     "사회이슈": "🔥",
-    "스포츠": "⚽",
     "경제": "💰",
+    "연예": "🎭",
+    "스포츠": "⚽",
+    "IT과학": "💻",
 }
 
 USED_TITLES_FILE = "used_titles2.json"
 
+# 네이버 뉴스 섹션ID 정확한 매핑
+# 101=경제, 102=사회, 104=세계, 105=IT/과학, 106=연예, 107=스포츠
+NAVER_SECTION_MAP = {
+    "사회이슈": "102",
+    "경제": "101",
+    "연예": "106",
+    "스포츠": "107",
+    "IT과학": "105",
+}
+
 CATEGORY_IMAGE_KEYWORDS = {
-    "자동차": [
-        "car showroom lights", "highway driving sunset", "car interior modern",
-        "electric vehicle charging", "automobile design studio",
+    "사회이슈": [
+        "city street Korea", "bridge river sunset",
+        "crowd walking street blur", "newspaper coffee table", "urban night lights",
+    ],
+    "경제": [
+        "city buildings skyline dusk", "office desk morning coffee",
+        "graph chart paper desk", "coins stack blurred background", "busy street people walking",
     ],
     "연예": [
         "stage spotlight empty", "microphone stand concert hall",
         "dark auditorium lights", "music notes blur background", "curtain stage theater",
     ],
-    "사회이슈": [
-        "city street Korea", "bridge river sunset", "crowd walking street blur",
-        "newspaper coffee table", "urban night lights",
-    ],
     "스포츠": [
         "stadium lights empty seats", "running track morning",
         "sports field grass sunlight", "finish line ribbon", "crowd cheering blur",
     ],
-    "경제": [
-        "city buildings skyline dusk", "office desk morning coffee",
-        "graph chart paper desk", "coins stack blurred background", "busy street people walking",
+    "IT과학": [
+        "computer screen code dark", "server room lights",
+        "smartphone technology abstract", "digital circuit board", "laptop coffee workspace",
     ],
 }
 
@@ -84,28 +94,11 @@ def is_duplicate(title):
     return False
 
 
-# ──────────────────────────────────────────────
-# ✅ 핵심: 네이버 많이 본 뉴스 TOP 크롤링
-#    → 실제 조회수 높은 이슈만 수집
-# ──────────────────────────────────────────────
 def get_naver_top_news():
-    """네이버 분야별 많이 본 뉴스 수집"""
+    """네이버 분야별 많이 본 뉴스 수집 — 정확한 섹션ID 사용"""
     print("[네이버 많이 본 뉴스] 수집 시작...")
 
-    # 네이버 뉴스 랭킹 API (공개 API)
-    ranking_urls = [
-        # 자동차
-        ("자동차", "https://news.naver.com/main/ranking/popularDay.naver?rankingType=popular_day&sectionId=103&date=" + datetime.now().strftime("%Y%m%d")),
-        # 연예
-        ("연예", "https://news.naver.com/main/ranking/popularDay.naver?rankingType=popular_day&sectionId=106&date=" + datetime.now().strftime("%Y%m%d")),
-        # 사회
-        ("사회이슈", "https://news.naver.com/main/ranking/popularDay.naver?rankingType=popular_day&sectionId=102&date=" + datetime.now().strftime("%Y%m%d")),
-        # 스포츠
-        ("스포츠", "https://news.naver.com/main/ranking/popularDay.naver?rankingType=popular_day&sectionId=107&date=" + datetime.now().strftime("%Y%m%d")),
-        # 경제
-        ("경제", "https://news.naver.com/main/ranking/popularDay.naver?rankingType=popular_day&sectionId=101&date=" + datetime.now().strftime("%Y%m%d")),
-    ]
-
+    today_str = datetime.now().strftime("%Y%m%d")
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -114,34 +107,50 @@ def get_naver_top_news():
 
     all_results = []
 
-    for category, url in ranking_urls:
+    for category, section_id in NAVER_SECTION_MAP.items():
+        url = (
+            "https://news.naver.com/main/ranking/popularDay.naver"
+            "?rankingType=popular_day&sectionId=" + section_id + "&date=" + today_str
+        )
         try:
             response = requests.get(url, headers=headers, timeout=10)
             if response.status_code == 200:
                 html = response.text
-                # 뉴스 제목 추출 (네이버 랭킹 페이지 파싱)
-                titles = re.findall(r'rankingnews_box_tit[^>]*>[^<]*<a[^>]*>([^<]+)<', html)
-                if not titles:
-                    # 대안 패턴
-                    titles = re.findall(r'class="list_title[^"]*"[^>]*>([^<]+)<', html)
-                if not titles:
-                    titles = re.findall(r'<a[^>]+href="https://n\.news\.naver\.com[^"]*"[^>]*>([^<]{10,80})<', html)
 
-                for title in titles[:5]:
+                # 여러 패턴으로 제목 추출 시도
+                titles = re.findall(
+                    r'class="[^"]*rankingnews[^"]*tit[^"]*"[^>]*>[^<]*<a[^>]*>([^<]+)<', html
+                )
+                if not titles:
+                    titles = re.findall(
+                        r'<a[^>]+href="https://n\.news\.naver\.com[^"]*"[^>]*>\s*([^<]{8,80})\s*<', html
+                    )
+                if not titles:
+                    # data-rank 속성 기반 패턴
+                    titles = re.findall(
+                        r'data-rank="\d+"[^>]*>[^<]*<a[^>]*>([^<]{8,80})<', html
+                    )
+
+                # 중복/짧은 제목 제거
+                seen = set()
+                for title in titles:
                     title = title.strip()
-                    if len(title) > 5:
+                    if len(title) > 7 and title not in seen:
+                        seen.add(title)
                         all_results.append({"category": category, "title": title})
-                        print("[" + category + "] " + title[:50])
+                        print("[" + category + "(" + section_id + ")] " + title[:50])
+                        if len([r for r in all_results if r["category"] == category]) >= 5:
+                            break
 
         except Exception as e:
-            print("[랭킹 오류] " + category + ": " + str(e))
+            print("[랭킹 오류] " + category + "(" + section_id + "): " + str(e))
 
     print("[네이버 많이 본 뉴스] 총 " + str(len(all_results)) + "개 수집")
     return all_results
 
 
 def get_naver_news_detail(keyword, category):
-    """특정 키워드의 상세 뉴스 내용 수집"""
+    """특정 키워드 상세 뉴스 수집"""
     if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
         return []
     try:
@@ -158,8 +167,12 @@ def get_naver_news_detail(keyword, category):
             items = response.json().get("items", [])
             results = []
             for item in items:
-                title = item.get("title", "").replace("<b>", "").replace("</b>", "").replace("&amp;", "&").replace("&quot;", '"')
-                desc = item.get("description", "").replace("<b>", "").replace("</b>", "").replace("&amp;", "&")
+                title = (item.get("title", "")
+                         .replace("<b>", "").replace("</b>", "")
+                         .replace("&amp;", "&").replace("&quot;", '"'))
+                desc = (item.get("description", "")
+                        .replace("<b>", "").replace("</b>", "")
+                        .replace("&amp;", "&"))
                 if title:
                     results.append(title + ": " + desc)
             print("[네이버 상세] " + str(len(results)) + "개")
@@ -169,9 +182,9 @@ def get_naver_news_detail(keyword, category):
     return []
 
 
-def get_youtube_trending_keywords():
-    """YouTube 트렌딩에서 한국 인기 키워드 수집"""
-    print("[YouTube 트렌딩] 수집 시도...")
+def get_google_trends():
+    """구글 실시간 트렌드 수집"""
+    print("[구글 트렌드] 수집 시도...")
     try:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
@@ -184,48 +197,41 @@ def get_youtube_trending_keywords():
         if response.status_code == 200:
             titles = re.findall(r'<title><!\[CDATA\[([^\]]+)\]\]></title>', response.text)
             titles = [t for t in titles if t != "Google Trends" and len(t) > 1]
-            print("[Google 트렌드] " + str(len(titles)) + "개: " + str(titles[:5]))
+            print("[구글 트렌드] " + str(len(titles)) + "개: " + str(titles[:5]))
             return titles[:10]
     except Exception as e:
-        print("[Google 트렌드 오류] " + str(e))
+        print("[구글 트렌드 오류] " + str(e))
     return []
 
 
 def select_best_topic(ranking_news, trending_keywords):
-    """
-    수집된 많이 본 뉴스 + 트렌드 키워드 중에서
-    가장 조회수가 높을 것으로 예상되는 이슈 1개 선택
-    """
+    """가장 핫한 이슈 1개 선택"""
     used = load_used_titles()
 
     # 중복 제거
     filtered = []
     for item in ranking_news:
         title = item["title"]
-        is_dup = False
-        for u in used:
-            if title[:8] in u or u[:8] in title:
-                is_dup = True
-                break
+        is_dup = any(title[:8] in u or u[:8] in title for u in used)
         if not is_dup:
             filtered.append(item)
 
     if not filtered:
-        print("[경고] 모든 랭킹 뉴스가 중복 - 초기화")
+        print("[경고] 모든 랭킹 뉴스 중복 — 초기화")
         filtered = ranking_news
 
-    # 트렌드 키워드와 겹치는 뉴스 우선 선택
+    # 트렌드 키워드와 겹치는 뉴스 우선
     if trending_keywords:
         for item in filtered:
             for keyword in trending_keywords:
-                if keyword[:3] in item["title"]:
-                    print("[선택] 트렌드 키워드 매칭: " + item["title"])
+                if len(keyword) >= 3 and keyword[:3] in item["title"]:
+                    print("[선택] 트렌드 매칭: " + item["title"][:40])
                     return item
 
-    # 랭덤 선택 (상위 5개 중에서)
+    # 상위 5개 중 랜덤 선택
     top = filtered[:5] if len(filtered) >= 5 else filtered
     selected = random.choice(top)
-    print("[선택] 랭킹 뉴스 선택: " + selected["title"])
+    print("[선택] 랭킹 뉴스 선택: " + selected["title"][:40])
     return selected
 
 
@@ -257,9 +263,7 @@ def call_gemini(prompt, max_tokens=8000):
                 candidates = data.get("candidates", [])
                 if candidates:
                     parts = candidates[0].get("content", {}).get("parts", [])
-                    result = ""
-                    for part in parts:
-                        result += part.get("text", "")
+                    result = "".join(part.get("text", "") for part in parts)
                     return result
                 else:
                     raise Exception("Gemini 응답에 candidates 없음: " + str(data))
@@ -288,16 +292,14 @@ def call_gemini(prompt, max_tokens=8000):
 
 
 def generate_post():
-    # ✅ 1단계: 실제 조회수 높은 뉴스 수집
     print("\n[1단계] 네이버 많이 본 뉴스 수집...")
     ranking_news = get_naver_top_news()
 
     print("\n[2단계] 구글 트렌드 수집...")
-    trending_keywords = get_youtube_trending_keywords()
+    trending_keywords = get_google_trends()
 
-    # ✅ 2단계: 가장 핫한 이슈 1개 선택
     if not ranking_news:
-        print("[경고] 랭킹 뉴스 수집 실패 - 기본 카테고리로 진행")
+        print("[경고] 랭킹 뉴스 수집 실패 — 기본값으로 진행")
         selected = {"category": "사회이슈", "title": "오늘의 핫이슈"}
     else:
         selected = select_best_topic(ranking_news, trending_keywords)
@@ -307,23 +309,21 @@ def generate_post():
 
     print("\n[선택된 이슈] " + hot_title + " (" + category + ")")
 
-    # ✅ 3단계: 해당 이슈 상세 뉴스 추가 수집
     detail_news = get_naver_news_detail(hot_title[:15], category)
-    news_context = "=== 오늘(" + TODAY + ") 많이 본 뉴스 1위 이슈 ===\n"
+    news_context = "=== 오늘(" + TODAY + ") 네이버 많이 본 뉴스 ===\n"
     news_context += "핵심 이슈: " + hot_title + "\n\n"
     if detail_news:
         news_context += "=== 관련 상세 뉴스 ===\n"
         for i, news in enumerate(detail_news[:5]):
             news_context += str(i + 1) + ". " + news + "\n"
 
-    # ✅ 4단계: Gemini로 칼럼 작성
     prompt = (
         "당신은 날카로운 시각을 가진 시사 해설 칼럼니스트입니다.\n"
         "사건을 '전달'하는 것이 아니라, 사건의 이면과 의미를 독자에게 '해석'해주는 사람입니다.\n"
         "오늘 네이버에서 실제로 가장 많이 본 뉴스를 기반으로 글을 씁니다.\n"
         "한국어만 사용하세요. 외국 문자 절대 금지.\n\n"
 
-        "오늘 네이버 많이 본 뉴스 1위 이슈:\n"
+        "오늘 네이버 많이 본 뉴스:\n"
         + news_context + "\n\n"
 
         "✅ 글쓰기 핵심 원칙:\n"
@@ -660,7 +660,10 @@ def post_to_blogger(post_data, images, retry=2):
             access_token = get_access_token()
             body_html = body_to_html(post_data["body"], images, category)
             url = "https://www.googleapis.com/blogger/v3/blogs/" + BLOG_ID + "/posts?isDraft=false"
-            headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
+            headers = {
+                "Authorization": "Bearer " + access_token,
+                "Content-Type": "application/json"
+            }
             payload = {
                 "kind": "blogger#post",
                 "title": post_data["title"],
@@ -689,7 +692,7 @@ def post_to_blogger(post_data, images, retry=2):
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("insaplayer - 네이버 많이 본 뉴스 기반 시사칼럼 v8")
+    print("insaplayer - 네이버 많이 본 뉴스 기반 시사칼럼 v9")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
 
