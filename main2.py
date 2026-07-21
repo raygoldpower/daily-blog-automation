@@ -32,7 +32,6 @@ CATEGORY_EMOJI = {
 USED_TITLES_FILE = "used_titles2.json"
 USED_IMAGES_FILE = "used_images2.json"
 
-# 네이버 뉴스 섹션ID 정확한 매핑
 NAVER_SECTION_MAP = {
     "사회이슈": "102",
     "경제": "101",
@@ -88,12 +87,7 @@ def save_used_image(url):
         pass
 
 
-# ──────────────────────────────────────────────
-# ✅ 핵심 1: 네이버 뉴스 기사 원문 크롤링
-#    → 실제 내용 + 대표 이미지 추출
-# ──────────────────────────────────────────────
 def crawl_naver_article(article_url):
-    """네이버 뉴스 기사 원문 크롤링 — 본문 + 대표 이미지"""
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Referer": "https://news.naver.com",
@@ -106,7 +100,6 @@ def crawl_naver_article(article_url):
             return result
         html = response.text
 
-        # 대표 이미지 추출 (og:image 우선)
         og_image = re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']', html)
         if not og_image:
             og_image = re.search(r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']', html)
@@ -115,14 +108,12 @@ def crawl_naver_article(article_url):
             if img_url and img_url.startswith("http"):
                 result["image_url"] = img_url
 
-        # 언론사명 추출
         publisher = re.search(r'<meta[^>]+property=["\']og:site_name["\'][^>]+content=["\']([^"\']+)["\']', html)
         if not publisher:
             publisher = re.search(r'class="[^"]*press[^"]*"[^>]*>([^<]+)<', html)
         if publisher:
             result["publisher"] = publisher.group(1).strip()
 
-        # 기사 본문 추출 (네이버 뉴스 구조)
         body_patterns = [
             r'<article[^>]*class="[^"]*go_trans[^"]*"[^>]*>(.*?)</article>',
             r'<div[^>]*id="dic_area"[^>]*>(.*?)</div>',
@@ -132,10 +123,9 @@ def crawl_naver_article(article_url):
             body_match = re.search(pattern, html, re.DOTALL)
             if body_match:
                 body_html = body_match.group(1)
-                # HTML 태그 제거, 이미지 태그만 남기기
                 body_text = re.sub(r'<(?!img)[^>]+>', ' ', body_html)
                 body_text = re.sub(r'\s+', ' ', body_text).strip()
-                body_text = body_text[:2000]  # 최대 2000자
+                body_text = body_text[:2000]
                 result["body"] = body_text
                 break
 
@@ -149,7 +139,6 @@ def crawl_naver_article(article_url):
 
 
 def get_naver_top_news():
-    """네이버 분야별 많이 본 뉴스 수집 + 기사 URL 함께 수집"""
     print("[네이버 많이 본 뉴스] 수집 시작...")
     today_str = datetime.now().strftime("%Y%m%d")
     headers = {
@@ -167,13 +156,10 @@ def get_naver_top_news():
             response = requests.get(url, headers=headers, timeout=10)
             if response.status_code == 200:
                 html = response.text
-
-                # 제목 + URL 동시 추출
                 links = re.findall(
                     r'<a[^>]+href="(https://n\.news\.naver\.com/[^"]+)"[^>]*>\s*([^<]{8,80})\s*</a>',
                     html
                 )
-
                 seen_titles = set()
                 for link_url, title in links:
                     title = title.strip()
@@ -187,7 +173,6 @@ def get_naver_top_news():
                         print("[" + category + "] " + title[:45])
                         if len([r for r in all_results if r["category"] == category]) >= 5:
                             break
-
         except Exception as e:
             print("[랭킹 오류] " + category + ": " + str(e))
 
@@ -196,7 +181,6 @@ def get_naver_top_news():
 
 
 def get_naver_news_with_url(keyword, category):
-    """네이버 검색 API로 관련 기사 URL 포함 수집"""
     if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
         return []
     try:
@@ -234,7 +218,6 @@ def get_naver_news_with_url(keyword, category):
 
 
 def get_google_trends():
-    """구글 실시간 트렌드 수집"""
     try:
         response = requests.get(
             "https://trends.google.com/trends/trendingsearches/daily/rss?geo=KR",
@@ -329,11 +312,9 @@ def generate_post():
 
     print("\n[선택된 이슈] " + hot_title + " (" + category + ")")
 
-    # ✅ 핵심: 기사 원문 크롤링
     article_data = {"image_url": "", "image_source": "", "body": "", "publisher": ""}
     related_articles = get_naver_news_with_url(hot_title[:15], category)
 
-    # 원문 기사 크롤링 시도 (랭킹 URL 우선, 검색 결과 보조)
     crawl_targets = []
     if hot_url:
         crawl_targets.append({"url": hot_url, "publisher": ""})
@@ -353,7 +334,6 @@ def generate_post():
             article_data["body"] = crawled["body"]
             article_data["publisher"] = crawled["publisher"]
 
-    # 뉴스 컨텍스트 구성 (실제 기사 내용 포함)
     news_context = "=== 오늘(" + TODAY + ") 네이버 많이 본 뉴스 ===\n"
     news_context += "핵심 이슈 제목: " + hot_title + "\n"
     if article_data["body"]:
@@ -363,7 +343,6 @@ def generate_post():
         for i, art in enumerate(related_articles[:4]):
             news_context += str(i+1) + ". " + art["title"] + ": " + art["desc"][:100] + "\n"
 
-    # Gemini 칼럼 작성 (실제 기사 내용 기반)
     prompt = (
         "당신은 날카로운 시각을 가진 시사 해설 칼럼니스트입니다.\n"
         "아래 실제 기사 원문 내용을 반드시 기반으로 글을 쓰세요.\n"
@@ -434,12 +413,7 @@ def generate_post():
     }
 
 
-# ──────────────────────────────────────────────
-# ✅ 핵심 2: 기사 원문 이미지 사용 + 저작권 방패
-#    출처 명시 = 보도 목적 인용 (합법적 사용)
-# ──────────────────────────────────────────────
 def make_article_image_html(image_url, publisher, article_url, issue_title):
-    """기사 원문 이미지 + 출처 명시 (저작권 방패)"""
     if not image_url:
         return ""
     source_text = publisher if publisher else "언론사"
@@ -479,11 +453,9 @@ def body_to_html(body, post_data):
         '<div style="font-size:13px;color:#888;margin-bottom:20px;">📅 ' + TODAY + "</div>\n"
     )
 
-    # ✅ 기사 원문 이미지 (출처 명시)
     if article_image:
         html += make_article_image_html(article_image, article_publisher, article_url, issue_title)
-    
-    # 원본 기사 링크 박스
+
     if article_url:
         html += (
             '<div style="background:#f5f5f5;border-left:4px solid #e65100;'
@@ -610,14 +582,59 @@ def send_facebook(title, post_url, category):
     emoji = CATEGORY_EMOJI.get(category, "📰")
     message = emoji + " " + title + "\n\n자세히 읽기 👉 " + post_url
     try:
-        requests.post(
+        r = requests.post(
             "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
             data={"message": message, "link": post_url, "access_token": FACEBOOK_ACCESS_TOKEN},
             timeout=10
         )
-        print("[페이스북] 공유 성공!")
+        if r.status_code == 200:
+            print("[페이스북] 공유 성공!")
+        else:
+            print("[페이스북] 실패: " + r.text[:200])
     except Exception as e:
         print("[페이스북 오류] " + str(e))
+
+
+def send_instagram(title, post_url, article_image, category):
+    instagram_account_id = os.environ.get("INSTAGRAM_ACCOUNT_ID", "")
+    if not instagram_account_id or not FACEBOOK_ACCESS_TOKEN:
+        return
+    if not article_image:
+        print("[인스타그램] 이미지 없어서 건너뜀")
+        return
+    emoji = CATEGORY_EMOJI.get(category, "📰")
+    caption = emoji + " " + title + "\n\n자세히 읽기 👉 " + post_url
+    try:
+        r1 = requests.post(
+            "https://graph.facebook.com/v19.0/" + instagram_account_id + "/media",
+            data={
+                "image_url": article_image,
+                "caption": caption,
+                "access_token": FACEBOOK_ACCESS_TOKEN
+            },
+            timeout=30
+        )
+        if r1.status_code != 200:
+            print("[인스타그램] 컨테이너 생성 실패: " + r1.text[:200])
+            return
+        creation_id = r1.json().get("id", "")
+        if not creation_id:
+            print("[인스타그램] creation_id 없음")
+            return
+        r2 = requests.post(
+            "https://graph.facebook.com/v19.0/" + instagram_account_id + "/media_publish",
+            data={
+                "creation_id": creation_id,
+                "access_token": FACEBOOK_ACCESS_TOKEN
+            },
+            timeout=30
+        )
+        if r2.status_code == 200:
+            print("[인스타그램] 공유 성공!")
+        else:
+            print("[인스타그램] 발행 실패: " + r2.text[:200])
+    except Exception as e:
+        print("[인스타그램 오류] " + str(e))
 
 
 def post_to_blogger(post_data, retry=2):
@@ -645,6 +662,7 @@ def post_to_blogger(post_data, retry=2):
                 print("발행 완료! " + post_url)
                 send_telegram(post_data["title"], post_url, category)
                 send_facebook(post_data["title"], post_url, category)
+                send_instagram(post_data["title"], post_url, post_data.get("article_image", ""), category)
                 return True
             else:
                 print("실패: " + response.text[:200])
