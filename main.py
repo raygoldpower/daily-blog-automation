@@ -331,8 +331,8 @@ def generate_post():
         "## Subheading rules\n"
         "Subheadings must use the format [emoji Subheading text], with exactly ONE emoji at the front only.\n"
         "Every subheading must include a specific number or data point.\n"
-        "Good example: [\xf0\x9f\xa6\xb4 A 1-Degree Pelvic Tilt Triples the Pressure on Your Lower Back]\n"
-        "Bad example: [\xf0\x9f\xa6\xb4 The Science of the Pelvis \xf0\x9f\xa6\xb4] (two emojis, no number)\n\n"
+        "Good example: [\U0001f9b4 A 1-Degree Pelvic Tilt Triples the Pressure on Your Lower Back]\n"
+        "Bad example: [\U0001f9b4 The Science of the Pelvis \U0001f9b4] (two emojis, no number)\n\n"
         "## Required elements\n"
         "Key concept: wrap one core concept in ##keyword## format and unpack it.\n"
         "Subheadings: at least 4, following the rules above.\n"
@@ -728,6 +728,48 @@ def send_facebook(title, post_url, topic):
         print("[Facebook error] " + str(e))
 
 
+def send_instagram(title, post_url, image_url, topic):
+    instagram_account_id = os.environ.get("INSTAGRAM_ACCOUNT_ID", "")
+    if not instagram_account_id or not FACEBOOK_ACCESS_TOKEN:
+        return
+    if not image_url:
+        print("[Instagram] No image, skipping")
+        return
+    sport_emoji = SPORT_EMOJI.get(topic["sport"], "🏆")
+    caption = sport_emoji + " " + title + "\n\nRead more 👉 " + post_url
+    try:
+        r1 = requests.post(
+            "https://graph.facebook.com/v19.0/" + instagram_account_id + "/media",
+            data={
+                "image_url": image_url,
+                "caption": caption,
+                "access_token": FACEBOOK_ACCESS_TOKEN
+            },
+            timeout=30
+        )
+        if r1.status_code != 200:
+            print("[Instagram] Container failed: " + r1.text[:200])
+            return
+        creation_id = r1.json().get("id", "")
+        if not creation_id:
+            print("[Instagram] No creation_id")
+            return
+        r2 = requests.post(
+            "https://graph.facebook.com/v19.0/" + instagram_account_id + "/media_publish",
+            data={
+                "creation_id": creation_id,
+                "access_token": FACEBOOK_ACCESS_TOKEN
+            },
+            timeout=30
+        )
+        if r2.status_code == 200:
+            print("[Instagram] Shared!")
+        else:
+            print("[Instagram] Publish failed: " + r2.text[:200])
+    except Exception as e:
+        print("[Instagram error] " + str(e))
+
+
 def post_to_blogger(post_data, images, retry=2):
     print("\n[Blogger] Starting post...")
     topic = post_data["topic"]
@@ -766,6 +808,8 @@ def post_to_blogger(post_data, images, retry=2):
                 request_google_indexing(post_url)
                 send_telegram(post_data["title"], post_url, topic)
                 send_facebook(post_data["title"], post_url, topic)
+                image_url = images[0]["url"] if images else ""
+                send_instagram(post_data["title"], post_url, image_url, topic)
                 return True
             else:
                 print("Failed: " + response.text[:300])
