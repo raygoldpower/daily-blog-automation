@@ -303,6 +303,10 @@ def generate_post():
     topic = pick_topic()
     print("[Generate] Topic: " + topic["title"])
 
+    # ✅ 수정1: 등장인물 이름 랜덤화 (Marcus 고정 제거)
+    client_names = ["Jake", "Sarah", "Tom", "David", "Elena", "James", "Nina", "Carlos", "Mia", "Ryan"]
+    client_name = random.choice(client_names)
+
     series_info = ""
     if topic["episode"] > 1:
         series_info = (
@@ -314,7 +318,9 @@ def generate_post():
         "You are a sports trainer and blogger with 10 years of hands-on experience.\n"
         "You explain complex sports science in a way anyone can understand,\n"
         "drawing on real stories from the gym floor and the field.\n"
-        "Write only in English. Do not use any other language.\n\n"
+        "Write only in English. Do not use any other language.\n"
+        # ✅ 수정2: 이름 랜덤 지시
+        "Use the client name \"" + client_name + "\" in your opening story, not always the same name.\n\n"
         + series_info
         + "## How to use the title\n"
         "The given title is a hook designed to spark curiosity.\n"
@@ -740,11 +746,7 @@ def send_instagram(title, post_url, image_url, topic):
     try:
         r1 = requests.post(
             "https://graph.facebook.com/v19.0/" + instagram_account_id + "/media",
-            data={
-                "image_url": image_url,
-                "caption": caption,
-                "access_token": FACEBOOK_ACCESS_TOKEN
-            },
+            data={"image_url": image_url, "caption": caption, "access_token": FACEBOOK_ACCESS_TOKEN},
             timeout=30
         )
         if r1.status_code != 200:
@@ -756,10 +758,7 @@ def send_instagram(title, post_url, image_url, topic):
             return
         r2 = requests.post(
             "https://graph.facebook.com/v19.0/" + instagram_account_id + "/media_publish",
-            data={
-                "creation_id": creation_id,
-                "access_token": FACEBOOK_ACCESS_TOKEN
-            },
+            data={"creation_id": creation_id, "access_token": FACEBOOK_ACCESS_TOKEN},
             timeout=30
         )
         if r2.status_code == 200:
@@ -773,7 +772,8 @@ def send_instagram(title, post_url, image_url, topic):
 def post_to_blogger(post_data, images, retry=2):
     print("\n[Blogger] Starting post...")
     topic = post_data["topic"]
-    labels = [topic["sport"], topic["series"]]
+    # ✅ 수정3: 시리즈 태그 제거, 카테고리만 유지
+    labels = [topic["sport"]]
 
     for attempt in range(1, retry + 2):
         try:
@@ -799,12 +799,7 @@ def post_to_blogger(post_data, images, retry=2):
                 post_url = result.get("url", "")
                 print("\nPublished!")
                 print("   URL: " + post_url)
-                save_series_link(
-                    topic.get("series", ""),
-                    topic.get("episode", 1),
-                    post_data["title"],
-                    post_url
-                )
+                save_series_link(topic.get("series", ""), topic.get("episode", 1), post_data["title"], post_url)
                 request_google_indexing(post_url)
                 send_telegram(post_data["title"], post_url, topic)
                 send_facebook(post_data["title"], post_url, topic)
