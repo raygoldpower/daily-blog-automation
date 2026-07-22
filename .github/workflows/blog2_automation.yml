@@ -1,29 +1,22 @@
 name: insaplayer Blog Automation
-
 on:
   schedule:
     - cron: '30 2 * * *'
-    - cron: '30 7 * * *'
-    - cron: '30 12 * * *'
   workflow_dispatch:
 jobs:
   post-blog2:
     runs-on: ubuntu-latest
-
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
         with:
           ref: main
-
       - name: Python 설치
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
       - name: 패키지 설치
         run: pip install requests cryptography
-
       - name: 블로그2 자동 발행
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -36,6 +29,7 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
           FACEBOOK_ACCESS_TOKEN: ${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
           NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
           NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
           GOOGLE_SEARCH_API_KEY: ${{ secrets.GOOGLE_SEARCH_API_KEY }}
