@@ -390,8 +390,9 @@ def generate_post():
             body_lines.append(line)
 
     body = "\n".join(body_lines).strip()
+    # ✅ 수정4: "— 지금 이슈" 패턴 제거
     if not title:
-        title = hot_title[:40] + " — 지금 이슈"
+        title = hot_title[:40]
     if not body:
         body = full_text
 
@@ -607,11 +608,7 @@ def send_instagram(title, post_url, article_image, category):
     try:
         r1 = requests.post(
             "https://graph.facebook.com/v19.0/" + instagram_account_id + "/media",
-            data={
-                "image_url": article_image,
-                "caption": caption,
-                "access_token": FACEBOOK_ACCESS_TOKEN
-            },
+            data={"image_url": article_image, "caption": caption, "access_token": FACEBOOK_ACCESS_TOKEN},
             timeout=30
         )
         if r1.status_code != 200:
@@ -623,10 +620,7 @@ def send_instagram(title, post_url, article_image, category):
             return
         r2 = requests.post(
             "https://graph.facebook.com/v19.0/" + instagram_account_id + "/media_publish",
-            data={
-                "creation_id": creation_id,
-                "access_token": FACEBOOK_ACCESS_TOKEN
-            },
+            data={"creation_id": creation_id, "access_token": FACEBOOK_ACCESS_TOKEN},
             timeout=30
         )
         if r2.status_code == 200:
@@ -640,7 +634,8 @@ def send_instagram(title, post_url, article_image, category):
 def post_to_blogger(post_data, retry=2):
     print("\n[Blogger] insaplayer 포스팅 시작...")
     category = post_data["category"]
-    labels = [category, "시사칼럼", "이슈해설", "많이본뉴스"]
+    # ✅ 수정3: 불필요한 태그 제거, 카테고리만 유지
+    labels = [category]
 
     for attempt in range(1, retry + 2):
         try:
