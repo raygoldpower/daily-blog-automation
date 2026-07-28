@@ -41,7 +41,7 @@ NAVER_SECTION_MAP = {
 }
 
 def clean_url(url):
-    """URL에서 ?m=1 모바일 파라미터 완전 제거 (검색 색인 표준화)"""
+    """URL에서 ?m=1 및 모바일 파라미터를 완전히 제거하여 표준 URL로 만듭니다."""
     if not url:
         return ""
     return url.split('?m=1')[0].split('&m=1')[0]
@@ -333,22 +333,25 @@ def generate_post():
     if article_data["body"]:
         news_context += "\n=== 기사 원문 내용 ===\n" + article_data["body"] + "\n"
 
-    # SEO 고도화를 위한 프롬프트 개선 (구글 Helpful Content 가이드라인 반영)
     prompt = (
         "당신은 깊이 있는 분석을 제공하는 전문 시사 칼럼니스트입니다.\n"
         "제공된 기사를 토대로 독창적이고 유용한 칼럼을 작성하세요.\n"
-        "단순 뉴스 요약이 아닌, 이 사건이 사회/경제에 미칠 영향과 일반 대중에 주는 시사점을 깊이 있게 분석하세요.\n\n"
+        "단순 뉴스 요약이 아닌, 이 사건이 사회/경제에 미칠 영향과 일반 대중에 주는 시사점을 깊이 있게 분석하세요.\n"
+        "한국어만 사용하세요.\n\n"
         "실제 기사 내용:\n" + news_context + "\n\n"
         "글 작성 가이드:\n"
         "1. 자연스럽고 매끄러운 어조(경어체)를 사용하세요.\n"
-        "2. 소제목은 이 이슈만의 특색을 반영하여 창의적으로 지으세요.\n"
-        "3. AI가 쓴 듯한 정형화된 표현('알아보겠습니다', '살펴보겠습니다', 이모지 남발)을 절대 피하세요.\n"
-        "4. 독자의 검색 의도를 만족시킬 수 있는 구체적인 이유와 독창적인 시각을 포함하세요.\n\n"
-        "출력 형식 (반드시 이 형식을 지켜주세요):\n"
+        "2. '알아보겠습니다', '살펴보겠습니다' 같은 상투적인 AI 표현은 사용하지 마세요.\n"
+        "3. 본문 내 무분별한 이모지 사용을 자제하고 깔끔한 문장으로 작성하세요.\n"
+        "4. 소제목은 이 이슈만의 특색을 반영하여 창의적으로 지으세요. (소제목 형식: [소제목])\n\n"
+        "글 구조:\n"
+        "1. 훅 (2~3줄) — 독자를 멈추게 하는 통찰력 있는 첫 문장\n"
+        "2. 소제목 3~4개 및 내용\n"
+        "3. [SUMMARY_START]\n핵심 요약1\n핵심 요약2\n핵심 요약3\n[SUMMARY_END]\n\n"
+        "출력 형식:\n"
         "제목: (검색에 잘 걸리는 매력적인 제목, 날짜/카테고리 표시 금지)\n"
         "---\n"
-        "(본문 내용을 자연스러운 단락으로 작성. 소제목은 [소제목] 형식으로 작성)\n"
-        "[SUMMARY_START]\n핵심 요약1\n핵심 요약2\n핵심 요약3\n[SUMMARY_END]\n"
+        "(본문 내용)"
     )
 
     print("[AI] Gemini 칼럼 작성 중...")
@@ -430,7 +433,7 @@ def body_to_html(body, post_data):
         summary_html += '<strong>📌 핵심 포인트</strong><ul style="margin:8px 0 0 0;padding-left:20px;">'
         for line in lines:
             summary_html += '<li>' + line + '</li>'
-        summary_html += '</ul>blockquote>\n'
+        summary_html += '</ul></blockquote>\n'
 
     clean_body = summary_pattern.sub("", body)
 
@@ -504,7 +507,7 @@ def send_facebook(title, post_url, category):
         print("[페이스북 오류] " + str(e))
 
 def post_to_blogger(post_data, retry=2):
-    print("\n[Blogger] insaplayer 포스팅 시작...")
+    print("\n[Blogger] 블로그 포스팅 시작...")
     category = post_data["category"]
     labels = [category]
 
@@ -525,7 +528,6 @@ def post_to_blogger(post_data, retry=2):
             response = requests.post(url, headers=headers, json=payload, timeout=30)
             if response.status_code == 200:
                 raw_post_url = response.json().get("url", "")
-                # ?m=1 정제된 URL 확보
                 post_url = clean_url(raw_post_url)
                 print("발행 완료! (표준 URL): " + post_url)
                 send_telegram(post_data["title"], post_url, category)
@@ -543,7 +545,7 @@ def post_to_blogger(post_data, retry=2):
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("insaplayer - SEO 최적화 파이썬 포스팅 엔진 v11")
+    print("블로그 자동 포스팅 엔진 (SEO 최적화 적용 버전)")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
 
