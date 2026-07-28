@@ -406,14 +406,26 @@ def body_to_html(body, post_data):
     article_url = post_data.get("article_url", "")
     issue_title = post_data["title"]
 
-    emoji = CATEGORY_EMOJI.get(category, "📰")
+    # ✅ 카테고리 태그 출력을 완전히 삭제하고 빈 문자열로 시작합니다.
+    html = ""
 
-    # 상단 카테고리 표시
-    html = f'<div style="font-size:14px;color:#e65100;font-weight:bold;margin-bottom:16px;">{emoji} {category}</div>\n'
-
-    # 본문 대표 이미지
+    # 본문 대표 이미지 (이미지가 있으면 바로 이미지부터 시작)
     if article_image:
         html += make_article_image_html(article_image, article_publisher, article_url, issue_title)
+
+    # 본문 줄바꿈 및 가독성 최적화
+    paragraphs = body.split("\n")
+    for para in paragraphs:
+        p = para.strip()
+        if not p:
+            continue
+        html += f'<p style="line-height:1.85;font-size:16px;color:#222;margin:18px 0;word-break:keep-all;">{p}</p>\n'
+
+    # 하단 참고 기사 출처 링크
+    if article_url:
+        html += f'<p style="font-size:13px;color:#888;margin-top:40px;border-top:1px solid #eee;padding-top:12px;">참고 기사 출처: <a href="{article_url}" target="_blank" rel="noopener" style="color:#888;">{article_url}</a></p>'
+
+    return html
 
     # 본문 줄바꿈 및 가독성 최적화 (이모지 및 특수기호 제거된 깔끔한 문단)
     paragraphs = body.split("\n")
