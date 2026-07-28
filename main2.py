@@ -334,22 +334,22 @@ def generate_post():
         news_context += "\n=== 기사 원문 내용 ===\n" + article_data["body"] + "\n"
 
     prompt = (
-        "당신은 깊이 있는 분석을 제공하는 전문 시사 칼럼니스트입니다.\n"
-        "제공된 기사를 토대로 독창적이고 유용한 칼럼을 작성하세요.\n"
-        "단순 뉴스 요약이 아닌, 이 사건이 사회/경제에 미칠 영향과 일반 대중에 주는 시사점을 깊이 있게 분석하세요.\n"
-        "한국어만 사용하세요.\n\n"
+        "당신은 친절하고 식견이 넓은 시사/경제 전문 에디터입니다.\n"
+        "아래 기사 내용을 바탕으로, 일반 독자가 쉽게 이해하고 흥미롭게 읽을 수 있는 고품질 해설 칼럼을 작성하세요.\n\n"
         "실제 기사 내용:\n" + news_context + "\n\n"
-        "글 작성 가이드:\n"
-        "1. 자연스럽고 매끄러운 어조(경어체)를 사용하세요.\n"
-        "2. '알아보겠습니다', '살펴보겠습니다' 같은 상투적인 AI 표현은 사용하지 마세요.\n"
-        "3. 본문 내 무분별한 이모지 사용을 자제하고 깔끔한 문장으로 작성하세요.\n"
-        "4. 소제목은 이 이슈만의 특색을 반영하여 창의적으로 지으세요. (소제목 형식: [소제목])\n\n"
-        "글 구조:\n"
-        "1. 훅 (2~3줄) — 독자를 멈추게 하는 통찰력 있는 첫 문장\n"
-        "2. 소제목 3~4개 및 내용\n"
-        "3. [SUMMARY_START]\n핵심 요약1\n핵심 요약2\n핵심 요약3\n[SUMMARY_END]\n\n"
+        "작성 지침:\n"
+        "1. 문장은 매끄럽고 자연스러운 경어체(~합니다, ~입니다)를 사용하세요.\n"
+        "2. 어려운 전문 용어나 어색한 번역투 표현은 피하고, 30대 일반 직장인이 읽어도 한 번에 이해할 수 있도록 쉬운 어휘로 풀어서 설명하세요.\n"
+        "3. 문장은 가급적 너무 길지 않게 나누어 가독성을 높이세요.\n"
+        "4. '알아보겠습니다', '살펴보겠습니다', '안녕하세요' 같은 무의미한 서두나 AI 특유의 상투적인 인사말은 생략하고, 본론으로 자연스럽게 진입하세요.\n"
+        "5. 소제목은 본문의 핵심을 잘 담아내는 매력적인 문장으로 작성하세요. (형식: [소제목])\n"
+        "6. 작성 시 이모지는 절대 사용하지 말고, 오직 완성도 높은 텍스트에만 집중하세요.\n\n"
+        "글 구성 구조:\n"
+        "- 서론: 현재 어떤 일이 일어났는지 핵심 사건을 한눈에 파악할 수 있도록 서술\n"
+        "- 본론 (소제목 2~3개 활용): 이 사건이 발생한 배경, 그리고 우리 삶이나 경제에 미치는 실질적인 영향과 문제점 분석\n"
+        "- 결론: 앞으로 어떻게 변화할지 전망하며 깔끔하게 마무리\n\n"
         "출력 형식:\n"
-        "제목: (검색에 잘 걸리는 매력적인 제목, 날짜/카테고리 표시 금지)\n"
+        "제목: (독자의 호기심을 자극하면서도 핵심을 명확히 전달하는 매력적인 제목)\n"
         "---\n"
         "(본문 내용)"
     )
@@ -415,44 +415,54 @@ def body_to_html(body, post_data):
 
     emoji = CATEGORY_EMOJI.get(category, "📰")
 
+    # 1. 상단 카테고리 표시
     html = (
-        '<div style="font-size:14px;color:#e65100;font-weight:bold;margin-bottom:8px;">'
+        '<div style="font-size:14px;color:#e65100;font-weight:bold;margin-bottom:12px;">'
         + emoji + " " + category + '</div>\n'
     )
 
+    # 2. 기사 이미지 삽입
     if article_image:
         html += make_article_image_html(article_image, article_publisher, article_url, issue_title)
 
+    # 3. [SUMMARY_START] ~ [SUMMARY_END] 요약 파싱 (원본 로직 유지)
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
     summary_match = summary_pattern.search(body)
     
     summary_html = ""
     if summary_match:
         lines = [l.strip() for l in summary_match.group(1).strip().split("\n") if l.strip()]
-        summary_html = '<blockquote style="background:#f9f9f9;border-left:4px solid #e65100;padding:12px 16px;margin:20px 0;">'
-        summary_html += '<strong>📌 핵심 포인트</strong><ul style="margin:8px 0 0 0;padding-left:20px;">'
+        summary_html = '<blockquote style="background:#f9f9f9;border-left:4px solid #e65100;padding:14px 18px;margin:24px 0;border-radius:4px;">'
+        summary_html += '<strong style="font-size:16px;color:#111;">📌 핵심 포인트</strong><ul style="margin:10px 0 0 0;padding-left:20px;">'
         for line in lines:
-            summary_html += '<li>' + line + '</li>'
+            summary_html += f'<li style="margin:6px 0;font-size:15px;color:#333;line-height:1.6;">{line}</li>'
         summary_html += '</ul></blockquote>\n'
 
+    # 본문에서 요약 문구 제거
     clean_body = summary_pattern.sub("", body)
 
+    # 4. 본문 단락 변환 (가독성 증대: 줄간격 1.85, 단어 잘림 방지 추가)
     paragraphs = clean_body.split("\n")
     for para in paragraphs:
         p = para.strip()
         if not p:
             continue
+        
+        # [소제목] 변환
         if p.startswith("[") and "]" in p:
             heading = p.strip("[]").strip()
-            html += f'<h2 style="margin-top:32px;font-size:20px;color:#222;border-bottom:2px solid #f0f0f0;padding-bottom:8px;">{heading}</h2>\n'
+            html += f'<h2 style="margin-top:36px;margin-bottom:16px;font-size:20px;font-weight:bold;color:#111;border-bottom:2px solid #f0f0f0;padding-bottom:8px;">{heading}</h2>\n'
         else:
-            html += f'<p style="line-height:1.8;font-size:16px;color:#333;margin:16px 0;">{p}</p>\n'
+            # 일반 문단 (사람이 읽기 좋도록 한글 단어 단위 줄바꿈 적용)
+            html += f'<p style="line-height:1.85;font-size:16px;color:#222;margin:18px 0;word-break:keep-all;">{p}</p>\n'
 
+    # 5. 하단에 요약 박스 배치
     if summary_html:
         html += summary_html
 
+    # 6. 하단 원문 참고 기사 링크
     if article_url:
-        html += f'<p style="font-size:13px;color:#888;margin-top:30px;">출처 및 참고 기사: <a href="{article_url}" target="_blank" rel="noopener">{article_url}</a></p>'
+        html += f'<p style="font-size:13px;color:#888;margin-top:40px;border-top:1px solid #eee;padding-top:12px;">참고 기사 출처: <a href="{article_url}" target="_blank" rel="noopener" style="color:#888;">{article_url}</a></p>'
 
     return html
 
