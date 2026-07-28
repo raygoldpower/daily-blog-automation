@@ -88,29 +88,20 @@ def save_used_image(url):
         pass
 
 def crawl_naver_article(article_url):
+    """기사 원문 본문 및 다중 이미지(최대 3개) 크롤링"""
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Referer": "https://news.naver.com",
         "Accept-Language": "ko-KR,ko;q=0.9",
     }
-    result = {"image_url": "", "image_source": "", "body": "", "publisher": ""}
+    result = {"image_url": "", "images": [], "image_source": "", "body": "", "publisher": ""}
     try:
         response = requests.get(article_url, headers=headers, timeout=10)
         if response.status_code != 200:
             return result
         html = response.text
 
-        og_image = re.search(r'<meta[^>]+property=["\']og:image["\'][^>]+content=["\']([^"\']+)["\']', html)
-        if not og_image:
-            og_image = re.search(r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+property=["\']og:image["\']', html)
-        if og_image:
-            img_url = og_image.group(1).strip()
-            if img_url and img_url.startswith("http"):
-                result["image_url"] = img_url
-
         publisher = re.search(r'<meta[^>]+property=["\']og:site_name["\'][^>]+content=["\']([^"\']+)["\']', html)
-        if not publisher:
-            publisher = re.search(r'class="[^"]*press[^"]*"[^>]*>([^<]+)<', html)
         if publisher:
             result["publisher"] = publisher.group(1).strip()
 
@@ -123,13 +114,26 @@ def crawl_naver_article(article_url):
             body_match = re.search(pattern, html, re.DOTALL)
             if body_match:
                 body_html = body_match.group(1)
-                body_text = re.sub(r'<(?!img)[^>]+>', ' ', body_html)
+                
+                # 본문 내 이미지 태그 추출 (최대 3개)
+                img_urls = re.findall(r'<img[^>]+src=["\']([^"\']+)["\']', body_html)
+                clean_imgs = []
+                for img in img_urls:
+                    if img.startswith("http") and "static" not in img and "icon" not in img:
+                        if img not in clean_imgs:
+                            clean_imgs.append(img)
+                result["images"] = clean_imgs[:3]
+
+                # 본문 순수 텍스트 정제
+                body_text = re.sub(r'<[^>]+>', ' ', body_html)
                 body_text = re.sub(r'\s+', ' ', body_text).strip()
-                body_text = body_text[:2000]
-                result["body"] = body_text
+                result["body"] = body_text[:2000]
                 break
 
-        print("[크롤링] 이미지: " + (result["image_url"][:60] if result["image_url"] else "없음"))
+        if result["images"]:
+            result["image_url"] = result["images"][0]
+
+        print("[크롤링] 수집된 이미지 수: " + str(len(result["images"])) + "개")
         print("[크롤링] 본문: " + str(len(result["body"])) + "자")
         return result
 
@@ -306,7 +310,7 @@ def generate_post():
 
     print("\n[선택된 이슈] " + hot_title + " (" + category + ")")
 
-    article_data = {"image_url": "", "image_source": "", "body": "", "publisher": ""}
+    article_data = {"image_url": "", "images": [], "image_source": "", "body": "", "publisher": ""}
     related_articles = get_naver_news_with_url(hot_title[:15], category)
 
     crawl_targets = []
@@ -319,28 +323,33 @@ def generate_post():
     used_images = load_used_images()
     for target in crawl_targets:
         crawled = crawl_naver_article(target["url"])
-        if crawled["image_url"] and crawled["image_url"] not in used_images:
-            article_data = crawled
-            save_used_image(crawled["image_url"])
-            print("[이미지 확보] " + crawled["image_url"][:60])
-            break
+        if crawled["images"]:
+            # 미사용 이미지 필터링
+            new_imgs = [img for img in crawled["images"] if img not in used_images]
+            if new_imgs:
+                article_data = crawled
+                article_data["images"] = new_imgs
+                for img in new_imgs:
+                    save_used_image(img)
+                break
         elif crawled["body"] and not article_data["body"]:
             article_data["body"] = crawled["body"]
             article_data["publisher"] = crawled["publisher"]
 
     news_context = "=== 기사 원문 내용 ===\n" + (article_data["body"] if article_data["body"] else hot_title) + "\n"
 
-    # 사람이 작성한 듯한 자연스러운 스토리텔링 전용 프롬프트
+    # 사람이 작성한 듯한 스토리텔링 및 다중 이미지 배치 전용 프롬프트
     prompt = (
         "당신은 친근하고 글을 매끄럽게 잘 쓰는 인기 블로거입니다.\n"
         "제공된 뉴스 기사의 사실(팩트)을 바탕으로, 사람이 읽기에 매우 매끄럽고 자연스러운 스토리 형태의 블로그 글을 작성하세요.\n\n"
         "기사 원문 내용:\n" + news_context + "\n\n"
         "작성 필수 규칙 (엄격히 적용):\n"
         "1. 문장 간의 연결이 물 흐르듯 자연스러워야 합니다. 앞 문장이 뒷 문장을 이끄는 이야기(서사) 구조로 쓰세요.\n"
-        "2. 억지스러운 철학적 교훈, 상투적인 AI 서두('알아보겠습니다', '살펴보겠습니다'), 거창한 요약 박스를 완전히 배제하세요.\n"
-        "3. 이모티콘, 특수기호(###, ***, [ ]), 날짜 텍스트는 절대 사용하지 마세요.\n"
-        "4. 사람이 읽기 편하도록 2~3문장 단위로 단락(줄바꿈)을 나누어 주세요.\n"
-        "5. 문체는 자연스러운 구어체 존댓말(~했습니다, ~입니다, ~인데요)을 사용하세요.\n\n"
+        "2. 글 중간에 자연스럽게 내용이 전환되는 지점에 [IMAGE_2], [IMAGE_3] 태그를 각각 한 줄로 넣어주세요.\n"
+        "3. 억지스러운 철학적 교훈, 상투적인 AI 서두('알아보겠습니다', '살펴보겠습니다')를 완전히 배제하세요.\n"
+        "4. 이모티콘, 특수기호(###, ***, [ ]), 날짜 텍스트는 절대 사용하지 마세요.\n"
+        "5. 사람이 읽기 편하도록 2~3문장 단위로 단락(줄바꿈)을 나누어 주세요.\n"
+        "6. 문체는 자연스러운 구어체 존댓말(~했습니다, ~입니다, ~인데요)을 사용하세요.\n\n"
         "출력 형식:\n"
         "제목: (자연스럽고 궁금증을 유발하는 블로그 제목)\n"
         "---\n"
@@ -383,7 +392,7 @@ def generate_post():
         "title": title,
         "body": body,
         "category": category,
-        "article_image": article_data.get("image_url", ""),
+        "article_images": article_data.get("images", []),
         "article_publisher": article_data.get("publisher", ""),
         "article_url": clean_url(hot_url),
     }
@@ -400,41 +409,37 @@ def make_article_image_html(image_url, publisher, article_url, issue_title):
     return html
 
 def body_to_html(body, post_data):
-    category = post_data["category"]
-    article_image = post_data.get("article_image", "")
-    article_publisher = post_data.get("article_publisher", "")
+    article_images = post_data.get("article_images", [])
+    article_publisher = post_data.get("article_publisher", "언론사")
     article_url = post_data.get("article_url", "")
     issue_title = post_data["title"]
 
-    # ✅ 카테고리 태그 출력을 완전히 삭제하고 빈 문자열로 시작합니다.
     html = ""
 
-    # 본문 대표 이미지 (이미지가 있으면 바로 이미지부터 시작)
-    if article_image:
-        html += make_article_image_html(article_image, article_publisher, article_url, issue_title)
+    # 1번째 대표 이미지 (상단 배치)
+    if article_images:
+        html += make_article_image_html(article_images[0], article_publisher, article_url, issue_title)
 
-    # 본문 줄바꿈 및 가독성 최적화
-    paragraphs = body.split("\n")
-    for para in paragraphs:
-        p = para.strip()
-        if not p:
-            continue
-        html += f'<p style="line-height:1.85;font-size:16px;color:#222;margin:18px 0;word-break:keep-all;">{p}</p>\n'
-
-    # 하단 참고 기사 출처 링크
-    if article_url:
-        html += f'<p style="font-size:13px;color:#888;margin-top:40px;border-top:1px solid #eee;padding-top:12px;">참고 기사 출처: <a href="{article_url}" target="_blank" rel="noopener" style="color:#888;">{article_url}</a></p>'
-
-    return html
-
-    # 본문 줄바꿈 및 가독성 최적화 (이모지 및 특수기호 제거된 깔끔한 문단)
+    # 본문 단락 변환 및 2, 3번째 이미지 태그 치환
     paragraphs = body.split("\n")
     for para in paragraphs:
         p = para.strip()
         if not p:
             continue
         
-        # 2~3문장 단위 문단에 가독성 높은 여백과 줄간격(1.85) 부여
+        # [IMAGE_2] 태그 위치 처리 (2번째 이미지가 있을 때만 출력)
+        if "[IMAGE_2]" in p:
+            if len(article_images) > 1:
+                html += make_article_image_html(article_images[1], article_publisher, article_url, issue_title)
+            continue
+            
+        # [IMAGE_3] 태그 위치 처리 (3번째 이미지가 있을 때만 출력)
+        if "[IMAGE_3]" in p:
+            if len(article_images) > 2:
+                html += make_article_image_html(article_images[2], article_publisher, article_url, issue_title)
+            continue
+
+        # 일반 문단
         html += f'<p style="line-height:1.85;font-size:16px;color:#222;margin:18px 0;word-break:keep-all;">{p}</p>\n'
 
     # 하단 참고 기사 출처 링크
@@ -532,7 +537,7 @@ def post_to_blogger(post_data, retry=2):
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("블로그 자동 포스팅 엔진 (사람 스타일 가독성 v12)")
+    print("블로그 자동 포스팅 엔진 (다중 이미지 + 가독성 최적화 v13)")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
 
