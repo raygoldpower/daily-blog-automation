@@ -328,33 +328,26 @@ def generate_post():
             article_data["body"] = crawled["body"]
             article_data["publisher"] = crawled["publisher"]
 
-    news_context = "=== 오늘(" + TODAY + ") 네이버 많이 본 뉴스 ===\n"
-    news_context += "핵심 이슈 제목: " + hot_title + "\n"
-    if article_data["body"]:
-        news_context += "\n=== 기사 원문 내용 ===\n" + article_data["body"] + "\n"
+    news_context = "=== 기사 원문 내용 ===\n" + (article_data["body"] if article_data["body"] else hot_title) + "\n"
 
+    # 사람이 작성한 듯한 자연스러운 스토리텔링 전용 프롬프트
     prompt = (
-        "당신은 친절하고 식견이 넓은 시사/경제 전문 에디터입니다.\n"
-        "아래 기사 내용을 바탕으로, 일반 독자가 쉽게 이해하고 흥미롭게 읽을 수 있는 고품질 해설 칼럼을 작성하세요.\n\n"
-        "실제 기사 내용:\n" + news_context + "\n\n"
-        "작성 지침:\n"
-        "1. 문장은 매끄럽고 자연스러운 경어체(~합니다, ~입니다)를 사용하세요.\n"
-        "2. 어려운 전문 용어나 어색한 번역투 표현은 피하고, 30대 일반 직장인이 읽어도 한 번에 이해할 수 있도록 쉬운 어휘로 풀어서 설명하세요.\n"
-        "3. 문장은 가급적 너무 길지 않게 나누어 가독성을 높이세요.\n"
-        "4. '알아보겠습니다', '살펴보겠습니다', '안녕하세요' 같은 무의미한 서두나 AI 특유의 상투적인 인사말은 생략하고, 본론으로 자연스럽게 진입하세요.\n"
-        "5. 소제목은 본문의 핵심을 잘 담아내는 매력적인 문장으로 작성하세요. (형식: [소제목])\n"
-        "6. 작성 시 이모지는 절대 사용하지 말고, 오직 완성도 높은 텍스트에만 집중하세요.\n\n"
-        "글 구성 구조:\n"
-        "- 서론: 현재 어떤 일이 일어났는지 핵심 사건을 한눈에 파악할 수 있도록 서술\n"
-        "- 본론 (소제목 2~3개 활용): 이 사건이 발생한 배경, 그리고 우리 삶이나 경제에 미치는 실질적인 영향과 문제점 분석\n"
-        "- 결론: 앞으로 어떻게 변화할지 전망하며 깔끔하게 마무리\n\n"
+        "당신은 친근하고 글을 매끄럽게 잘 쓰는 인기 블로거입니다.\n"
+        "제공된 뉴스 기사의 사실(팩트)을 바탕으로, 사람이 읽기에 매우 매끄럽고 자연스러운 스토리 형태의 블로그 글을 작성하세요.\n\n"
+        "기사 원문 내용:\n" + news_context + "\n\n"
+        "작성 필수 규칙 (엄격히 적용):\n"
+        "1. 문장 간의 연결이 물 흐르듯 자연스러워야 합니다. 앞 문장이 뒷 문장을 이끄는 이야기(서사) 구조로 쓰세요.\n"
+        "2. 억지스러운 철학적 교훈, 상투적인 AI 서두('알아보겠습니다', '살펴보겠습니다'), 거창한 요약 박스를 완전히 배제하세요.\n"
+        "3. 이모티콘, 특수기호(###, ***, [ ]), 날짜 텍스트는 절대 사용하지 마세요.\n"
+        "4. 사람이 읽기 편하도록 2~3문장 단위로 단락(줄바꿈)을 나누어 주세요.\n"
+        "5. 문체는 자연스러운 구어체 존댓말(~했습니다, ~입니다, ~인데요)을 사용하세요.\n\n"
         "출력 형식:\n"
-        "제목: (독자의 호기심을 자극하면서도 핵심을 명확히 전달하는 매력적인 제목)\n"
+        "제목: (자연스럽고 궁금증을 유발하는 블로그 제목)\n"
         "---\n"
-        "(본문 내용)"
+        "(본문)"
     )
 
-    print("[AI] Gemini 칼럼 작성 중...")
+    print("[AI] 스토리텔링 블로그 글 작성 중...")
     full_text = call_gemini(prompt, max_tokens=8000)
 
     lines = full_text.strip().split("\n")
@@ -415,52 +408,24 @@ def body_to_html(body, post_data):
 
     emoji = CATEGORY_EMOJI.get(category, "📰")
 
-    # 1. 상단 카테고리 표시
-    html = (
-        '<div style="font-size:14px;color:#e65100;font-weight:bold;margin-bottom:12px;">'
-        + emoji + " " + category + '</div>\n'
-    )
+    # 상단 카테고리 표시
+    html = f'<div style="font-size:14px;color:#e65100;font-weight:bold;margin-bottom:16px;">{emoji} {category}</div>\n'
 
-    # 2. 기사 이미지 삽입
+    # 본문 대표 이미지
     if article_image:
         html += make_article_image_html(article_image, article_publisher, article_url, issue_title)
 
-    # 3. [SUMMARY_START] ~ [SUMMARY_END] 요약 파싱 (원본 로직 유지)
-    summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
-    summary_match = summary_pattern.search(body)
-    
-    summary_html = ""
-    if summary_match:
-        lines = [l.strip() for l in summary_match.group(1).strip().split("\n") if l.strip()]
-        summary_html = '<blockquote style="background:#f9f9f9;border-left:4px solid #e65100;padding:14px 18px;margin:24px 0;border-radius:4px;">'
-        summary_html += '<strong style="font-size:16px;color:#111;">📌 핵심 포인트</strong><ul style="margin:10px 0 0 0;padding-left:20px;">'
-        for line in lines:
-            summary_html += f'<li style="margin:6px 0;font-size:15px;color:#333;line-height:1.6;">{line}</li>'
-        summary_html += '</ul></blockquote>\n'
-
-    # 본문에서 요약 문구 제거
-    clean_body = summary_pattern.sub("", body)
-
-    # 4. 본문 단락 변환 (가독성 증대: 줄간격 1.85, 단어 잘림 방지 추가)
-    paragraphs = clean_body.split("\n")
+    # 본문 줄바꿈 및 가독성 최적화 (이모지 및 특수기호 제거된 깔끔한 문단)
+    paragraphs = body.split("\n")
     for para in paragraphs:
         p = para.strip()
         if not p:
             continue
         
-        # [소제목] 변환
-        if p.startswith("[") and "]" in p:
-            heading = p.strip("[]").strip()
-            html += f'<h2 style="margin-top:36px;margin-bottom:16px;font-size:20px;font-weight:bold;color:#111;border-bottom:2px solid #f0f0f0;padding-bottom:8px;">{heading}</h2>\n'
-        else:
-            # 일반 문단 (사람이 읽기 좋도록 한글 단어 단위 줄바꿈 적용)
-            html += f'<p style="line-height:1.85;font-size:16px;color:#222;margin:18px 0;word-break:keep-all;">{p}</p>\n'
+        # 2~3문장 단위 문단에 가독성 높은 여백과 줄간격(1.85) 부여
+        html += f'<p style="line-height:1.85;font-size:16px;color:#222;margin:18px 0;word-break:keep-all;">{p}</p>\n'
 
-    # 5. 하단에 요약 박스 배치
-    if summary_html:
-        html += summary_html
-
-    # 6. 하단 원문 참고 기사 링크
+    # 하단 참고 기사 출처 링크
     if article_url:
         html += f'<p style="font-size:13px;color:#888;margin-top:40px;border-top:1px solid #eee;padding-top:12px;">참고 기사 출처: <a href="{article_url}" target="_blank" rel="noopener" style="color:#888;">{article_url}</a></p>'
 
@@ -555,7 +520,7 @@ def post_to_blogger(post_data, retry=2):
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("블로그 자동 포스팅 엔진 (SEO 최적화 적용 버전)")
+    print("블로그 자동 포스팅 엔진 (사람 스타일 가독성 v12)")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
 
