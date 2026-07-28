@@ -40,6 +40,11 @@ NAVER_SECTION_MAP = {
     "IT과학": "105",
 }
 
+def clean_url(url):
+    """URL에서 ?m=1 모바일 파라미터 완전 제거 (검색 색인 표준화)"""
+    if not url:
+        return ""
+    return url.split('?m=1')[0].split('&m=1')[0]
 
 def load_used_titles():
     try:
@@ -47,7 +52,6 @@ def load_used_titles():
             return json.load(f)
     except Exception:
         return []
-
 
 def save_used_title(title):
     used = load_used_titles()
@@ -60,11 +64,9 @@ def save_used_title(title):
     except Exception as e:
         print("[중복방지] 저장 실패: " + str(e))
 
-
 def is_duplicate(title):
     used = load_used_titles()
     return any(title[:10] in t or t[:10] in title for t in used)
-
 
 def load_used_images():
     try:
@@ -72,7 +74,6 @@ def load_used_images():
             return json.load(f)
     except Exception:
         return []
-
 
 def save_used_image(url):
     used = load_used_images()
@@ -85,7 +86,6 @@ def save_used_image(url):
             json.dump(used, f, ensure_ascii=False)
     except Exception:
         pass
-
 
 def crawl_naver_article(article_url):
     headers = {
@@ -137,7 +137,6 @@ def crawl_naver_article(article_url):
         print("[크롤링 오류] " + str(e))
         return result
 
-
 def get_naver_top_news():
     print("[네이버 많이 본 뉴스] 수집 시작...")
     today_str = datetime.now().strftime("%Y%m%d")
@@ -179,7 +178,6 @@ def get_naver_top_news():
     print("[수집 완료] 총 " + str(len(all_results)) + "개")
     return all_results
 
-
 def get_naver_news_with_url(keyword, category):
     if not NAVER_CLIENT_ID or not NAVER_CLIENT_SECRET:
         return []
@@ -216,7 +214,6 @@ def get_naver_news_with_url(keyword, category):
         print("[네이버 검색 오류] " + str(e))
     return []
 
-
 def get_google_trends():
     try:
         response = requests.get(
@@ -231,7 +228,6 @@ def get_google_trends():
     except Exception as e:
         print("[구글 트렌드 오류] " + str(e))
     return []
-
 
 def select_best_topic(ranking_news, trending_keywords):
     used = load_used_titles()
@@ -253,7 +249,6 @@ def select_best_topic(ranking_news, trending_keywords):
     selected = random.choice(top)
     print("[선택] 랭킹 뉴스 선택: " + selected["title"][:40])
     return selected
-
 
 def call_gemini(prompt, max_tokens=8000):
     if not GEMINI_API_KEY:
@@ -292,7 +287,6 @@ def call_gemini(prompt, max_tokens=8000):
             else:
                 raise
     raise Exception("Gemini 최대 재시도 초과")
-
 
 def generate_post():
     print("\n[1단계] 네이버 많이 본 뉴스 수집...")
@@ -338,37 +332,26 @@ def generate_post():
     news_context += "핵심 이슈 제목: " + hot_title + "\n"
     if article_data["body"]:
         news_context += "\n=== 기사 원문 내용 ===\n" + article_data["body"] + "\n"
-    if related_articles:
-        news_context += "\n=== 관련 기사 ===\n"
-        for i, art in enumerate(related_articles[:4]):
-            news_context += str(i+1) + ". " + art["title"] + ": " + art["desc"][:100] + "\n"
 
+    # SEO 고도화를 위한 프롬프트 개선 (구글 Helpful Content 가이드라인 반영)
     prompt = (
-        "당신은 날카로운 시각을 가진 시사 해설 칼럼니스트입니다.\n"
-        "아래 실제 기사 원문 내용을 반드시 기반으로 글을 쓰세요.\n"
-        "원문에 없는 내용을 상상해서 쓰지 마세요. 팩트는 원문 기준으로만.\n"
-        "한국어만 사용하세요.\n\n"
+        "당신은 깊이 있는 분석을 제공하는 전문 시사 칼럼니스트입니다.\n"
+        "제공된 기사를 토대로 독창적이고 유용한 칼럼을 작성하세요.\n"
+        "단순 뉴스 요약이 아닌, 이 사건이 사회/경제에 미칠 영향과 일반 대중에 주는 시사점을 깊이 있게 분석하세요.\n\n"
         "실제 기사 내용:\n" + news_context + "\n\n"
-        "글쓰기 원칙:\n"
-        "1. 첫 문장은 날카로운 질문 또는 역설적 사실로 시작.\n"
-        "2. 팩트는 원문 기반으로만 정확하게. 추측 금지.\n"
-        "3. 반드시 존댓말.\n"
-        "4. 절대 금지: 이모지 사용, '알아보겠습니다', '살펴보겠습니다', AI 나열식 표현.\n"
-        "5. 소제목은 이 이슈에 맞게 직접 창작해라. 고정 소제목 절대 금지.\n"
-        "6. 소제목 형식: [소제목] — 이모지 없이 텍스트만.\n"
-        "7. 마지막은 독자에게 생각거리를 던지는 질문으로 마무리.\n\n"
-        "글 구조:\n"
-        "1. 훅 (2~3줄) — 독자를 멈추게 하는 첫 문장\n"
-        "2. ##핵심키워드## — 이 이슈의 핵심 한 단어나 짧은 구\n"
-        "3. 소제목 3~4개 — 이슈 내용에 맞게 직접 작성\n"
-        "4. 마무리 질문 (2~3줄)\n"
-        "5. [SUMMARY_START]\n핵심1\n핵심2\n핵심3\n[SUMMARY_END]\n\n"
-        "분량: 3000자 이상. 반드시 완성된 글.\n"
-        "카테고리: " + category + "\n\n"
-        "출력:\n제목: (핵심 팩트 + 해석적 시각. 날짜·카테고리명 금지)\n---\n(본문)"
+        "글 작성 가이드:\n"
+        "1. 자연스럽고 매끄러운 어조(경어체)를 사용하세요.\n"
+        "2. 소제목은 이 이슈만의 특색을 반영하여 창의적으로 지으세요.\n"
+        "3. AI가 쓴 듯한 정형화된 표현('알아보겠습니다', '살펴보겠습니다', 이모지 남발)을 절대 피하세요.\n"
+        "4. 독자의 검색 의도를 만족시킬 수 있는 구체적인 이유와 독창적인 시각을 포함하세요.\n\n"
+        "출력 형식 (반드시 이 형식을 지켜주세요):\n"
+        "제목: (검색에 잘 걸리는 매력적인 제목, 날짜/카테고리 표시 금지)\n"
+        "---\n"
+        "(본문 내용을 자연스러운 단락으로 작성. 소제목은 [소제목] 형식으로 작성)\n"
+        "[SUMMARY_START]\n핵심 요약1\n핵심 요약2\n핵심 요약3\n[SUMMARY_END]\n"
     )
 
-    print("[AI] Gemini 칼럼 작성 중 (실제 기사 기반)...")
+    print("[AI] Gemini 칼럼 작성 중...")
     full_text = call_gemini(prompt, max_tokens=8000)
 
     lines = full_text.strip().split("\n")
@@ -387,7 +370,6 @@ def generate_post():
             body_lines.append(line)
 
     body = "\n".join(body_lines).strip()
-    # ✅ 수정4: "— 지금 이슈" 패턴 제거
     if not title:
         title = hot_title[:40]
     if not body:
@@ -407,33 +389,19 @@ def generate_post():
         "category": category,
         "article_image": article_data.get("image_url", ""),
         "article_publisher": article_data.get("publisher", ""),
-        "article_url": hot_url,
+        "article_url": clean_url(hot_url),
     }
-
 
 def make_article_image_html(image_url, publisher, article_url, issue_title):
     if not image_url:
         return ""
     source_text = publisher if publisher else "언론사"
     html = '<div style="text-align:center;margin:24px 0;">'
-    html += '<img src="' + image_url + '" alt="' + issue_title[:30] + '" style="max-width:100%;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);"/>'
-    html += '<p style="font-size:12px;color:#999;margin-top:8px;">'
-    html += '© ' + source_text + ' | 보도 목적 인용 | '
-    if article_url:
-        html += '<a href="' + article_url + '" style="color:#999;" target="_blank" rel="noopener">원문 기사 보기</a>'
+    html += '<img src="' + image_url + '" alt="' + issue_title[:30] + '" style="max-width:100%;border-radius:8px;"/>'
+    html += '<p style="font-size:12px;color:#888;margin-top:8px;">'
+    html += '© ' + source_text + ' | 보도 인용'
     html += '</p></div>\n'
     return html
-
-
-def make_summary_html(summary_text):
-    lines = [l.strip() for l in summary_text.strip().split("\n") if l.strip()]
-    html = '<div style="background:#fff8e1;border-left:5px solid #f57f17;border-radius:8px;padding:20px 24px;margin:28px 0;">'
-    html += '<p style="font-weight:700;font-size:17px;color:#f57f17;margin-bottom:12px;">📌 핵심 요약</p>'
-    for line in lines:
-        html += '<p style="margin:6px 0;font-size:15px;color:#333;">✅ ' + line + "</p>"
-    html += "</div>\n"
-    return html
-
 
 def body_to_html(body, post_data):
     category = post_data["category"]
@@ -445,102 +413,45 @@ def body_to_html(body, post_data):
     emoji = CATEGORY_EMOJI.get(category, "📰")
 
     html = (
-        '<div style="display:inline-block;background:#e65100;color:#fff;'
-        'font-size:13px;padding:5px 14px;border-radius:20px;margin-bottom:8px;font-weight:600;">'
-        + emoji + " " + category + "</div>\n"
-        '<div style="font-size:13px;color:#888;margin-bottom:20px;">📅 ' + TODAY + "</div>\n"
+        '<div style="font-size:14px;color:#e65100;font-weight:bold;margin-bottom:8px;">'
+        + emoji + " " + category + '</div>\n'
     )
 
     if article_image:
         html += make_article_image_html(article_image, article_publisher, article_url, issue_title)
 
-    if article_url:
-        html += (
-            '<div style="background:#f5f5f5;border-left:4px solid #e65100;'
-            'padding:12px 16px;margin:16px 0;border-radius:0 8px 8px 0;">'
-            '<p style="margin:0;font-size:13px;color:#666;">📰 이 글은 실제 보도된 뉴스를 기반으로 작성된 시사 해설입니다. '
-            '<a href="' + article_url + '" target="_blank" rel="noopener" style="color:#e65100;font-weight:600;">원문 기사 보기 →</a></p>'
-            '</div>\n'
-        )
-
     summary_pattern = re.compile(r'\[SUMMARY_START\](.*?)\[SUMMARY_END\]', re.DOTALL)
-    keyword_pattern = re.compile(r'##(.+?)##')
-
     summary_match = summary_pattern.search(body)
-    summary_html = make_summary_html(summary_match.group(1)) if summary_match else ""
-    clean_body = summary_pattern.sub("[SUMMARY_PLACEHOLDER]", body)
+    
+    summary_html = ""
+    if summary_match:
+        lines = [l.strip() for l in summary_match.group(1).strip().split("\n") if l.strip()]
+        summary_html = '<blockquote style="background:#f9f9f9;border-left:4px solid #e65100;padding:12px 16px;margin:20px 0;">'
+        summary_html += '<strong>📌 핵심 포인트</strong><ul style="margin:8px 0 0 0;padding-left:20px;">'
+        for line in lines:
+            summary_html += '<li>' + line + '</li>'
+        summary_html += '</ul>blockquote>\n'
 
-    headings = re.findall(r'\[([^\]]+)\]', clean_body)
-    headings = [h for h in headings if h not in ["SUMMARY_PLACEHOLDER"]]
-    if headings:
-        toc = '<div style="background:#f8f9ff;border:1px solid #e0e0e0;border-radius:10px;padding:20px 24px;margin:24px 0;">'
-        toc += '<p style="font-weight:700;font-size:15px;color:#e65100;margin-bottom:12px;">📋 목차</p>'
-        toc += '<ol style="margin:0;padding-left:20px;">'
-        for h in headings:
-            clean_h = re.sub(r'^[^\w가-힣]+', '', h).strip()
-            clean_h = re.sub(r'[^\w가-힣\s]+$', '', clean_h).strip()
-            if clean_h:
-                toc += '<li style="margin:6px 0;font-size:15px;color:#444;line-height:1.6;">' + clean_h + '</li>'
-        toc += '</ol></div>\n'
-        html += toc
-
-    def replace_keyword(m):
-        return (
-            '<div style="margin:28px 0 12px 0;">'
-            '<span style="display:inline-block;font-size:30px;font-weight:900;'
-            'color:#e65100;letter-spacing:-0.5px;'
-            'border-bottom:3px solid #e65100;padding-bottom:4px;">'
-            + m.group(1) + '</span></div>\n'
-        )
+    clean_body = summary_pattern.sub("", body)
 
     paragraphs = clean_body.split("\n")
-    para_count = 0
-
     for para in paragraphs:
-        if not para.strip():
-            html += '<div style="margin:10px 0;"></div>\n'
+        p = para.strip()
+        if not p:
             continue
-        if para.strip() == "[SUMMARY_PLACEHOLDER]":
-            html += summary_html
-            continue
-        if para.startswith("[") and "]" in para:
-            heading = para.strip("[]").strip()
-            html += (
-                '<h2 style="margin-top:48px;margin-bottom:16px;font-size:21px;font-weight:700;'
-                'background:linear-gradient(90deg,#e65100,#ef6c00);'
-                'color:#fff;padding:12px 20px;border-radius:8px;">'
-                + heading + "</h2>\n"
-            )
-            continue
-        if len(para.strip()) > 1 and para.strip()[0].isdigit() and para.strip()[1] in [".", ")"]:
-            html += (
-                '<div style="display:flex;align-items:flex-start;margin:10px 0;padding:12px 16px;'
-                'background:#fff3e0;border-radius:8px;">'
-                '<span style="color:#e65100;font-weight:700;margin-right:12px;font-size:16px;">'
-                + para.strip()[0] + '.</span>'
-                '<span style="color:#333;font-size:16px;line-height:1.8;">'
-                + para.strip()[2:].strip() + '</span></div>\n'
-            )
-            continue
-        para_count += 1
-        processed = keyword_pattern.sub(replace_keyword, para.strip())
-        if processed != para.strip():
-            html += processed
-        elif para_count % 4 == 0 and len(para.strip()) > 30:
-            html += (
-                '<div style="border-left:4px solid #e65100;padding:14px 20px;margin:20px 0;'
-                'background:#fff3e0;border-radius:0 8px 8px 0;">'
-                '<p style="margin:0;font-size:16px;line-height:1.9;color:#1a1a1a;font-weight:500;">'
-                + para.strip() + '</p></div>\n'
-            )
+        if p.startswith("[") and "]" in p:
+            heading = p.strip("[]").strip()
+            html += f'<h2 style="margin-top:32px;font-size:20px;color:#222;border-bottom:2px solid #f0f0f0;padding-bottom:8px;">{heading}</h2>\n'
         else:
-            html += (
-                '<p style="margin:14px 0;line-height:1.9;font-size:16px;color:#333;">'
-                + para.strip() + '</p>\n'
-            )
+            html += f'<p style="line-height:1.8;font-size:16px;color:#333;margin:16px 0;">{p}</p>\n'
+
+    if summary_html:
+        html += summary_html
+
+    if article_url:
+        html += f'<p style="font-size:13px;color:#888;margin-top:30px;">출처 및 참고 기사: <a href="{article_url}" target="_blank" rel="noopener">{article_url}</a></p>'
 
     return html
-
 
 def get_access_token():
     response = requests.post(
@@ -557,12 +468,12 @@ def get_access_token():
         raise Exception("토큰 발급 실패: " + response.text)
     return response.json()["access_token"]
 
-
 def send_telegram(title, post_url, category):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         return
+    clean_post_url = clean_url(post_url)
     emoji = CATEGORY_EMOJI.get(category, "📰")
-    message = emoji + " " + title + "\n\n자세히 읽기 👉 " + post_url
+    message = emoji + " " + title + "\n\n자세히 읽기 👉 " + clean_post_url
     try:
         requests.post(
             "https://api.telegram.org/bot" + TELEGRAM_BOT_TOKEN + "/sendMessage",
@@ -573,16 +484,16 @@ def send_telegram(title, post_url, category):
     except Exception as e:
         print("[텔레그램 오류] " + str(e))
 
-
 def send_facebook(title, post_url, category):
     if not FACEBOOK_PAGE_ID or not FACEBOOK_ACCESS_TOKEN:
         return
+    clean_post_url = clean_url(post_url)
     emoji = CATEGORY_EMOJI.get(category, "📰")
-    message = emoji + " " + title + "\n\n자세히 읽기 👉 " + post_url
+    message = emoji + " " + title + "\n\n자세히 읽기 👉 " + clean_post_url
     try:
         r = requests.post(
             "https://graph.facebook.com/v19.0/" + FACEBOOK_PAGE_ID + "/feed",
-            data={"message": message, "link": post_url, "access_token": FACEBOOK_ACCESS_TOKEN},
+            data={"message": message, "link": clean_post_url, "access_token": FACEBOOK_ACCESS_TOKEN},
             timeout=10
         )
         if r.status_code == 200:
@@ -592,46 +503,9 @@ def send_facebook(title, post_url, category):
     except Exception as e:
         print("[페이스북 오류] " + str(e))
 
-
-def send_instagram(title, post_url, article_image, category):
-    instagram_account_id = os.environ.get("INSTAGRAM_ACCOUNT_ID", "")
-    if not instagram_account_id or not FACEBOOK_ACCESS_TOKEN:
-        return
-    if not article_image:
-        print("[인스타그램] 이미지 없어서 건너뜀")
-        return
-    emoji = CATEGORY_EMOJI.get(category, "📰")
-    caption = emoji + " " + title + "\n\n자세히 읽기 👉 " + post_url
-    try:
-        r1 = requests.post(
-            "https://graph.facebook.com/v19.0/" + instagram_account_id + "/media",
-            data={"image_url": article_image, "caption": caption, "access_token": FACEBOOK_ACCESS_TOKEN},
-            timeout=30
-        )
-        if r1.status_code != 200:
-            print("[인스타그램] 컨테이너 생성 실패: " + r1.text[:200])
-            return
-        creation_id = r1.json().get("id", "")
-        if not creation_id:
-            print("[인스타그램] creation_id 없음")
-            return
-        r2 = requests.post(
-            "https://graph.facebook.com/v19.0/" + instagram_account_id + "/media_publish",
-            data={"creation_id": creation_id, "access_token": FACEBOOK_ACCESS_TOKEN},
-            timeout=30
-        )
-        if r2.status_code == 200:
-            print("[인스타그램] 공유 성공!")
-        else:
-            print("[인스타그램] 발행 실패: " + r2.text[:200])
-    except Exception as e:
-        print("[인스타그램 오류] " + str(e))
-
-
 def post_to_blogger(post_data, retry=2):
     print("\n[Blogger] insaplayer 포스팅 시작...")
     category = post_data["category"]
-    # ✅ 수정3: 불필요한 태그 제거, 카테고리만 유지
     labels = [category]
 
     for attempt in range(1, retry + 2):
@@ -650,11 +524,12 @@ def post_to_blogger(post_data, retry=2):
             print("[시도 " + str(attempt) + "] " + post_data["title"])
             response = requests.post(url, headers=headers, json=payload, timeout=30)
             if response.status_code == 200:
-                post_url = response.json().get("url", "")
-                print("발행 완료! " + post_url)
+                raw_post_url = response.json().get("url", "")
+                # ?m=1 정제된 URL 확보
+                post_url = clean_url(raw_post_url)
+                print("발행 완료! (표준 URL): " + post_url)
                 send_telegram(post_data["title"], post_url, category)
                 send_facebook(post_data["title"], post_url, category)
-                send_instagram(post_data["title"], post_url, post_data.get("article_image", ""), category)
                 return True
             else:
                 print("실패: " + response.text[:200])
@@ -666,10 +541,9 @@ def post_to_blogger(post_data, retry=2):
                 time.sleep(10)
     return False
 
-
 if __name__ == "__main__":
     print("=" * 50)
-    print("insaplayer - 기사 원문 기반 시사칼럼 v10")
+    print("insaplayer - SEO 최적화 파이썬 포스팅 엔진 v11")
     print("실행 시각: " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 50)
 
